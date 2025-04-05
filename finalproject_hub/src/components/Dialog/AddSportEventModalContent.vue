@@ -23,6 +23,14 @@
             placeholder="Select sport"
         />
     </n-form-item>
+    <n-form-item label="Description">
+    <n-input
+        v-model:value="formValue.description"
+        type="textarea"
+        placeholder="e.g. Hosted by John, bring water, etc."
+        :autosize="{ minRows: 3, maxRows: 6 }"
+    />
+    </n-form-item>
     <n-form-item>
         <div style="width: 100%; text-align: right;">
             <n-button type="primary" @click="handleSubmit" color="orange">Add Event</n-button>
@@ -50,7 +58,8 @@ const formValue = reactive({
   participants: 1,
   ageRange: '',
   eventTime: null as null | number,
-  sportType: null as null | string
+  sportType: null as null | string,
+  description: ''
 })
 
 const sportOptions = [
