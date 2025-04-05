@@ -31,58 +31,40 @@
     </n-form>
 </template>
   
-<script lang="ts">
-import { defineComponent, reactive } from 'vue'
+<script setup lang="ts">
+import { reactive } from 'vue'
 import {
-    NForm,
-    NFormItem,
-    NInput,
-    NInputNumber,
-    NDatePicker,
-    NSelect,
-    NButton
+  NForm,
+  NFormItem,
+  NInput,
+  NInputNumber,
+  NDatePicker,
+  NSelect,
+  NButton
 } from 'naive-ui'
 
-export default defineComponent({
-    name: 'AddSportEventForm',
-    components: {
-        NForm,
-        NFormItem,
-        NInput,
-        NInputNumber,
-        NDatePicker,
-        NSelect,
-        NButton
-    },
-    setup(_, { emit }) {
-        const formValue = reactive({
-        location: '',
-        participants: 1,
-        ageRange: '',
-        eventTime: null as null | number,
-        sportType: null as null | string
-        })
+const emit = defineEmits(['submit'])
 
-        const sportOptions = [
-        { label: 'Football', value: 'football' },
-        { label: 'Basketball', value: 'basketball' },
-        { label: 'Tennis', value: 'tennis' },
-        { label: 'Running', value: 'running' }
-        ]
-
-        const handleSubmit = () => {
-            console.log('Submitted:', { ...formValue })
-            emit('submit')
-        }
-
-        return {
-            formValue,
-            sportOptions,
-            handleSubmit
-        }
-    }
+const formValue = reactive({
+  location: '',
+  participants: 1,
+  ageRange: '',
+  eventTime: null as null | number,
+  sportType: null as null | string
 })
+
+const sportOptions = [
+  { label: 'Football', value: 'football' },
+  { label: 'Basketball', value: 'basketball' },
+  { label: 'Tennis', value: 'tennis' },
+  { label: 'Running', value: 'running' }
+]
+
+const handleSubmit = () => {
+    emit('submit', { ...formValue })
+}
 </script>
+
 
 <style>
 
