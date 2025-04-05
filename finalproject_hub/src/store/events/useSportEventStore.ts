@@ -6,6 +6,7 @@ export interface SportEvent {
   ageRange: string
   eventTime: number | null
   sportType: string | null
+  description: string | null
 }
 
 export const useSportEventStore = defineStore('sportEvent', {
