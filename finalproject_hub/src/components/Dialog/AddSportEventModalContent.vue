@@ -1,8 +1,16 @@
 <template>
     <n-form :model="formValue" label-placement="top">
     <n-form-item label="Location">
-        <n-input v-model:value="formValue.location" placeholder="e.g. Central Park" />
+        <LocationSearch 
+            v-model="formValue.location"
+            @location-selected="onLocationSelected"
+        />
+        <div v-if="locationError" style="color: red; margin-top: 6px;">
+            {{ locationError }}
+        </div>
     </n-form-item>
+
+
 
     <n-form-item label="Number of Participants">
         <n-input-number v-model:value="formValue.participants" :min="1" />
@@ -40,7 +48,7 @@
 </template>
   
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import {
   NForm,
   NFormItem,
@@ -50,11 +58,14 @@ import {
   NSelect,
   NButton
 } from 'naive-ui'
+import LocationSearch from '../GMaps/LocationSearch.vue'
 
 const emit = defineEmits(['submit'])
+const locationError = ref('')
 
 const formValue = reactive({
-  location: '',
+  locationLat: 0,
+  locationLng: 0,
   participants: 1,
   ageRange: '',
   eventTime: null as null | number,
@@ -69,9 +80,21 @@ const sportOptions = [
   { label: 'Running', value: 'running' }
 ]
 
-const handleSubmit = () => {
-    emit('submit', { ...formValue })
+const onLocationSelected = ({ lat, lng }: { lat: number, lng: number }) => {
+  formValue.locationLat = lat
+  formValue.locationLng = lng
+  locationError.value = ''
 }
+
+const handleSubmit = () => {
+  if (!formValue.locationLat || !formValue.locationLng) {
+    locationError.value = 'Please select a valid location.'
+    return
+  }
+
+  emit('submit', { ...formValue })
+}
+
 </script>
 
 

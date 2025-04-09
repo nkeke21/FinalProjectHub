@@ -7,8 +7,15 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    vue(),
-    vueDevTools(),
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) =>
+            ['gmpx-api-loader', 'gmpx-place-picker', 'gmp-map', 'gmp-advanced-marker'].includes(tag)
+        }
+      }
+    }),
+    vueDevTools()
   ],
   resolve: {
     alias: {

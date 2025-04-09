@@ -16,7 +16,8 @@
     "@vicons/ionicons5": "0.13.0",
     "@types/google.maps": "3.58.1",
     "axios": "1.8.4",
-    "@googlemaps/js-api-loader": "1.16.8"
+    "@googlemaps/js-api-loader": "1.16.8",
+    "vue-final-modal": "4.5.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.3",
