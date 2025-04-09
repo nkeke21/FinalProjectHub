@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import { defineComponent, ref } from 'vue'
 import { NModal, NButton } from 'naive-ui'
-import { useSportEventStore } from '../../store/events/useSportEventStore'
+import { useSportEventStore } from '../../../store/events/useSportEventStore'
 import AddSportEventModalContent from './AddSportEventModalContent.vue'
 
 const showModal = ref(false)
