@@ -76,28 +76,16 @@ import { LocationOutline as LocationIcon, CalendarOutline as CalendarIcon } from
 import CustomModal from '../Dialog/CustomModal.vue'
 import AddSportEventModalContent from '../Dialog/AddSportEventModalContent.vue'
 import { useSportEventStore } from '../../../store/events/useSportEventStore'
+import events from '../List/events.json'
+import { useRoute } from 'vue-router'
+
+
+const route = useRoute()
+
+const eventId = Number(route.params.id)
+const event = ref(events.find(e => e.id === eventId))
 
 const store = useSportEventStore()
-
-const event = ref({
-  id: 1, // assuming each event has a unique id
-  title: 'Sunday Basketball Match',
-  location: 'Didi Dighomi',
-  date: new Date('2025-04-30T15:12:08'),
-  joined: 5,
-  total: 10,
-  sportType: 'Basketball',
-  ageRange: '27-39',
-  host: 'John Doe',
-  description: 'Join us for a fun basketball match. Bring your own water and gear. Beginners are welcome!',
-  participantsList: [
-    { name: 'Luka', age: 28 },
-    { name: 'Ana', age: 30 },
-    { name: 'Nika', age: 27 },
-    { name: 'Giorgi', age: 31 },
-    { name: 'Sopo', age: 26 }
-  ]
-})
 
 const percentage = computed(() => Math.round((event.value.joined / event.value.total) * 100))
 const formattedDate = computed(() => event.value.date.toLocaleString())
@@ -116,8 +104,7 @@ const handleEditSubmit = (eventDetails: any) => {
 
 <style scoped>
     .event-detail {
-        padding: 16px;
-        max-width: 1000px;
+        width: 800px;
         margin: auto;
         font-family: sans-serif;
     }

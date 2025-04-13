@@ -1,6 +1,6 @@
 <template>
     <div class="table-container">
-        <n-data-table :columns="columns" :data="paginatedData" :row-props="rowProps" />
+        <n-data-table :columns="columns" :data="paginatedData" :row-props="rowProps" size="large"/>
         <Pagination
         :item-count="events.length"
         @page-change="handlePageChange"
@@ -12,11 +12,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { NDataTable } from 'naive-ui'
+import { useRouter } from 'vue-router'
 import Pagination from '../../common/Pagination.vue'
 import events  from './events.json'
 
 const currentPage = ref(1)
 const pageSize = ref(10)
+const router = useRouter()
 
 const columns = [
     { title: 'Host', key: 'host' },
@@ -30,6 +32,8 @@ const columns = [
 const paginatedData = computed(() => {
 const start = (currentPage.value - 1) * pageSize.value
 const end = currentPage.value * pageSize.value
+
+
 return events.slice(start, end).map(event => ({
         key: event.id,
         host: event.host,
@@ -52,7 +56,7 @@ const handlePageSizeChange = (size: number) => {
 const rowProps = (row: any) => ({
     style: 'cursor: pointer;',
     onClick: () => {
-        console.log(`Event by ${row.host} - ${row.sportType}`)
+        router.push(`/events/${row.key}`) // Navigate to event detail page
     }
 })
 </script>
