@@ -17,7 +17,6 @@ export const useSportEventStore = defineStore('sportEvent', {
   
   actions: {
     addEvent(event: SportEvent) {
-      event.id = Date.now() // Assign a unique id
       this.events.push(event)
       console.log('Event added to store:', event)
     },
