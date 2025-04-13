@@ -2,15 +2,10 @@
   <SportEventDetail/>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { defineComponent, ref } from 'vue'
+import AddSportEventModal from "./components/events/Dialog/AddSportEventModal.vue";
 import SportEventDetail from './components/events/Details/SportEventDetail.vue';
-
-export default defineComponent({
-  components: {
-    SportEventDetail
-  },
-})
 </script>
 
 <style scoped>
