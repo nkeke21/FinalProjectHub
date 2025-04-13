@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 
 export interface SportEvent {
-  location: string
+  locationLat: number | null
+  locationLng: number | null
   participants: number
   ageRange: string
   eventTime: number | null
