@@ -13,9 +13,8 @@
 import { ref } from 'vue'
 import CustomModal from './CustomModal.vue'
 import { NModal, NButton } from 'naive-ui'
-
 import AddSportEventModalContent from './AddSportEventModalContent.vue'
-import { useSportEventStore } from '../../store/events/useSportEventStore'
+import { useSportEventStore } from '../../../store/events/useSportEventStore'
 
 const showModal = ref(false)
 const store = useSportEventStore()

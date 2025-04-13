@@ -14,13 +14,23 @@ export const useSportEventStore = defineStore('sportEvent', {
   state: () => ({
     events: [] as SportEvent[]
   }),
+  
   actions: {
     addEvent(event: SportEvent) {
+      event.id = Date.now() // Assign a unique id
       this.events.push(event)
       console.log('Event added to store:', event)
+    },
+
+    updateEvent(updatedEvent: Partial<SportEvent>) {
+      if (updatedEvent) {
+        console.log('Event updated:', updatedEvent)
+      } else {
+        console.warn(`Event with id ${updatedEvent} not found`)
+      }
     }
   },
+  
   getters: {
-    eventCount: (state) => state.events.length
   }
 })

@@ -41,29 +41,32 @@
     </n-form-item>
     <n-form-item>
         <div style="width: 100%; text-align: right;">
-            <n-button type="primary" @click="handleSubmit" color="orange">Add Event</n-button>
+            <n-button type="primary" @click="handleSubmit" color="orange">{{ props.submitButtonText }}</n-button>
         </div>
     </n-form-item>
     </n-form>
 </template>
   
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, watchEffect } from 'vue'
 import {
-  NForm,
-  NFormItem,
-  NInput,
-  NInputNumber,
-  NDatePicker,
-  NSelect,
-  NButton
+  NForm, NFormItem, NInput, NInputNumber, NDatePicker, NSelect, NButton
 } from 'naive-ui'
-import LocationSearch from '../GMaps/LocationSearch.vue'
+import LocationSearch from '../../GMaps/LocationSearch.vue'
 
 const emit = defineEmits(['submit'])
+const props = defineProps({
+  initialData: {
+    type: Object,
+    default: null
+  },
+  submitButtonText: { type: String, default: 'Add Event' }
+})
+
 const locationError = ref('')
 
 const formValue = reactive({
+  location: '',
   locationLat: 0,
   locationLng: 0,
   participants: 1,
@@ -74,15 +77,27 @@ const formValue = reactive({
 })
 
 const sportOptions = [
-  { label: 'Football', value: 'football' },
-  { label: 'Basketball', value: 'basketball' },
-  { label: 'Tennis', value: 'tennis' },
-  { label: 'Running', value: 'running' }
+  { label: 'Football', value: 'Football' },
+  { label: 'Basketball', value: 'Basketball' },
+  { label: 'Tennis', value: 'Tennis' },
+  { label: 'Running', value: 'Running' }
 ]
 
-const onLocationSelected = ({ lat, lng }: { lat: number, lng: number }) => {
+watchEffect(() => {
+  if (props.initialData) {
+    formValue.location = props.initialData.location || ''
+    formValue.participants = props.initialData.total || 1
+    formValue.ageRange = props.initialData.ageRange || ''
+    formValue.eventTime = props.initialData.date ? new Date(props.initialData.date).getTime() : null
+    formValue.sportType = props.initialData.sportType || null
+    formValue.description = props.initialData.description || ''
+  }
+})
+
+const onLocationSelected = ({ lat, lng, name }: { lat: number, lng: number, name: string }) => {
   formValue.locationLat = lat
   formValue.locationLng = lng
+  formValue.location = name
   locationError.value = ''
 }
 
@@ -94,7 +109,6 @@ const handleSubmit = () => {
 
   emit('submit', { ...formValue })
 }
-
 </script>
 
 
