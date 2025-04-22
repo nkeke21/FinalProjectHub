@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Repository
 public class EventInMemoryRepository implements EventRepository {
-    private final Map<UUID, Event> events = new HashMap<UUID, Event>();
+    private final Map<UUID, Event> events = new HashMap<>();
 
     @Override
     public Event getById(UUID id) {

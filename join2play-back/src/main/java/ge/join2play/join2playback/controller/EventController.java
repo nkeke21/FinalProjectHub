@@ -1,6 +1,5 @@
 package ge.join2play.join2playback.controller;
 
-import ge.join2play.join2playback.model.Event;
 import ge.join2play.join2playback.model.EventRequest;
 import ge.join2play.join2playback.model.EventResponse;
 import ge.join2play.join2playback.service.EventService;

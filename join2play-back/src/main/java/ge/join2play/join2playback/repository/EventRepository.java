@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface EventRepository {
-    public Event getById(UUID id);
-    public void save(Event event);
-    public void update(Event event);
-    public void delete(UUID id);
-    public List<Event> getAll();
+    Event getById(UUID id);
+    void save(Event event);
+    void update(Event event);
+    void delete(UUID id);
+    List<Event> getAll();
 }
