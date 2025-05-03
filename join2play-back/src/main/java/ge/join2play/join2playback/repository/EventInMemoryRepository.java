@@ -43,4 +43,9 @@ public class EventInMemoryRepository implements EventRepository {
     public List<Event> getAll() {
         return new ArrayList<>(events.values());
     }
+
+    @Override
+    public void clear() {
+        events.clear();
+    }
 }
