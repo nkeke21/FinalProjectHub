@@ -7,8 +7,8 @@ import java.util.UUID;
 
 public interface EventRepository {
     Event getById(UUID id);
-    void save(Event event);
-    void update(Event event);
+    Event save(Event event);
+    Event update(Event event);
     void delete(UUID id);
     List<Event> getAll();
 }

@@ -37,16 +37,16 @@ public class EventService {
                 event.getLatitude(), event.getLongitude(), event.getNumberOfParticipants(), event.getSportType());
     }
 
-    public void createEvent(EventRequest eventRequest) {
-        eventRepository.save(convertEventRequestToEvent(eventRequest));
+    public EventResponse createEvent(EventRequest eventRequest) {
+        return convertEventToEventResponse(eventRepository.save(convertEventRequestToEvent(eventRequest)));
     }
 
     public EventResponse getEvent(UUID id) {
         return convertEventToEventResponse(eventRepository.getById(id));
     }
 
-    public void updateEvent(EventRequest eventRequest, UUID id) {
-        eventRepository.update(convertEventRequestToEvent(eventRequest));
+    public EventResponse updateEvent(EventRequest eventRequest, UUID id) {
+        return convertEventToEventResponse(eventRepository.update(convertEventRequestToEvent(eventRequest)));
     }
 
     public List<EventResponse> getAllEvents() {

@@ -20,8 +20,8 @@ public class EventController {
     }
 
     @PostMapping
-    public void createEvent(@RequestBody EventRequest eventRequest) {
-        eventService.createEvent(eventRequest);
+    public EventResponse createEvent(@RequestBody EventRequest eventRequest) {
+        return eventService.createEvent(eventRequest);
     }
 
     @GetMapping("/{id}")
@@ -30,8 +30,8 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
-    public void updateEvent(@RequestBody EventRequest eventRequest, @PathVariable UUID id) {
-        eventService.updateEvent(eventRequest, id);
+    public EventResponse updateEvent(@RequestBody EventRequest eventRequest, @PathVariable UUID id) {
+        return eventService.updateEvent(eventRequest, id);
     }
 
     @GetMapping
