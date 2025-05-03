@@ -201,9 +201,9 @@ public class EventServiceTests {
         assertEquals(events.get(1).getId(), eventResponses.get(1).getEventId());
         assertEquals(events.get(0).getMinAge()+"-"+events.get(0).getMaxAge(), eventResponses.get(0).getAgeRange());
         assertEquals(events.get(0).getDescription(), eventResponses.get(0).getDescription());
-        assertEquals(events.get(0).getEventTime().toEpochMilli(), eventResponses.get(0).getEventTime());
-        assertEquals(events.get(0).getLatitude(), eventResponses.get(0).getLatitude());
-        assertEquals(events.get(0).getLongitude(), eventResponses.get(0).getLongitude());
+        assertEquals(events.getFirst().getEventTime().toEpochMilli(), eventResponses.getFirst().getEventTime());
+        assertEquals(events.getFirst().getLatitude(), eventResponses.getFirst().getLatitude());
+        assertEquals(events.getFirst().getLongitude(), eventResponses.getFirst().getLongitude());
         assertEquals(events.get(0).getNumberOfParticipants(), eventResponses.get(0).getNumberOfParticipants());
         assertEquals(events.get(0).getSportType(), eventResponses.get(0).getSportType());
         assertEquals(events.get(1).getMinAge()+"-"+events.get(1).getMaxAge(), eventResponses.get(1).getAgeRange());
