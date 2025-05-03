@@ -1,11 +1,9 @@
 package ge.join2play.join2playback.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import ge.join2play.join2playback.model.Event;
 import ge.join2play.join2playback.model.EventRequest;
 import ge.join2play.join2playback.model.EventResponse;
 import ge.join2play.join2playback.repository.EventInMemoryRepository;
-import ge.join2play.join2playback.service.EventService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +30,7 @@ public class EventControllerTests {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
     private EventInMemoryRepository eventRepository;
-
-    @Autowired
-    private EventService eventService;
 
     @BeforeEach
     void setUp() {
