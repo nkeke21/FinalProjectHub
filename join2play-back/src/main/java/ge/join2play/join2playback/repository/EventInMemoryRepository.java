@@ -4,10 +4,7 @@ import ge.join2play.join2playback.model.Event;
 import ge.join2play.join2playback.model.errors.EventDoesNotExistError;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 public class EventInMemoryRepository implements EventRepository {
@@ -19,16 +16,18 @@ public class EventInMemoryRepository implements EventRepository {
     }
 
     @Override
-    public void save(Event event) {
+    public Event save(Event event) {
         events.put(event.getId(), event);
+        return event;
     }
 
     @Override
-    public void update(Event event) {
+    public Event update(Event event) {
         Event oldEvent = events.replace(event.getId(), event);
         if (oldEvent == null) {
             throw new EventDoesNotExistError("Cannot update: event with ID " + event.getId() + " does not exist.");
         }
+        return event;
     }
 
     @Override
@@ -38,6 +37,6 @@ public class EventInMemoryRepository implements EventRepository {
 
     @Override
     public List<Event> getAll() {
-        return List.of();
+        return new ArrayList<>(events.values());
     }
 }
