@@ -3,6 +3,8 @@
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
       <module name="join2play" target="21" />
+      <module name="join2play.main" target="21" />
+      <module name="join2play.test" target="21" />
     </bytecodeTargetLevel>
   </component>
 </project>
