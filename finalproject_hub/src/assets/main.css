@@ -1,13 +1,15 @@
 @import './base.css';
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
 }
 
 a,
 .green {
  
+}
+body, html {
+  height: 100%;
+  width: 100%;
 }
 
 @media (hover: hover) {
@@ -15,7 +17,7 @@ a,
   }
 }
 
-@media (min-width: 1024px) {
+@media () {
   body {
     display: flex;
     place-items: center;
