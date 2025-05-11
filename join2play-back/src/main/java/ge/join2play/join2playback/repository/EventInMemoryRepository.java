@@ -1,6 +1,7 @@
 package ge.join2play.join2playback.repository;
 
 import ge.join2play.join2playback.model.Event;
+import ge.join2play.join2playback.model.errors.EventAlreadyExistsError;
 import ge.join2play.join2playback.model.errors.EventDoesNotExistError;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +18,9 @@ public class EventInMemoryRepository implements EventRepository {
 
     @Override
     public Event save(Event event) {
+        if (getById(event.getId()) != null) {
+            throw new EventAlreadyExistsError("Cannot save: event with ID " + event.getId() + "already exists.");
+        }
         events.put(event.getId(), event);
         return event;
     }
@@ -38,5 +42,10 @@ public class EventInMemoryRepository implements EventRepository {
     @Override
     public List<Event> getAll() {
         return new ArrayList<>(events.values());
+    }
+
+    @Override
+    public void clear() {
+        events.clear();
     }
 }

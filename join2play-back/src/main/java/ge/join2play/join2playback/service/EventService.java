@@ -46,7 +46,9 @@ public class EventService {
     }
 
     public EventResponse updateEvent(EventRequest eventRequest, UUID id) {
-        return convertEventToEventResponse(eventRepository.update(convertEventRequestToEvent(eventRequest)));
+        Event event = convertEventRequestToEvent(eventRequest);
+        event.setId(id);
+        return convertEventToEventResponse(eventRepository.update(event));
     }
 
     public List<EventResponse> getAllEvents() {

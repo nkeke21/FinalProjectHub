@@ -11,4 +11,5 @@ public interface EventRepository {
     Event update(Event event);
     void delete(UUID id);
     List<Event> getAll();
+    void clear();
 }
