@@ -1,6 +1,6 @@
 <template>
     <div>
-      <n-button color="orange" @click="showModal = true">Start me up</n-button>
+      <n-button color="orange" @click="showModal = true">Add Event</n-button>
   
       <CustomModal :show="showModal" @close="showModal = false">
         <h2 style="margin-bottom: 1rem;">Add Sport Event</h2>
