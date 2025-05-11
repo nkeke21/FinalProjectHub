@@ -1,73 +1,73 @@
 <template>
-  <div>
-    <n-card class="event-card" bordered>
-      <div class="event-detail">
-        <h1>{{ event.title }}</h1>
-        <div class="event-meta">
-          <div class="meta-item">
-            <n-icon :component="LocationIcon" />
-            <span>{{ event.location }}</span>
-          </div>
-          <div class="meta-item">
-            <n-icon :component="CalendarIcon" />
-            <span>{{ formattedDate }}</span>
-          </div>
-        </div>
-
-        <n-split direction="horizontal" style="height: auto;" :max="0.75" :min="0.25">
-          <template #1>
-            <div class="right-pane">
-              <n-card title="Event Details" :bordered="false">
-                <p><strong>Sport:</strong> {{ event.sportType }}</p>
-                <p><strong>Age Range:</strong> {{ event.ageRange }}</p>
-                <p><strong>Host:</strong> {{ event.host }}</p>
-              </n-card>
-              <n-card title="Description" style="margin-top: 16px;" :bordered="false">
-                <p>{{ event.description }}</p>
-              </n-card>
+    <div class="event-page">
+      <n-card class="event-card" bordered>
+        <div class="event-detail">
+          <h1>{{ event.title }}</h1>
+          <div class="event-meta">
+            <div class="meta-item">
+              <n-icon :component="LocationIcon" />
+              <span>{{ event.location }}</span>
             </div>
-          </template>
+            <div class="meta-item">
+              <n-icon :component="CalendarIcon" />
+              <span>{{ formattedDate }}</span>
+            </div>
+          </div>
 
-          <template #2>
-            <div class="left-pane">
-              <div class="progress">
-                <n-progress type="circle" color="green" :percentage="percentage">
-                  <template #default>
-                    <div class="progress-text">{{ event.joined }}/{{ event.total }}</div>
-                  </template>
-                </n-progress>
-                <div class="progress-label">Participants</div>
+          <n-split direction="horizontal" style="height: auto; height: 80%;" :max="0.75" :min="0.25">
+            <template #1>
+              <div class="right-pane">
+                <n-card title="Event Details" :bordered="false">
+                  <p><strong>Sport:</strong> {{ event.sportType }}</p>
+                  <p><strong>Age Range:</strong> {{ event.ageRange }}</p>
+                  <p><strong>Host:</strong> {{ event.host }}</p>
+                </n-card>
+                <n-card title="Description" style="margin-top: 16px;" :bordered="false">
+                  <p>{{ event.description }}</p>
+                </n-card>
               </div>
+            </template>
 
-              <n-card title="Participants" :bordered="false" style="margin-top: 24px;">
-                <ul>
-                  <li v-for="(participant, index) in event.participantsList" :key="index">
-                    {{ participant.name }} ({{ participant.age }} y/o)
-                  </li>
-                </ul>
-
-                <div style="text-align: right;">
-                  <n-button type="primary" color="orange" size="medium" @click="onEditClick">
-                    Edit
-                  </n-button>
+            <template #2>
+              <div class="left-pane">
+                <div class="progress">
+                  <n-progress type="circle" color="green" :percentage="percentage">
+                    <template #default>
+                      <div class="progress-text">{{ event.joined }}/{{ event.total }}</div>
+                    </template>
+                  </n-progress>
+                  <div class="progress-label">Participants</div>
                 </div>
-              </n-card>
-            </div>
-          </template>
-        </n-split>
 
-        <!-- Modal for editing -->
-        <CustomModal :show="showEditModal" @close="showEditModal = false">
-          <h2 style="margin-bottom: 1rem;">Edit Sport Event</h2>
-          <AddSportEventModalContent
-            :initial-data="event"
-            submit-button-text="Edit Event"
-            @submit="handleEditSubmit"
-          />
-        </CustomModal>
-      </div>
-    </n-card>
-    <h2 class="map-title">Location Map</h2>
+                <n-card title="Participants" :bordered="false" style="margin-top: 24px;">
+                  <ul>
+                    <li v-for="(participant, index) in event.participantsList" :key="index">
+                      {{ participant.name }} ({{ participant.age }} y/o)
+                    </li>
+                  </ul>
+
+                  <div style="text-align: right;">
+                    <n-button type="primary" color="orange" size="medium" @click="onEditClick">
+                      Edit
+                    </n-button>
+                  </div>
+                </n-card>
+              </div>
+            </template>
+          </n-split>
+
+          <!-- Modal for editing -->
+          <CustomModal :show="showEditModal" @close="showEditModal = false">
+            <h2 style="margin-bottom: 1rem;">Edit Sport Event</h2>
+            <AddSportEventModalContent
+              :initial-data="event"
+              submit-button-text="Edit Event"
+              @submit="handleEditSubmit"
+            />
+          </CustomModal>
+        </div>
+      </n-card>
+      <h2 class="map-title">Location Map</h2>
     <div id="map" class="google-map"></div>
   </div>
 </template>
@@ -144,68 +144,81 @@ const handleEditSubmit = (eventDetails: any) => {
 </script>
 
 <style scoped>
-  .event-detail {
-      width: 800px;
-      margin: auto;
-      font-family: sans-serif;
-  }
+.event-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 16px;
+}
 
-  .event-card {
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-      border-radius: 12px;
-  }
+.event-card {
+  width: 65%;
+  height: 60%;
+  margin: 0 auto 32px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+}
 
-  .event-meta {
-      display: flex;
-      gap: 16px;
-      margin: 8px 0 24px;
-  }
+.event-detail {
+  width: 100%;
+  height: 100%;
+  font-family: sans-serif;
+}
 
-  .meta-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #555;
-  }
 
-  .left-pane, .right-pane {
-      padding: 16px;
-  }
+.event-meta {
+    display: flex;
+    gap: 16px;
+    margin: 8px 0 24px;
+}
 
-  .progress {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-  }
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #555;
+}
 
-  .progress-text {
-      font-size: 16px;
-      font-weight: bold;
-  }
+.left-pane, .right-pane {
+    padding: 16px;
+}
 
-  .progress-label {
-      margin-top: 8px;
-      font-size: 14px;
-      color: #666;
-  }
+.progress {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-  .google-map {
-    width: 800px;
-    height: 400px;
-    margin: 2rem auto 0;
-    border-radius: 12px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-  }
+.progress-text {
+    font-size: 16px;
+    font-weight: bold;
+}
 
-  .map-title {
-    max-width: 800px;
-    margin: 2rem auto 0;
-    font-size: 20px;
-    font-weight: 600;
-    text-align: center;
-    color: #333;
-  }
+.progress-label {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #666;
+}
+
+.google-map {
+  width: 65%;
+  height: 40%;
+  margin: 2rem auto 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.map-title {
+  max-width: 800px;
+  margin: 2rem auto 0;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  color: #333;
+}
 
 </style>
   
