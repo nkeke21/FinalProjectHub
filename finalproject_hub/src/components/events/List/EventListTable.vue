@@ -1,39 +1,48 @@
 <template>
-    <div class="table-container">
-        <n-space justify="start" style="margin-bottom: 16px;">
-            <n-dropdown
-                trigger="click"
-                :options="[{ label: 'Sport Type', key: 'sport-type' }]"
-                @select="handleFilterSelect"
-                >
-                <n-button type="primary" color="orange">
-                    Add Filter
-                </n-button>
-            </n-dropdown>
+  <div class="table-container">
+      <div class="table-toolbar">
+        <div class="left-controls">
+          <n-dropdown
+            trigger="click"
+            :options="[{ label: 'Sport Type', key: 'sport-type' }]"
+            @select="handleFilterSelect"
+          >
+            <n-button type="primary" color="green">
+              Add Filter
+            </n-button>
+          </n-dropdown>
 
-            <n-popselect
-                v-if="showSportTypeSelector"
-                v-model:value="selectedSportType"
-                :options="sportTypeOptions"
-                >
-                <n-button>
-                    {{ selectedSportType || 'Sport Type' }}
-                </n-button>
-            </n-popselect>
-        </n-space>
-  
-        <n-data-table
-            :columns="columns"
-            :data="paginatedData"
-            :row-props="rowProps"
-            size="large"
-        />
-        <Pagination
-            :item-count="filteredEvents.length"
-            @page-change="handlePageChange"
-            @page-size-change="handlePageSizeChange"
-        />
-    </div>
+          <n-popselect
+            v-if="showSportTypeSelector"
+            v-model:value="selectedSportType"
+            :options="sportTypeOptions"
+          >
+            <n-button>
+              {{ selectedSportType || 'Sport Type' }}
+            </n-button>
+          </n-popselect>
+        </div>
+
+        <div class="right-controls">
+          <AddSportEventModal />
+        </div>
+      </div>
+
+
+      <n-data-table
+        :columns="columns"
+        :data="paginatedData"
+        :row-props="rowProps"
+        :row-class-name="() => 'custom-row-height'"
+        size="large"
+      />
+
+      <Pagination
+          :item-count="filteredEvents.length"
+          @page-change="handlePageChange"
+          @page-size-change="handlePageSizeChange"
+      />
+  </div>
 </template>
   
 <script setup lang="ts">
@@ -41,6 +50,7 @@ import { computed, ref, watch } from 'vue'
 import { NDropdown, NButton, NSpace, NDataTable, NPopselect } from 'naive-ui'
 import { useRouter } from 'vue-router'
 import Pagination from '../../common/Pagination.vue'
+import AddSportEventModal from '../Dialog/AddSportEventModal.vue'
 import events  from './events.json'
 
 const currentPage = ref(1)
@@ -127,4 +137,30 @@ const rowProps = (row: any) => ({
     margin: 40px auto;
     padding: 20px;
 }
+
+.table-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.left-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.right-controls {
+  display: flex;
+}
+
+.custom-row-height {
+  height: 100px !important;
+}
+
+.n-data-table .n-data-table__th {
+  font-size: 18px;
+  font-weight: bold;
+}
+
 </style>
