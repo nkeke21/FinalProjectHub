@@ -20,7 +20,7 @@ const showModal = ref(false)
 const store = useSportEventStore()
 
 const handleAddEvent = (eventDetails: any) => {
-    store.addEvent(eventDetails)
+    store.createEvent(eventDetails)
     showModal.value = false
 }
 </script>

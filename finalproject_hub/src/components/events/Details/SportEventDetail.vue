@@ -1,73 +1,78 @@
 <template>
-    <div class="event-page">
-      <n-card class="event-card" bordered>
-        <div class="event-detail">
-          <h1>{{ event.title }}</h1>
-          <div class="event-meta">
-            <div class="meta-item">
-              <n-icon :component="LocationIcon" />
-              <span>{{ event.location }}</span>
-            </div>
-            <div class="meta-item">
-              <n-icon :component="CalendarIcon" />
-              <span>{{ formattedDate }}</span>
-            </div>
+  <div class="event-page">
+    <n-card class="event-card" bordered>
+      <div v-if="event" class="event-detail">
+        <h1>{{ event.title }}</h1>
+        <div class="event-meta">
+          <div class="meta-item">
+            <n-icon :component="LocationIcon" />
+            <span>{{ event.location }}</span>
           </div>
-
-          <n-split direction="horizontal" style="height: auto; height: 80%;" :max="0.75" :min="0.25">
-            <template #1>
-              <div class="right-pane">
-                <n-card title="Event Details" :bordered="false">
-                  <p><strong>Sport:</strong> {{ event.sportType }}</p>
-                  <p><strong>Age Range:</strong> {{ event.ageRange }}</p>
-                  <p><strong>Host:</strong> {{ event.host }}</p>
-                </n-card>
-                <n-card title="Description" style="margin-top: 16px;" :bordered="false">
-                  <p>{{ event.description }}</p>
-                </n-card>
-              </div>
-            </template>
-
-            <template #2>
-              <div class="left-pane">
-                <div class="progress">
-                  <n-progress type="circle" color="green" :percentage="percentage">
-                    <template #default>
-                      <div class="progress-text">{{ event.joined }}/{{ event.total }}</div>
-                    </template>
-                  </n-progress>
-                  <div class="progress-label">Participants</div>
-                </div>
-
-                <n-card title="Participants" :bordered="false" style="margin-top: 24px;">
-                  <ul>
-                    <li v-for="(participant, index) in event.participantsList" :key="index">
-                      {{ participant.name }} ({{ participant.age }} y/o)
-                    </li>
-                  </ul>
-
-                  <div style="text-align: right;">
-                    <n-button type="primary" color="orange" size="medium" @click="onEditClick">
-                      Edit
-                    </n-button>
-                  </div>
-                </n-card>
-              </div>
-            </template>
-          </n-split>
-
-          <!-- Modal for editing -->
-          <CustomModal :show="showEditModal" @close="showEditModal = false">
-            <h2 style="margin-bottom: 1rem;">Edit Sport Event</h2>
-            <AddSportEventModalContent
-              :initial-data="event"
-              submit-button-text="Edit Event"
-              @submit="handleEditSubmit"
-            />
-          </CustomModal>
+          <div class="meta-item">
+            <n-icon :component="CalendarIcon" />
+            <span>{{ formattedDate }}</span>
+          </div>
         </div>
-      </n-card>
-      <h2 class="map-title">Location Map</h2>
+
+        <n-split direction="horizontal" style="height: auto; height: 80%;" :max="0.75" :min="0.25">
+          <template #1>
+            <div class="right-pane">
+              <n-card title="Event Details" :bordered="false">
+                <p><strong>Sport:</strong> {{ event.sportType }}</p>
+                <p><strong>Age Range:</strong> {{ event.ageRange }}</p>
+                <p><strong>Host:</strong> {{ event.host }}</p>
+              </n-card>
+              <n-card title="Description" style="margin-top: 16px;" :bordered="false">
+                <p>{{ event.description }}</p>
+              </n-card>
+            </div>
+          </template>
+
+          <template #2>
+            <div class="left-pane">
+              <div class="progress">
+                <n-progress type="circle" color="green" :percentage="percentage">
+                  <template #default>
+                    <div class="progress-text">{{ event.joined }}/{{ event.total }}</div>
+                  </template>
+                </n-progress>
+                <div class="progress-label">Participants</div>
+              </div>
+
+              <n-card title="Participants" :bordered="false" style="margin-top: 24px;">
+                <ul>
+                  <li v-for="(participant, index) in event.participantsList" :key="index">
+                    {{ participant.name }} ({{ participant.age }} y/o)
+                  </li>
+                </ul>
+
+                <div style="text-align: right;">
+                  <n-button type="primary" color="orange" size="medium" @click="onEditClick">
+                    Edit
+                  </n-button>
+                </div>
+              </n-card>
+            </div>
+          </template>
+        </n-split>
+
+        <!-- Modal for editing -->
+        <CustomModal :show="showEditModal" @close="showEditModal = false">
+          <h2 style="margin-bottom: 1rem;">Edit Sport Event</h2>
+          <AddSportEventModalContent
+            :initial-data="event"
+            submit-button-text="Edit Event"
+            @submit="handleEditSubmit"
+          />
+        </CustomModal>
+      </div>
+      <div v-else style="text-align: center; padding: 40px;">
+        <n-spin size="large" />
+        <p>Loading event...</p>
+      </div>
+    </n-card>
+
+    <h2 class="map-title">Location Map</h2>
     <div id="map" class="google-map"></div>
   </div>
 </template>
@@ -77,12 +82,20 @@
 import { ref, computed, onMounted  } from 'vue'
 import { NProgress, NCard, NIcon, NSplit, NButton } from 'naive-ui'
 import { LocationOutline as LocationIcon, CalendarOutline as CalendarIcon } from '@vicons/ionicons5'
+import { SportEvent } from '../../../models/SportEvent'
+import { useSportEventStore } from '../../../store/events/useSportEventStore'
+import { useRoute } from 'vue-router'
 import CustomModal from '../Dialog/CustomModal.vue'
 import AddSportEventModalContent from '../Dialog/AddSportEventModalContent.vue'
-import { useSportEventStore } from '../../../store/events/useSportEventStore'
-import events from '../List/events.json'
-import { useRoute } from 'vue-router'
 
+const route = useRoute();
+const store = useSportEventStore()
+
+onMounted(async () => {
+  console.log("mounted")
+  await store.fetchEventById(route.params.id as string)
+  initMap()
+})
 
 const loadGoogleMapsScript = () => {
   return new Promise((resolve, reject) => {
@@ -103,33 +116,32 @@ const loadGoogleMapsScript = () => {
 const initMap = async () => {
   const google = await loadGoogleMapsScript()
 
+  const location = event.value
+    ? { lat: event.value.locationLat, lng: event.value.locationLng }
+    : { lat: 37.7866, lng: -122.4133 }
+
   const map = new google.maps.Map(document.getElementById('map') as HTMLElement, {
     zoom: 13,
-    center: { lat: 37.7866, lng: -122.4133 },
+    center: location,
     mapId: 'DEMO_MAP_ID'
   })
 
   new google.maps.Marker({
-    position: { lat: 37.7866, lng: -122.4133 },
+    position: location,
     map,
     title: 'Event Location'
   })
 }
 
-onMounted(() => {
-  initMap()
-})
+const event = computed(() => store.selectedEvent)
 
+const percentage = computed(() =>
+  event.value?.total ? Math.round((event.value.joined / event.value.total) * 100) : 0
+)
 
-const route = useRoute()
-
-const eventId = Number(route.params.id)
-const event = ref(events.find(e => e.id === eventId))
-
-const store = useSportEventStore()
-
-const percentage = computed(() => Math.round((event.value.joined / event.value.total) * 100))
-const formattedDate = computed(() => event.value.date.toLocaleString())
+const formattedDate = computed(() =>
+  event.value?.date ? event.value.date.toLocaleString() : ''
+)
 
 const showEditModal = ref(false)
 
@@ -137,9 +149,10 @@ const onEditClick = () => {
   showEditModal.value = true
 }
 
-const handleEditSubmit = (eventDetails: any) => {
-  store.updateEvent(eventDetails)
+const handleEditSubmit = async (eventDetails: SportEvent) => {
+  await store.updateEvent(route.params.id as string, eventDetails)
   showEditModal.value = false
+  console.log("Event updated successfully!")
 }
 </script>
 
