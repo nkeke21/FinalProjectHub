@@ -80,7 +80,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted  } from 'vue'
-import { NProgress, NCard, NIcon, NSplit, NButton } from 'naive-ui'
+import { NProgress, NCard, NIcon, NSplit, NButton, useMessage } from 'naive-ui'
 import { LocationOutline as LocationIcon, CalendarOutline as CalendarIcon } from '@vicons/ionicons5'
 import { SportEvent } from '../../../models/SportEvent'
 import { useSportEventStore } from '../../../store/events/useSportEventStore'
@@ -90,6 +90,7 @@ import AddSportEventModalContent from '../Dialog/AddSportEventModalContent.vue'
 
 const route = useRoute();
 const store = useSportEventStore()
+const message = useMessage()
 
 onMounted(async () => {
   console.log("mounted")
@@ -150,9 +151,13 @@ const onEditClick = () => {
 }
 
 const handleEditSubmit = async (eventDetails: SportEvent) => {
-  await store.updateEvent(route.params.id as string, eventDetails)
-  showEditModal.value = false
-  console.log("Event updated successfully!")
+  try {
+    await store.updateEvent(route.params.id as string, eventDetails)
+    showEditModal.value = false
+    message.success('Event updated successfully!')
+  } catch (err) {
+    message.error('Failed to update the event. Please try again.')
+  }
 }
 </script>
 

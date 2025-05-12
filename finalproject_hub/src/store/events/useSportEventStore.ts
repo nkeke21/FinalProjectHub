@@ -27,7 +27,7 @@ export const useSportEventStore = defineStore('sportEvent', {
     
           this.selectedEvent = {
             ...updatedEvent,
-            id // Optional: preserve ID in selectedEvent
+            id
           }
         }
       } catch (error) {
