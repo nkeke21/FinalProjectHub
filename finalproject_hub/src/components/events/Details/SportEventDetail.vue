@@ -1,19 +1,19 @@
 <template>
   <div class="event-page">
     <n-card class="event-card" bordered>
-        <n-spin :show="isUpdating" size="large">
+        <n-spin class="event-content" :show="isUpdating" size="large">
 
-        <div v-if="event" class="event-detail">
-          <h1>{{ event.title }}</h1>
-          <div class="event-meta">
-            <div class="meta-item">
-              <n-icon :component="LocationIcon" />
-              <span>{{ event.location }}</span>
-            </div>
-            <div class="meta-item">
-              <n-icon :component="CalendarIcon" />
-              <span>{{ formattedDate }}</span>
-            </div>
+          <div v-if="event" class="event-detail">
+            <h1>{{ event.title }}</h1>
+            <div class="event-meta">
+              <div class="meta-item">
+                <n-icon :component="LocationIcon" />
+                <span>{{ locationAddress }}</span>
+              </div>
+              <div class="meta-item">
+                <n-icon :component="CalendarIcon" />
+                <span>{{ formattedDate }}</span>
+              </div>
           </div>
 
           <n-split direction="horizontal" style="height: auto; height: 80%;" :max="0.75" :min="0.25">
@@ -95,6 +95,7 @@ const route = useRoute();
 const store = useSportEventStore()
 const message = useMessage()
 const isUpdating = ref(false)
+const locationAddress = ref<string>('Loading location...')
 
 onMounted(async () => {
   isUpdating.value = true
@@ -103,8 +104,14 @@ onMounted(async () => {
 })
 
 watch(isUpdating, async (newVal) => {
-  if (!newVal) {
+  if (!newVal && event.value) {
     await initMap()
+
+    try {
+      locationAddress.value = await reverseGeocode(event.value.locationLat, event.value.locationLng)
+    } catch (err) {
+      locationAddress.value = 'Unknown location'
+    }
   }
 })
 
@@ -121,6 +128,23 @@ const loadGoogleMapsScript = () => {
     script.onload = () => resolve((window as any).google)
     script.onerror = reject
     document.head.appendChild(script)
+  })
+}
+
+const reverseGeocode = async (lat: number, lng: number) => {
+  const google = await loadGoogleMapsScript()
+
+  const geocoder = new google.maps.Geocoder()
+  const latlng = { lat, lng }
+
+  return new Promise<string>((resolve, reject) => {
+    geocoder.geocode({ location: latlng }, (results, status) => {
+      if (status === 'OK' && results[0]) {
+        resolve(results[0].formatted_address)
+      } else {
+        reject('Unable to retrieve address.')
+      }
+    })
   })
 }
 
@@ -176,7 +200,7 @@ const handleEditSubmit = async (eventDetails: SportEvent) => {
 }
 </script>
 
-<style scoped>
+<style>
 .event-page {
   width: 100%;
   display: flex;
@@ -193,12 +217,15 @@ const handleEditSubmit = async (eventDetails: SportEvent) => {
   border-radius: 12px;
 }
 
+.event-content {
+  height: 100%;
+}
+
 .event-detail {
   width: 100%;
   height: 100%;
   font-family: sans-serif;
 }
-
 
 .event-meta {
     display: flex;
@@ -268,5 +295,8 @@ const handleEditSubmit = async (eventDetails: SportEvent) => {
   color: #333;
 }
 
+.n-spin-content {
+  height: 100%;
+}
 </style>
   
