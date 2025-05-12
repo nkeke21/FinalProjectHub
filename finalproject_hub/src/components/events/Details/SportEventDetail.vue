@@ -1,19 +1,19 @@
 <template>
   <div class="event-page">
     <n-card class="event-card" bordered>
-        <n-spin :show="isUpdating" size="large">
+        <n-spin class="event-content" :show="isUpdating" size="large">
 
-        <div v-if="event" class="event-detail">
-          <h1>{{ event.title }}</h1>
-          <div class="event-meta">
-            <div class="meta-item">
-              <n-icon :component="LocationIcon" />
-              <span>{{ event.location }}</span>
-            </div>
-            <div class="meta-item">
-              <n-icon :component="CalendarIcon" />
-              <span>{{ formattedDate }}</span>
-            </div>
+          <div v-if="event" class="event-detail">
+            <h1>{{ event.title }}</h1>
+            <div class="event-meta">
+              <div class="meta-item">
+                <n-icon :component="LocationIcon" />
+                <span>{{ event.location }}</span>
+              </div>
+              <div class="meta-item">
+                <n-icon :component="CalendarIcon" />
+                <span>{{ formattedDate }}</span>
+              </div>
           </div>
 
           <n-split direction="horizontal" style="height: auto; height: 80%;" :max="0.75" :min="0.25">
@@ -176,7 +176,7 @@ const handleEditSubmit = async (eventDetails: SportEvent) => {
 }
 </script>
 
-<style scoped>
+<style>
 .event-page {
   width: 100%;
   display: flex;
@@ -193,12 +193,15 @@ const handleEditSubmit = async (eventDetails: SportEvent) => {
   border-radius: 12px;
 }
 
+.event-content {
+  height: 100%;
+}
+
 .event-detail {
   width: 100%;
   height: 100%;
   font-family: sans-serif;
 }
-
 
 .event-meta {
     display: flex;
@@ -268,5 +271,8 @@ const handleEditSubmit = async (eventDetails: SportEvent) => {
   color: #333;
 }
 
+.n-spin-content {
+  height: 100%;
+}
 </style>
   
