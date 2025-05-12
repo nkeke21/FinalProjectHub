@@ -1,12 +1,15 @@
 <template>
-	<div class="app">
-		<Sidebar />
+	<n-message-provider>
+		<div class="app">
+			<Sidebar />
 
-		<router-view />
-	</div>
+			<router-view />
+		</div>
+	</n-message-provider>
 </template>
 
 <script setup>
+import { NMessageProvider } from 'naive-ui'
 import Sidebar from './components/Sidebar/Sidebar.vue'
 </script>
 
