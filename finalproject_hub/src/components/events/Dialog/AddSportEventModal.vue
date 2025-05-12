@@ -11,17 +11,27 @@
   
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import CustomModal from './CustomModal.vue'
-import { NModal, NButton } from 'naive-ui'
+import { NButton, useMessage } from 'naive-ui'
 import AddSportEventModalContent from './AddSportEventModalContent.vue'
 import { useSportEventStore } from '../../../store/events/useSportEventStore'
 
 const showModal = ref(false)
 const store = useSportEventStore()
+const message = useMessage()
+const router = useRouter()
 
-const handleAddEvent = (eventDetails: any) => {
-    store.createEvent(eventDetails)
+const handleAddEvent = async (eventDetails: any) => {
+  const newEventId = await store.createEvent(eventDetails)
+
+  if (newEventId) {
+    message.success('✅ Event created successfully!')
     showModal.value = false
+    router.push(`/events/${newEventId}`)
+  } else {
+    message.error('❌ Failed to create event. Please try again.')
+  }
 }
 </script>
 

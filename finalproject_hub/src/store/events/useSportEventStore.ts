@@ -35,21 +35,24 @@ export const useSportEventStore = defineStore('sportEvent', {
       }
     },    
 
-    async createEvent(event: SportEvent) {
+    async createEvent(event: SportEvent): Promise<string | null> {
       try {
         const response = await createSportEvent(event)
-
-        if(!response.ok){
+    
+        if (!response.ok) {
           const errorData = await response.json()
           console.error('Error creating event: ', errorData)
+          return null
         } else {
           const result = await response.json()
-          console.log('Event created: ', result)
+          console.log('✅ Event created: ', result)
+          return result.eventId // assuming this is the ID returned from backend
         }
       } catch (error) {
-        console.error('Failed to send event: ', error)
+        console.error('❌ Failed to send event: ', error)
+        return null
       }
-    },
+    },    
 
     async fetchEventById(id: string) {
       try {
