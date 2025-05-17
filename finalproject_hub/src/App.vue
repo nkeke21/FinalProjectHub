@@ -2,8 +2,8 @@
 	<n-message-provider>
 		<div class="app">
 			<Sidebar />
-
-			<router-view />
+			<ProfileComponent />
+			<!-- <router-view /> -->
 		</div>
 	</n-message-provider>
 </template>
@@ -11,6 +11,7 @@
 <script setup>
 import { NMessageProvider } from 'naive-ui'
 import Sidebar from './components/Sidebar/Sidebar.vue'
+import ProfileComponent from './components/profile/ProfileComponent.vue';
 </script>
 
 <style lang="scss">
