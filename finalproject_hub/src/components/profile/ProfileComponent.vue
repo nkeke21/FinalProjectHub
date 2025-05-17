@@ -22,8 +22,8 @@ import { ref, computed } from 'vue'
 import { NButton, NMenu, NTag } from 'naive-ui'
 
 import AccountDetails from '@/components/profile/AccountDetails.vue'
-// import HostedEvents from '@/components/HostedEvents.vue'
-// import RegisteredEvents from '@/components/RegisteredEvents.vue'
+import HostedEvents from '@/components/profile/HostedEvents.vue'
+import RegisteredEvents from '@/components/profile/RegisteredEvents.vue'
 
 const menuOptions = [
     { label: 'Hosted Events', key: 'hosted-events' },
@@ -40,13 +40,13 @@ const handleMenuChange = (key: string) => {
 const currentComponent = computed(() => {
   switch (selectedKey.value) {
     case 'hosted-events':
-      return;
+      return HostedEvents
     case 'account-details':
-      return AccountDetails;
+      return AccountDetails
     case 'registered-events':
-      return;
+      return RegisteredEvents
     default:
-      return;
+      return AccountDetails
   }
 })
 
@@ -55,6 +55,7 @@ const currentComponent = computed(() => {
 <style scoped>
 .account-container {
     display: flex;
+    width: 100%;
     min-height: 100vh;
 }
 

@@ -23,11 +23,10 @@
           </n-popselect>
         </div>
 
-        <div class="right-controls">
+        <div class="right-controls" v-if="showAddEvent !== false">
           <AddSportEventModal />
         </div>
       </div>
-
 
       <n-data-table
         :columns="columns"
@@ -52,6 +51,10 @@ import { useRouter } from 'vue-router'
 import Pagination from '../../common/Pagination.vue'
 import AddSportEventModal from '../Dialog/AddSportEventModal.vue'
 import events  from './events.json'
+
+defineProps<{
+  showAddEvent?: boolean
+}>()
 
 const currentPage = ref(1)
 const pageSize = ref(10)
