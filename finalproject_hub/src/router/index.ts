@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import EventListPage from '@/components/events/List/EventListPage.vue'
 import SportEventDetail from '@/components/events/Details/SportEventDetail.vue'
+import AboutPage from '@/components/about/AboutPage.vue' 
 
 const routes = [
   {
@@ -13,6 +14,11 @@ const routes = [
     name: 'SportEventDetail',
     component: SportEventDetail,
     props: true
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: AboutPage
   }
 ]
 
