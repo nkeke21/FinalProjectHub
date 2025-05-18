@@ -1,5 +1,5 @@
 <template>
-  <div class="table-container">
+    <div class="table-container">
       <div class="table-toolbar">
         <div class="left-controls">
           <n-dropdown
@@ -7,9 +7,7 @@
             :options="[{ label: 'Sport Type', key: 'sport-type' }]"
             @select="handleFilterSelect"
           >
-            <n-button type="primary" color="green">
-              Add Filter
-            </n-button>
+            <n-button type="primary" color="green">Add Filter</n-button>
           </n-dropdown>
 
           <n-popselect
@@ -17,9 +15,7 @@
             v-model:value="selectedSportType"
             :options="sportTypeOptions"
           >
-            <n-button>
-              {{ selectedSportType || 'Sport Type' }}
-            </n-button>
+            <n-button>{{ selectedSportType || 'Sport Type' }}</n-button>
           </n-popselect>
         </div>
 
@@ -37,11 +33,11 @@
       />
 
       <Pagination
-          :item-count="filteredEvents.length"
-          @page-change="handlePageChange"
-          @page-size-change="handlePageSizeChange"
+        :item-count="filteredEvents.length"
+        @page-change="handlePageChange"
+        @page-size-change="handlePageSizeChange"
       />
-  </div>
+    </div>
 </template>
   
 <script setup lang="ts">
@@ -50,27 +46,17 @@ import { NDropdown, NButton, NSpace, NDataTable, NPopselect } from 'naive-ui'
 import { useRouter } from 'vue-router'
 import Pagination from '../../common/Pagination.vue'
 import AddSportEventModal from '../Dialog/AddSportEventModal.vue'
-import events  from './events.json'
 
-defineProps<{
+const props = defineProps<{
+  events: any[]
   showAddEvent?: boolean
 }>()
 
 const currentPage = ref(1)
 const pageSize = ref(10)
-const router = useRouter()
-
-const columns = [
-    { title: 'Host', key: 'host' },
-    { title: 'Address', key: 'location' },
-    { title: 'Date', key: 'formattedDate' },
-    { title: 'Age Range', key: 'ageRange' },
-    { title: 'Participants', key: 'participants' },
-    { title: 'Sport Type', key: 'sportType' },
-]
-
 const showSportTypeSelector = ref(false)
 const selectedSportType = ref<string | null>(null)
+const router = useRouter()
 
 const sportTypeOptions = [
   { label: 'Football', value: 'Football' },
@@ -80,17 +66,20 @@ const sportTypeOptions = [
   { label: 'Cycling', value: 'Cycling' },
 ]
 
-const filterOptions = [
-  {
-    label: 'Sport Type',
-    key: 'sport-type'
-  },
+const columns = [
+  { title: 'Host', key: 'host' },
+  { title: 'Address', key: 'location' },
+  { title: 'Date', key: 'formattedDate' },
+  { title: 'Age Range', key: 'ageRange' },
+  { title: 'Participants', key: 'participants' },
+  { title: 'Sport Type', key: 'sportType' }
 ]
 
+// Computed filtering and pagination
 const filteredEvents = computed(() => {
-  return events.filter(event => {
-    return !selectedSportType.value || event.sportType === selectedSportType.value
-  })
+    return props.events.filter(event => {
+        return !selectedSportType.value || event.sportType === selectedSportType.value
+    })
 })
 
 const paginatedData = computed(() => {
@@ -104,10 +93,11 @@ const paginatedData = computed(() => {
     formattedDate: new Date(event.date).toLocaleString(),
     ageRange: event.ageRange,
     participants: `${event.joined}/${event.total}`,
-    sportType: event.sportType,
+    sportType: event.sportType
   }))
 })
 
+// Handlers
 const handleFilterSelect = (key: string) => {
   if (key === 'sport-type') {
     showSportTypeSelector.value = true
@@ -119,18 +109,18 @@ watch(selectedSportType, () => {
 })
 
 const handlePageChange = (page: number) => {
-    currentPage.value = page
+  currentPage.value = page
 }
 
 const handlePageSizeChange = (size: number) => {
-    pageSize.value = size
+  pageSize.value = size
 }
 
 const rowProps = (row: any) => ({
-    style: 'cursor: pointer;',
-    onClick: () => {
-        router.push(`/events/${row.key}`) // Navigate to event detail page
-    }
+  style: 'cursor: pointer;',
+  onClick: () => {
+    router.push(`/events/${row.key}`)
+  }
 })
 </script>
 

@@ -83,11 +83,6 @@ const currentComponent = computed(() => {
     font-weight: bold;
 }
 
-.price-text {
-    margin: 0 0 30px;
-    color: #888;
-}
-
 .plan-section {
     display: flex;
     gap: 20px;
