@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import EventListTable from '@/components/events/List/EventListTable.vue'
+import EventListPage from '@/components/events/List/EventListPage.vue'
 import SportEventDetail from '@/components/events/Details/SportEventDetail.vue'
 
 const routes = [
   {
     path: '/',
     name: 'EventList',
-    component: EventListTable
+    component: EventListPage
   },
   {
     path: '/events/:id',

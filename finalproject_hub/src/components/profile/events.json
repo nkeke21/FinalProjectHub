@@ -1,0 +1,46 @@
+[
+    {
+      "id": 1,
+      "host": "John Doe",
+      "location": "Didi Dighomi",
+      "date": "2025-04-30T15:12:08",
+      "joined": 5,
+      "total": 10,
+      "sportType": "Basketball",
+      "ageRange": "27-39",
+      "description": "Friendly basketball game, beginners welcome!"
+    },
+    {
+      "id": 2,
+      "host": "Jane Smith",
+      "location": "Saburtalo Arena",
+      "date": "2025-05-05T12:00:00",
+      "joined": 8,
+      "total": 8,
+      "sportType": "Football",
+      "ageRange": "20-30",
+      "description": "Competitive football match."
+    },
+    {
+      "id": 3,
+      "host": "Alex Johnson",
+      "location": "Vake Park",
+      "date": "2025-06-10T18:00:00",
+      "joined": 2,
+      "total": 5,
+      "sportType": "Running",
+      "ageRange": "18-25",
+      "description": "Casual evening run."
+    },
+    {
+      "id": 4,
+      "host": "Michael Brown",
+      "location": "Lisi Lake",
+      "date": "2025-07-15T09:00:00",
+      "joined": 10,
+      "total": 15,
+      "sportType": "Running",
+      "ageRange": "25-35",
+      "description": "Morning trail run at the lake."
+    }
+]
