@@ -1,23 +1,39 @@
 package ge.join2play.join2playback.model;
 
+import java.util.UUID;
+
 public class EventRequest {
+    private UUID hostId;
     private String ageRange;
     private String description;
     private long eventTime;
     private double latitude;
     private double longitude;
-    private int numberOfParticipants;
+    private String location;
+    private int numberOfParticipantsTotal;
+    private int numberOfParticipantsRegistered;
     private String sportType;
 
-    public EventRequest(String ageRange, String description, long eventTime, double latitude,
-                        double longitude, int numberOfParticipants, String sportType) {
+    public EventRequest(UUID hostId, String ageRange, String description, long eventTime, double latitude,
+                        double longitude, String location, int numberOfParticipantsTotal, int numberOfParticipantsRegistered, String sportType) {
+        this.hostId = hostId;
         this.ageRange = ageRange;
         this.description = description;
         this.eventTime = eventTime;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.numberOfParticipants = numberOfParticipants;
+        this.location = location;
+        this.numberOfParticipantsTotal = numberOfParticipantsTotal;
+        this.numberOfParticipantsRegistered = numberOfParticipantsRegistered;
         this.sportType = sportType;
+    }
+
+    public UUID getHostId() {
+        return hostId;
+    }
+
+    public void setHostId(UUID hostId) {
+        this.hostId = hostId;
     }
 
     public String getAgeRange() {
@@ -60,12 +76,12 @@ public class EventRequest {
         this.longitude = longitude;
     }
 
-    public int getNumberOfParticipants() {
-        return numberOfParticipants;
+    public int getNumberOfParticipantsTotal() {
+        return numberOfParticipantsTotal;
     }
 
-    public void setNumberOfParticipants(int numberOfParticipants) {
-        this.numberOfParticipants = numberOfParticipants;
+    public void setNumberOfParticipantsTotal(int numberOfParticipantsTotal) {
+        this.numberOfParticipantsTotal = numberOfParticipantsTotal;
     }
 
     public String getSportType() {
@@ -74,5 +90,21 @@ public class EventRequest {
 
     public void setSportType(String sportType) {
         this.sportType = sportType;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public int getNumberOfParticipantsRegistered() {
+        return numberOfParticipantsRegistered;
+    }
+
+    public void setNumberOfParticipantsRegistered(int numberOfParticipantsRegistered) {
+        this.numberOfParticipantsRegistered = numberOfParticipantsRegistered;
     }
 }
