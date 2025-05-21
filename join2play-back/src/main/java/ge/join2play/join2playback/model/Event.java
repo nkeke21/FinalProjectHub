@@ -6,25 +6,31 @@ import java.time.Instant;
 
 public class Event {
     private UUID id;
+    private UUID hostId;
     private int minAge;
     private int maxAge;
     private String description;
     private Instant eventTime;
     private double latitude;
     private double longitude;
-    private int numberOfParticipants;
-    private String sportType;
+    private String location;
+    private int numberOfParticipantsTotal;
+    private int numberOfParticipantsRegistered;
+    private SportType sportType;
 
-    public Event(UUID id, int minAge, int maxAge, String description, Instant eventTime,
-                 double latitude, double longitude, int numberOfParticipants, String sportType) {
+    public Event(UUID id, UUID hostId, int minAge, int maxAge, String description, Instant eventTime,
+                 double latitude, double longitude, String location, int numberOfParticipantsTotal, int numberOfParticipantsRegistered, SportType sportType) {
         this.id = id;
+        this.hostId = hostId;
         this.minAge = minAge;
         this.maxAge = maxAge;
         this.description = description;
         this.eventTime = eventTime;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.numberOfParticipants = numberOfParticipants;
+        this.location = location;
+        this.numberOfParticipantsTotal = numberOfParticipantsTotal;
+        this.numberOfParticipantsRegistered = numberOfParticipantsRegistered;
         this.sportType = sportType;
     }
 
@@ -34,6 +40,14 @@ public class Event {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public UUID getHostId() {
+        return hostId;
+    }
+
+    public void setHostId(UUID hostId) {
+        this.hostId = hostId;
     }
 
     public int getMinAge() {
@@ -84,19 +98,35 @@ public class Event {
         this.longitude = longitude;
     }
 
-    public int getNumberOfParticipants() {
-        return numberOfParticipants;
+    public int getNumberOfParticipantsTotal() {
+        return numberOfParticipantsTotal;
     }
 
-    public void setNumberOfParticipants(int numberOfParticipants) {
-        this.numberOfParticipants = numberOfParticipants;
+    public void setNumberOfParticipantsTotal(int numberOfParticipantsTotal) {
+        this.numberOfParticipantsTotal = numberOfParticipantsTotal;
     }
 
-    public String getSportType() {
+    public SportType getSportType() {
         return sportType;
     }
 
-    public void setSportType(String sportType) {
+    public void setSportType(SportType sportType) {
         this.sportType = sportType;
+    }
+
+    public int getNumberOfParticipantsRegistered() {
+        return numberOfParticipantsRegistered;
+    }
+
+    public void setNumberOfParticipantsRegistered(int numberOfParticipantsRegistered) {
+        this.numberOfParticipantsRegistered = numberOfParticipantsRegistered;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }
