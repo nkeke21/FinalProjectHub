@@ -45,6 +45,11 @@ public class EventInMemoryRepository implements EventRepository {
     }
 
     @Override
+    public List<Event> getAllHostedBy(UUID userId) {
+        return getAll().stream().filter(event -> event.getHostId().equals(userId)).toList();
+    }
+
+    @Override
     public void clear() {
         events.clear();
     }
