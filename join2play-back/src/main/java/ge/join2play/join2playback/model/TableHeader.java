@@ -4,8 +4,6 @@ public class TableHeader {
     private String title;
     private String key;
 
-    public TableHeader() {}
-
     public TableHeader(String title, String key) {
         this.title = title;
         this.key = key;

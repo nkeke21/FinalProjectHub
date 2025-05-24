@@ -1,6 +1,5 @@
 package ge.join2play.join2playback.repository;
 
-import ge.join2play.join2playback.model.Event;
 import ge.join2play.join2playback.model.EventParticipant;
 
 import java.util.List;

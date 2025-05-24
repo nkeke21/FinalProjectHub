@@ -4,9 +4,6 @@ public class Option {
     private String label;
     private String value;
 
-    public Option() {
-    }
-
     public Option(String label, String value) {
         this.label = label;
         this.value = value;
