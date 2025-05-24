@@ -1,15 +1,15 @@
 package ge.join2play.join2playback.model;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 public class UserDetailsResponse {
     private String name;
     private String email;
     private String phoneNumber;
-    private Instant birthDate;
+    private LocalDate birthDate;
     private String description;
 
-    public UserDetailsResponse(String name, String email, String phoneNumber, Instant birthDate, String description) {
+    public UserDetailsResponse(String name, String email, String phoneNumber, LocalDate birthDate, String description) {
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
@@ -33,11 +33,11 @@ public class UserDetailsResponse {
         this.email = email;
     }
 
-    public Instant getBirthDate() {
+    public LocalDate getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(Instant birthDate) {
+    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
 
