@@ -1,8 +1,7 @@
 package ge.join2play.join2playback.controller;
 
-import ge.join2play.join2playback.model.EventRequest;
-import ge.join2play.join2playback.model.EventResponse;
-import ge.join2play.join2playback.service.EventService;
+import ge.join2play.join2playback.model.*;
+import ge.join2play.join2playback.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,30 +11,35 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/events")
 public class EventController {
-    private final EventService eventService;
+    private final ApplicationService applicationService;
 
     @Autowired
-    public EventController(EventService eventService) {
-        this.eventService = eventService;
+    public EventController(ApplicationService applicationService) {
+        this.applicationService = applicationService;
+    }
+
+    @GetMapping("/setup")
+    public SetupResponse getSetupInfo() {
+        return applicationService.getSetupInfo();
     }
 
     @PostMapping
     public EventResponse createEvent(@RequestBody EventRequest eventRequest) {
-        return eventService.createEvent(eventRequest);
+        return applicationService.createEvent(eventRequest);
     }
 
     @GetMapping("/{id}")
     public EventResponse getEvent(@PathVariable UUID id) {
-        return eventService.getEvent(id);
+        return applicationService.getEvent(id);
     }
 
     @PutMapping("/{id}")
     public EventResponse updateEvent(@RequestBody EventRequest eventRequest, @PathVariable UUID id) {
-        return eventService.updateEvent(eventRequest, id);
+        return applicationService.updateEvent(eventRequest, id);
     }
 
     @GetMapping
     public List<EventResponse> getEvents() {
-        return eventService.getAllEvents();
+        return applicationService.getAllEvents();
     }
 }
