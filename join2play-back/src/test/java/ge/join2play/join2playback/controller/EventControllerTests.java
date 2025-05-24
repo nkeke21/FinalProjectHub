@@ -3,7 +3,6 @@ package ge.join2play.join2playback.controller;
 import ge.join2play.join2playback.model.*;
 import ge.join2play.join2playback.repository.EventInMemoryRepository;
 import ge.join2play.join2playback.repository.UserInMemoryRepository;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
