@@ -16,20 +16,20 @@ export const useSportEventStore = defineStore('sportEvent', {
 
     async updateEvent(id: string, updatedEvent: SportEvent) {
       try {
-        const response = await updateSportEvent(id, updatedEvent)
+          const response = await updateSportEvent(id, updatedEvent)
+      
+          if (!response.ok) {
+              const errorData = await response.json()
+              console.error('Error updating event:', errorData)
+          } else {
+            const result = await response.json()
+            console.log('✅ Event updated:', result)
     
-        if (!response.ok) {
-          const errorData = await response.json()
-          console.error('Error updating event:', errorData)
-        } else {
-          const result = await response.json()
-          console.log('✅ Event updated:', result)
-    
-          this.selectedEvent = {
-            ...updatedEvent,
-            id
+            this.selectedEvent = {
+              ...updatedEvent,
+              id
+            }
           }
-        }
       } catch (error) {
         console.error('❌ Failed to update event:', error)
       }
@@ -46,7 +46,7 @@ export const useSportEventStore = defineStore('sportEvent', {
         } else {
           const result = await response.json()
           console.log('✅ Event created: ', result)
-          return result.eventId // assuming this is the ID returned from backend
+          return result.eventId
         }
       } catch (error) {
         console.error('❌ Failed to send event: ', error)

@@ -1,4 +1,4 @@
-import { API_BASE_URL, HEADERS } from "@/constants/apis"
+import { API_BASE_URL, HEADERS, ENDPOINTS } from "@/constants/apis"
 import { UserUpdateDTO } from "@/models/UserUpdateDTO"
 
 export interface UserDetailsResponse {
@@ -10,7 +10,7 @@ export interface UserDetailsResponse {
 }
 
 export async function getUserDetails(userId: string): Promise<UserDetailsResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/users/details/${userId}`, {
+    const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.USER_DETAILS(userId)}`, {
         method: 'GET',
         headers: HEADERS.JSON,
         credentials: 'include'
@@ -23,10 +23,10 @@ export async function getUserDetails(userId: string): Promise<UserDetailsRespons
     }
 
     return await response.json()
-}
+    }
 
-export async function updateUserDetails(userId: string, update: UserUpdateDTO): Promise<UserUpdateDTO> {
-    const response = await fetch(`${API_BASE_URL}/api/users/details/${userId}`, {
+    export async function updateUserDetails(userId: string, update: UserUpdateDTO): Promise<UserUpdateDTO> {
+    const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.USER_DETAILS(userId)}`, {
         method: 'PATCH',
         headers: HEADERS.JSON,
         credentials: 'include',

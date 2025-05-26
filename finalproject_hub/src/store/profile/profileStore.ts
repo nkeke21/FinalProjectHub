@@ -29,13 +29,13 @@ export const useProfileStore = defineStore('profile', {
             this.error = null
       
             try {
-              const updated = await updateUserDetails(userId, updateData)
-              this.profile = { ...this.profile, ...updated }
+                const updated = await updateUserDetails(userId, updateData)
+                this.profile = { ...this.profile, ...updated }
             } catch (err: any) {
-              this.error = err.message
-              throw err
+                this.error = err.message
+                throw err
             } finally {
-              this.isLoading = false
+                this.isLoading = false
             }
         }
     }
