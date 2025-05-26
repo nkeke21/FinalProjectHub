@@ -88,11 +88,11 @@ const paginatedData = computed(() => {
 
   return filteredEvents.value.slice(start, end).map(event => ({
     key: event.id,
-    host: event.host,
+    host: event.hostName,
     location: event.location,
-    formattedDate: new Date(event.date).toLocaleString(),
+    formattedDate: new Date(event.eventTime).toLocaleString(),
     ageRange: event.ageRange,
-    participants: `${event.joined}/${event.total}`,
+    participants: `${event.numberOfParticipantsRegistered}/${event.numberOfParticipantsTotal}`,
     sportType: event.sportType
   }))
 })

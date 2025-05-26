@@ -6,7 +6,7 @@
 
         <EventListTable
             v-else
-            :events="events"
+            :events="hostedEvents"
             :show-add-event="true"
         />
     </div>
@@ -14,17 +14,18 @@
   
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useProfileEventStore } from '@/store/profile/profileEventStore'
 import EventListTable from '@/components/events/List/EventListTable.vue'
 import { NSpin } from 'naive-ui'
 
-const events = ref<any[]>([])
-const isLoading = ref(true)
+const profileEventStore = useProfileEventStore()
+const { hostedEvents, isLoading } = storeToRefs(profileEventStore)
 
-onMounted(async () => {
-    await new Promise(resolve => setTimeout(resolve, 1500)) 
-    const json = await import('./events.json')
-    events.value = json.default
-    isLoading.value = false
+const userId = '13fa5e4e-1d9e-4a2a-9a20-7385f24e9097'
+
+onMounted(() => {
+    profileEventStore.fetchHostedEvents(userId)
 })
 </script>
   

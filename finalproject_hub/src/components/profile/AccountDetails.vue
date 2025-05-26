@@ -63,12 +63,18 @@
   </template>
   
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { NFormItem, NInput, NButton, NSkeleton } from 'naive-ui'
+import { ref, reactive, onMounted, watch } from 'vue'
+import { useProfileStore } from '@/store/profile/profileStore'
+import { NFormItem, NInput, NButton, NSkeleton, useMessage  } from 'naive-ui'
+import { storeToRefs } from 'pinia'
+import { UserUpdateDTO } from '@/models/UserUpdateDTO'
 
-const isLoading = ref(true)
+const profileStore = useProfileStore()
+const { profile, isLoading } = storeToRefs(profileStore)
+
 const isSubmitting = ref(false)
 const isEditing = ref(false)
+const message = useMessage()
 
 const originalData = reactive({
     name: '',
@@ -86,21 +92,17 @@ const formData = reactive({
     description: ''
 })
 
-// Simulate fetching from backend
+const userId = '13fa5e4e-1d9e-4a2a-9a20-7385f24e9097'
+
 onMounted(async () => {
-    await new Promise(resolve => setTimeout(resolve, 1200)) // simulate fetch delay
+    profileStore.fetchProfile(userId)
+})
 
-    const fetched = {
-        name: 'Nika Kekelishvili',
-        email: 'nkeke21@freeuni.edu.ge',
-        phoneNumber: '599343842',
-        birthDate: '2002-08-25',
-        description: 'I love basketball and coding!'
+watch(profile, (data) => {
+    if (data) {
+        Object.assign(originalData, data)
+        Object.assign(formData, data)
     }
-
-    Object.assign(originalData, fetched)
-    Object.assign(formData, fetched)
-    isLoading.value = false
 })
 
 function startEditing() {
@@ -109,21 +111,26 @@ function startEditing() {
 
 async function submitChanges() {
     isSubmitting.value = true
+    try {
+        const updateData: UserUpdateDTO = {
+            name: formData.name,
+            phoneNumber: formData.phoneNumber,
+            description: formData.description
+        }
 
-    await new Promise(resolve => setTimeout(resolve, 1500))
-
-    const updatedFromBackend = {
-        description: formData.description 
+        const updated = await profileStore.updateProfile(userId, updateData)
+        
+        isEditing.value = false
+        message.success('Your account details were updated successfully!')
+    } catch (error) {
+        console.error("Update failed:", error)
+        message.error('Failed to update account details.')
+    } finally {
+        isSubmitting.value = false
     }
-
-    Object.assign(originalData, updatedFromBackend)
-    Object.assign(formData, originalData)
-
-    isSubmitting.value = false
-    isEditing.value = false
 }
 
-    function cancelChanges() {
+function cancelChanges() {
     Object.assign(formData, originalData)
     isEditing.value = false
 }
