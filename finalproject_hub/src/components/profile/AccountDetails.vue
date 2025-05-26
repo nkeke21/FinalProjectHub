@@ -65,7 +65,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from 'vue'
 import { useProfileStore } from '@/store/profile/profileStore'
-import { NFormItem, NInput, NButton, NSkeleton } from 'naive-ui'
+import { NFormItem, NInput, NButton, NSkeleton, useMessage  } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { UserUpdateDTO } from '@/models/UserUpdateDTO'
 
@@ -74,6 +74,7 @@ const { profile, isLoading } = storeToRefs(profileStore)
 
 const isSubmitting = ref(false)
 const isEditing = ref(false)
+const message = useMessage()
 
 const originalData = reactive({
     name: '',
@@ -118,18 +119,12 @@ async function submitChanges() {
         }
 
         const updated = await profileStore.updateProfile(userId, updateData)
-
-        originalData.name = updated.name
-        originalData.phoneNumber = updated.phoneNumber
-        originalData.description = updated.description
-
-        formData.name = updated.name
-        formData.phoneNumber = updated.phoneNumber
-        formData.description = updated.description
-
+        
         isEditing.value = false
+        message.success('Your account details were updated successfully!')
     } catch (error) {
         console.error("Update failed:", error)
+        message.error('Failed to update account details.')
     } finally {
         isSubmitting.value = false
     }
