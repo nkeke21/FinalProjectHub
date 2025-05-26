@@ -86,18 +86,18 @@ public class ApplicationService {
     }
 
     public List<EventResponse> getUserHostedEvents(UUID id) {
-//        if(userRepository.getById(id) == null){
-//            throw new UserDoesNotExistError(
-//                    String.format("User with id %s does not exist.", id));
-//        }
+        if(userRepository.getById(id) == null){
+            throw new UserDoesNotExistError(
+                    String.format("User with id %s does not exist.", id));
+        }
         return eventRepository.getAllHostedBy(id).stream().map(this::convertEventToEventResponse).collect(Collectors.toList());
     }
 
     public List<EventResponse> getUserRegisteredEvents(UUID id) {
-//        if(userRepository.getById(id) == null){
-//            throw new UserDoesNotExistError(
-//                    String.format("User with id %s does not exist.", id));
-//        }
+        if(userRepository.getById(id) == null){
+            throw new UserDoesNotExistError(
+                    String.format("User with id %s does not exist.", id));
+        }
         List<EventParticipant> eventParticipants = eventParticipantsRepository.getAllEventsParticipating(id);
         return eventParticipants.stream().map(ep -> eventRepository.getById(ep.getEventId())).map(this::convertEventToEventResponse).collect(Collectors.toList());
     }
