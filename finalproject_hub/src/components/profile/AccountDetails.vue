@@ -63,10 +63,15 @@
   </template>
   
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
+import { useProfileStore } from '@/store/profile/profileStore'
 import { NFormItem, NInput, NButton, NSkeleton } from 'naive-ui'
+import { storeToRefs } from 'pinia'
+import { UserUpdateDTO } from '@/models/UserUpdateDTO'
 
-const isLoading = ref(true)
+const profileStore = useProfileStore()
+const { profile, isLoading } = storeToRefs(profileStore)
+
 const isSubmitting = ref(false)
 const isEditing = ref(false)
 
@@ -86,21 +91,17 @@ const formData = reactive({
     description: ''
 })
 
-// Simulate fetching from backend
+const userId = '13fa5e4e-1d9e-4a2a-9a20-7385f24e9097'
+
 onMounted(async () => {
-    await new Promise(resolve => setTimeout(resolve, 1200)) // simulate fetch delay
+    profileStore.fetchProfile(userId)
+})
 
-    const fetched = {
-        name: 'Nika Kekelishvili',
-        email: 'nkeke21@freeuni.edu.ge',
-        phoneNumber: '599343842',
-        birthDate: '2002-08-25',
-        description: 'I love basketball and coding!'
+watch(profile, (data) => {
+    if (data) {
+        Object.assign(originalData, data)
+        Object.assign(formData, data)
     }
-
-    Object.assign(originalData, fetched)
-    Object.assign(formData, fetched)
-    isLoading.value = false
 })
 
 function startEditing() {
@@ -109,21 +110,32 @@ function startEditing() {
 
 async function submitChanges() {
     isSubmitting.value = true
+    try {
+        const updateData: UserUpdateDTO = {
+            name: formData.name,
+            phoneNumber: formData.phoneNumber,
+            description: formData.description
+        }
 
-    await new Promise(resolve => setTimeout(resolve, 1500))
+        const updated = await profileStore.updateProfile(userId, updateData)
 
-    const updatedFromBackend = {
-        description: formData.description 
+        originalData.name = updated.name
+        originalData.phoneNumber = updated.phoneNumber
+        originalData.description = updated.description
+
+        formData.name = updated.name
+        formData.phoneNumber = updated.phoneNumber
+        formData.description = updated.description
+
+        isEditing.value = false
+    } catch (error) {
+        console.error("Update failed:", error)
+    } finally {
+        isSubmitting.value = false
     }
-
-    Object.assign(originalData, updatedFromBackend)
-    Object.assign(formData, originalData)
-
-    isSubmitting.value = false
-    isEditing.value = false
 }
 
-    function cancelChanges() {
+function cancelChanges() {
     Object.assign(formData, originalData)
     isEditing.value = false
 }

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { SportEvent } from '@/models/sportEvent'
-import { getUserRegisteredEvents, getUserHostedEvents  } from '@/services/apis/ProfileEventService'
+import { getUserRegisteredEvents, getUserHostedEvents } from '@/services/apis/ProfileEventService'
 
 export const useProfileEventStore = defineStore('profileEvent', {
     state: () => ({
