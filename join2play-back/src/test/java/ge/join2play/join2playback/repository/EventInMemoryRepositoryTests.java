@@ -1,6 +1,7 @@
 package ge.join2play.join2playback.repository;
 
 import ge.join2play.join2playback.model.Event;
+import ge.join2play.join2playback.model.SportType;
 import ge.join2play.join2playback.model.errors.EventAlreadyExistsError;
 import ge.join2play.join2playback.model.errors.EventDoesNotExistError;
 import org.junit.jupiter.api.AfterEach;
@@ -18,20 +19,24 @@ public class EventInMemoryRepositoryTests {
     private Event sampleEvent;
     private final Instant eventTime = Instant.parse("2025-04-16T10:15:30.00Z");
     private final UUID eventId = UUID.fromString("e5d1d580-a4cf-4677-8220-a50c5decccfa");
+    private final UUID hostId = UUID.fromString("3d6005f9-f84d-43fa-a9f5-e15b51cdbe56");
 
     @BeforeEach
     void setUp() {
         repository = new EventInMemoryRepository();
         sampleEvent = new Event(
                 eventId,
+                hostId,
                 18,
                 25,
                 "Football Match",
                 eventTime,
                 41.725788,
                 44.727753,
+                "Tbilisi",
                 10,
-                "Football"
+                5,
+                SportType.FOOTBALL
                 );
     }
 
@@ -46,13 +51,16 @@ public class EventInMemoryRepositoryTests {
         Event result = repository.getById(eventId);
         assertNotNull(result);
         assertEquals(result.getId(), sampleEvent.getId());
+        assertEquals(result.getHostId(), sampleEvent.getHostId());
         assertEquals(result.getMinAge(), sampleEvent.getMinAge());
         assertEquals(result.getMaxAge(), sampleEvent.getMaxAge());
         assertEquals(result.getDescription(), sampleEvent.getDescription());
         assertEquals(result.getEventTime(), sampleEvent.getEventTime());
         assertEquals(result.getLatitude(), sampleEvent.getLatitude());
         assertEquals(result.getLongitude(), sampleEvent.getLongitude());
-        assertEquals(result.getNumberOfParticipants(), sampleEvent.getNumberOfParticipants());
+        assertEquals(result.getLocation(), sampleEvent.getLocation());
+        assertEquals(result.getNumberOfParticipantsTotal(), sampleEvent.getNumberOfParticipantsTotal());
+        assertEquals(result.getNumberOfParticipantsRegistered(), sampleEvent.getNumberOfParticipantsRegistered());
         assertEquals(result.getSportType(), sampleEvent.getSportType());
     }
 
@@ -61,14 +69,17 @@ public class EventInMemoryRepositoryTests {
         repository.save(sampleEvent);
         Event updatedEvent = new Event(
                 sampleEvent.getId(),
+                sampleEvent.getHostId(),
                 20,
                 30,
                 "Updated Football Match",
                 eventTime,
                 41.725788,
                 44.727753,
+                "Tbilisi",
                 15,
-                "Football"
+                7,
+                SportType.FOOTBALL
         );
 
         Event result = repository.update(updatedEvent);
@@ -80,14 +91,17 @@ public class EventInMemoryRepositoryTests {
     public void testUpdateNonexistentEventThrowsException() {
         Event nonExistentEvent = new Event(
                 UUID.randomUUID(),
+                hostId,
                 20,
                 30,
                 "Nonexistent Event",
                 eventTime,
                 41.725788,
                 44.727753,
-                15,
-                "Basketball"
+                "Tbilisi"
+                ,15,
+                9,
+                SportType.BASKETBALL
         );
 
         assertThrows(EventDoesNotExistError.class, () -> repository.update(nonExistentEvent),
@@ -113,14 +127,17 @@ public class EventInMemoryRepositoryTests {
     public void testGetAllEvents() {
         Event anotherEvent = new Event(
                 UUID.randomUUID(),
+                hostId,
                 16,
                 40,
                 "Basketball Game",
                 Instant.parse("2025-05-01T15:20:00.00Z"),
                 40.123456,
                 43.654321,
+                "New location",
                 12,
-                "Basketball"
+                4,
+                SportType.BASKETBALL
         );
 
         repository.save(sampleEvent);
@@ -143,14 +160,17 @@ public class EventInMemoryRepositoryTests {
         repository.save(sampleEvent);
         Event sameIdEvent = new Event(
                 sampleEvent.getId(),
+                sampleEvent.getHostId(),
                 19,
                 26,
                 "Modified Football Match",
                 eventTime,
                 41.725788,
                 44.727753,
+                "Tbilisi",
                 11,
-                "Football"
+                6,
+                SportType.FOOTBALL
         );
 
         assertThrows(EventAlreadyExistsError.class, () -> repository.save(sameIdEvent));
