@@ -5,11 +5,28 @@ import ge.join2play.join2playback.model.errors.UserAlreadyExistsError;
 import ge.join2play.join2playback.model.errors.UserDoesNotExistError;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Repository
 public class UserInMemoryRepository implements UserRepository {
     private final Map<UUID, User> users = new HashMap<>();
+
+    public UserInMemoryRepository() {
+        UUID userId = UUID.fromString("13fa5e4e-1d9e-4a2a-9a20-7385f24e9097");
+
+        User user = new User(
+                userId,
+                "Kakha Salukvadze",
+                "kakha@example.com",
+                "+995555123456",
+                LocalDate.of(1995, 6, 15),
+                "Sports enthusiast and backend developer.",
+                "securepassword123"
+        );
+
+        users.put(userId, user);
+    }
 
     @Override
     public User getById(UUID id) {
