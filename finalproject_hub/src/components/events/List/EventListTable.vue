@@ -67,7 +67,7 @@ const sportTypeOptions = [
 ]
 
 const columns = [
-  { title: 'Host', key: 'host' },
+  { title: 'Host', key: 'hostName' },
   { title: 'Address', key: 'location' },
   { title: 'Date', key: 'formattedDate' },
   { title: 'Age Range', key: 'ageRange' },
@@ -75,7 +75,6 @@ const columns = [
   { title: 'Sport Type', key: 'sportType' }
 ]
 
-// Computed filtering and pagination
 const filteredEvents = computed(() => {
     return props.events.filter(event => {
         return !selectedSportType.value || event.sportType === selectedSportType.value
@@ -87,8 +86,8 @@ const paginatedData = computed(() => {
   const end = start + pageSize.value
 
   return filteredEvents.value.slice(start, end).map(event => ({
-    key: event.id,
-    host: event.hostName,
+    key: event.eventId,
+    hostName: event.hostName,
     location: event.location,
     formattedDate: new Date(event.eventTime).toLocaleString(),
     ageRange: event.ageRange,

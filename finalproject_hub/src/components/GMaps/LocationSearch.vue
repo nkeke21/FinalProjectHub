@@ -20,7 +20,8 @@ export default {
           if (place.location) {
             this.$emit('location-selected', {
               lat: place.location.lat(),
-              lng: place.location.lng()
+              lng: place.location.lng(),
+              name: place.formattedAddress
             })
           }
         }

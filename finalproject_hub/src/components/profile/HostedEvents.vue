@@ -13,7 +13,7 @@
 </template>
   
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useProfileEventStore } from '@/store/profile/profileEventStore'
 import EventListTable from '@/components/events/List/EventListTable.vue'

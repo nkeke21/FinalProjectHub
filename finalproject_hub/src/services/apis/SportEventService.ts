@@ -9,6 +9,14 @@ export async function getSportEventById(id: string): Promise<Response> {
     })
 }
 
+export async function getAllSportEvents(): Promise<Response> {
+    return fetch(`${API_BASE_URL}/api/events`, {
+        method: 'GET',
+        headers: HEADERS.JSON,
+        credentials: 'include'
+    })
+}
+
 export async function createSportEvent(event: SportEvent): Promise<Response> {
     return fetch(`${API_BASE_URL}/api${ENDPOINTS.CREATE_EVENT}`, {
         method: 'POST',
@@ -20,7 +28,8 @@ export async function createSportEvent(event: SportEvent): Promise<Response> {
             eventTime: event.eventTime,
             latitude: event.locationLat,
             longitude: event.locationLng,
-            numberOfParticipants: event.participants,
+            location: event.location,
+            numberOfParticipantsTotal: event.participants,
             sportType: event.sportType
         })
     })
@@ -37,9 +46,11 @@ export async function updateSportEvent(id: string, event: SportEvent): Promise<R
             eventTime: event.eventTime,
             latitude: event.locationLat,
             longitude: event.locationLng,
-            numberOfParticipants: event.participants,
+            location: event.location,
+            numberOfParticipantsTotal: event.participants,
             sportType: event.sportType
         })
     })
-  }
+}
+  
   

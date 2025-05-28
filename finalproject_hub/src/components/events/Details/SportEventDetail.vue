@@ -22,7 +22,7 @@
                 <n-card title="Event Details" :bordered="false">
                   <p><strong>Sport:</strong> {{ event.sportType }}</p>
                   <p><strong>Age Range:</strong> {{ event.ageRange }}</p>
-                  <p><strong>Host:</strong> {{ event.host }}</p>
+                  <p><strong>Host:</strong> {{ event.hostName }}</p>
                 </n-card>
                 <n-card title="Description" style="margin-top: 16px;" :bordered="false">
                   <p>{{ event.description }}</p>
@@ -33,11 +33,20 @@
             <template #2>
               <div class="left-pane">
                 <div class="progress">
-                  <n-progress type="circle" color="green" :percentage="percentage">
+                  <n-progress
+                      type="circle"
+                      :percentage="percentage"
+                      color="#34d399"
+                      rail-color="#f3f4f6" 
+                      style="width: 120px; height: 120px;"
+                    >
                     <template #default>
-                      <div class="progress-text">{{ event.joined }}/{{ event.total }}</div>
+                        <div class="progress-text">
+                            {{ event.numberOfParticipantsRegistered }}/{{ event.numberOfParticipantsTotal }}
+                        </div>
                     </template>
                   </n-progress>
+
                   <div class="progress-label">Participants</div>
                 </div>
 
@@ -96,6 +105,8 @@ const store = useSportEventStore()
 const message = useMessage()
 const isUpdating = ref(false)
 
+const event = computed(() => store.selectedEvent)
+
 onMounted(async () => {
   isUpdating.value = true
   await store.fetchEventById(route.params.id as string)
@@ -116,7 +127,7 @@ const loadGoogleMapsScript = () => {
 
     const script = document.createElement('script')
     script.src =
-      'https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places'
+      'https://maps.googleapis.com/maps/api/js?key=&libraries=places'
     script.async = true
     script.onload = () => resolve((window as any).google)
     script.onerror = reject
@@ -128,7 +139,7 @@ const initMap = async () => {
   const google = await loadGoogleMapsScript()
 
   const location = event.value
-    ? { lat: event.value.locationLat, lng: event.value.locationLng }
+    ? { lat: event.value.latitude, lng: event.value.longitude }
     : { lat: 37.7866, lng: -122.4133 }
 
   const map = new google.maps.Map(document.getElementById('map') as HTMLElement, {
@@ -144,10 +155,8 @@ const initMap = async () => {
   })
 }
 
-const event = computed(() => store.selectedEvent)
-
 const percentage = computed(() =>
-  event.value?.total ? Math.round((event.value.joined / event.value.total) * 100) : 0
+  event.value?.numberOfParticipantsTotal ? Math.round((event.value.numberOfParticipantsRegistered / event.value.numberOfParticipantsTotal) * 100) : 0
 )
 
 const formattedDate = computed(() =>
@@ -225,6 +234,7 @@ const handleEditSubmit = async (eventDetails: SportEvent) => {
     display: flex;
     flex-direction: column;
     align-items: center;
+    background-color: transparent;
 }
 
 .progress-text {
