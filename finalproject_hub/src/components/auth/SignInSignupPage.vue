@@ -28,8 +28,16 @@
 </template>
   
 <script setup>
+import { ref } from 'vue'
 import { NInput, NButton, NForm, NFormItem, NCard } from 'naive-ui'
 
+
+const username = ref('')
+const password = ref('')
+
+const signIn = () => {
+    console.log('Sign-in with', username.value, password.value)
+}
 </script>
   
 <style scoped>
@@ -58,6 +66,16 @@ import { NInput, NButton, NForm, NFormItem, NCard } from 'naive-ui'
     align-items: center;
     justify-content: center;
     background-color: white;
+}
+
+.auth-card {
+  width: 360px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.signup-switch {
+  margin-top: 16px;
+  text-align: center;
 }
 </style>
   
