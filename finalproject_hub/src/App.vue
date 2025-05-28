@@ -2,8 +2,8 @@
 	<n-message-provider>
 		<div class="app">
 			<Sidebar />
-			<ProfileComponent />
-			<!-- <router-view /> -->
+			<!-- <ProfileComponent /> -->
+			<router-view />
 		</div>
 	</n-message-provider>
 </template>
