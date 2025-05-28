@@ -15,12 +15,12 @@
                         <n-input type="password" v-model:value="password" placeholder="Enter password" />
                     </n-form-item>
 
-                    <n-button type="primary" @click="signIn">Sign In</n-button>
+                    <n-button type="primary" @click="signIn" color="orange">Sign In</n-button>
                 </n-form>
 
                 <div class="signup-switch">
                     Don't have an account?
-                    <n-button text @click="goToSignUp">Sign Up</n-button>
+                    <n-button text color="orange" @click="goToSignUp">Sign Up</n-button>
                 </div>
             </n-card>
         </div>
