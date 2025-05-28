@@ -22,7 +22,7 @@
                 <n-card title="Event Details" :bordered="false">
                   <p><strong>Sport:</strong> {{ event.sportType }}</p>
                   <p><strong>Age Range:</strong> {{ event.ageRange }}</p>
-                  <p><strong>Host:</strong> {{ event.host }}</p>
+                  <p><strong>Host:</strong> {{ event.hostName }}</p>
                 </n-card>
                 <n-card title="Description" style="margin-top: 16px;" :bordered="false">
                   <p>{{ event.description }}</p>
