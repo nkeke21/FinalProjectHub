@@ -5,12 +5,31 @@
         </div>
 
         <div class="right-panel">
-        
+            <n-card title="Sign In" class="auth-card">
+                <n-form>
+                    <n-form-item label="Username">
+                        <n-input v-model:value="username" placeholder="Enter username" />
+                    </n-form-item>
+
+                    <n-form-item label="Password">
+                        <n-input type="password" v-model:value="password" placeholder="Enter password" />
+                    </n-form-item>
+
+                    <n-button type="primary" @click="signIn">Sign In</n-button>
+                </n-form>
+
+                <div class="signup-switch">
+                    Don't have an account?
+                    <n-button text @click="goToSignUp">Sign Up</n-button>
+                </div>
+            </n-card>
         </div>
     </div>
 </template>
   
 <script setup>
+import { NInput, NButton, NForm, NFormItem, NCard } from 'naive-ui'
+
 </script>
   
 <style scoped>
