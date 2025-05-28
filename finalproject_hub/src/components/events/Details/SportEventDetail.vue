@@ -96,6 +96,8 @@ const store = useSportEventStore()
 const message = useMessage()
 const isUpdating = ref(false)
 
+const event = computed(() => store.selectedEvent)
+
 onMounted(async () => {
   isUpdating.value = true
   await store.fetchEventById(route.params.id as string)
@@ -116,7 +118,7 @@ const loadGoogleMapsScript = () => {
 
     const script = document.createElement('script')
     script.src =
-      'https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places'
+      'https://maps.googleapis.com/maps/api/js?key=&libraries=places'
     script.async = true
     script.onload = () => resolve((window as any).google)
     script.onerror = reject
@@ -128,7 +130,7 @@ const initMap = async () => {
   const google = await loadGoogleMapsScript()
 
   const location = event.value
-    ? { lat: event.value.locationLat, lng: event.value.locationLng }
+    ? { lat: event.value.latitude, lng: event.value.longitude }
     : { lat: 37.7866, lng: -122.4133 }
 
   const map = new google.maps.Map(document.getElementById('map') as HTMLElement, {
@@ -143,8 +145,6 @@ const initMap = async () => {
     title: 'Event Location'
   })
 }
-
-const event = computed(() => store.selectedEvent)
 
 const percentage = computed(() =>
   event.value?.total ? Math.round((event.value.joined / event.value.total) * 100) : 0

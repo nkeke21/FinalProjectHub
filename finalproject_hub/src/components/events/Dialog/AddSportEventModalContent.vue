@@ -97,6 +97,7 @@ watchEffect(() => {
 const onLocationSelected = ({ lat, lng, name }: { lat: number, lng: number, name: string }) => {
   formValue.locationLat = lat
   formValue.locationLng = lng
+  formValue.location = name
   locationError.value = ''
 }
 

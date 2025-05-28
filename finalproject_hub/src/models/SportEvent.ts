@@ -1,6 +1,8 @@
 export interface SportEvent {
-    locationLat: number | null
-    locationLng: number | null
+    eventId: string | null
+    hostName: string |null
+    latitude: number | null
+    longitude: number | null
     location: string
     participants: number
     ageRange: string

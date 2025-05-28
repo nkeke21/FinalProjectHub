@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { SportEvent } from '@/models/sportEvent'
-import { createSportEvent, getSportEventById, updateSportEvent } from '@/services/apis/SportEventService'
+import { createSportEvent, getSportEventById, updateSportEvent, getAllSportEvents  } from '@/services/apis/SportEventService'
 
 export const useSportEventStore = defineStore('sportEvent', {
   state: () => ({
@@ -55,34 +55,35 @@ export const useSportEventStore = defineStore('sportEvent', {
     },    
 
     async fetchEventById(id: string) {
+        try {
+          const response = await getSportEventById(id)
+          if (!response.ok) {
+            const errorData = await response.json()
+            console.error('Error fetching event:', errorData)
+            return
+          }
+      
+          this.selectedEvent = await response.json()
+        } catch (error) {
+          console.error('Failed to fetch event:', error)
+        }
+    },
+    
+    async fetchAllEvents() {
       try {
-        const response = await getSportEventById(id)
+        const response = await getAllSportEvents()
+    
         if (!response.ok) {
           const errorData = await response.json()
-          console.error('Error fetching event:', errorData)
+          console.error('Error fetching all events:', errorData)
           return
         }
     
-        const eventData = await response.json()
-    
-        this.selectedEvent = {
-          id: eventData.eventId,
-          ageRange: eventData.ageRange,
-          description: eventData.description,
-          date: new Date(eventData.eventTime), 
-          locationLat: eventData.latitude,
-          locationLng: eventData.longitude,
-          total: eventData.numberOfParticipants,
-          joined: 0, 
-          sportType: eventData.sportType,
-          location: 'Unknown', 
-          host: 'Unknown', 
-          participantsList: [] 
-        }
+        this.events = await response.json()
       } catch (error) {
-        console.error('Failed to fetch event:', error)
+        console.error('Failed to fetch all events:', error)
       }
-    }    
+    }
   },
 
   
