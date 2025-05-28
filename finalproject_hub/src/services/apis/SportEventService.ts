@@ -29,7 +29,7 @@ export async function createSportEvent(event: SportEvent): Promise<Response> {
             latitude: event.locationLat,
             longitude: event.locationLng,
             location: event.location,
-            numberOfParticipants: event.participants,
+            numberOfParticipantsTotal: event.participants,
             sportType: event.sportType
         })
     })
@@ -47,7 +47,7 @@ export async function updateSportEvent(id: string, event: SportEvent): Promise<R
             latitude: event.locationLat,
             longitude: event.locationLng,
             location: event.location,
-            numberOfParticipants: event.participants,
+            numberOfParticipantsTotal: event.participants,
             sportType: event.sportType
         })
     })
