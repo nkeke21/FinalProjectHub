@@ -38,6 +38,10 @@ const password = ref('')
 const signIn = () => {
     console.log('Sign-in with', username.value, password.value)
 }
+
+const goToSignUp = () => {
+  console.log('Switch to sign-up')
+}
 </script>
   
 <style scoped>
@@ -69,7 +73,7 @@ const signIn = () => {
 }
 
 .auth-card {
-  width: 360px;
+  width: 450px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
 }
 
