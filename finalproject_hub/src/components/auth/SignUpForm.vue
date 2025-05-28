@@ -34,7 +34,12 @@
                     <n-input type="password" v-model:value="password" placeholder="Create password" />
                 </n-form-item>
 
-                <n-form-item label="Repeat Password" class="half">
+                <n-form-item
+                    label="Repeat Password"
+                    class="half"
+                    :feedback="passwordMismatch ? 'Passwords do not match' : ''"
+                    :validation-status="passwordMismatch ? 'error' : undefined"
+                >
                     <n-input type="password" v-model:value="repeatPassword" placeholder="Repeat password" />
                 </n-form-item>
             </div>
@@ -52,7 +57,7 @@
 </template>
   
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { NInput, NButton, NForm, NFormItem, NCard, NDatePicker } from 'naive-ui'
 
 const name = ref('')
@@ -64,11 +69,12 @@ const description = ref('')
 const password = ref('')
 const repeatPassword = ref('')
 
+const passwordMismatch = computed(() => {
+  return repeatPassword.value && password.value !== repeatPassword.value
+})
+
 const signUp = () => {
-    if (password.value !== repeatPassword.value) {
-        alert('Passwords do not match!')
-        return
-    }
+    if (passwordMismatch.value) return
 
     console.log('Registering user:', {
         name: name.value,
