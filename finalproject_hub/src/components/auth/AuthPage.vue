@@ -46,15 +46,5 @@ const isSignIn = ref(true)
     justify-content: center;
     background-color: white;
 }
-
-.auth-card {
-  width: 450px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-}
-
-.signup-switch {
-  margin-top: 16px;
-  text-align: center;
-}
 </style>
   

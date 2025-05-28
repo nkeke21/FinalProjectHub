@@ -44,7 +44,7 @@
             </n-button>
         </n-form>
 
-        <div class="signup-switch">
+        <div class="signin-switch">
             Already have an account?
             <n-button text color="orange" @click="$emit('switchToSignIn')">Sign In</n-button>
         </div>
@@ -98,7 +98,7 @@ const signUp = () => {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
-.signup-switch {
+.signin-switch {
     margin-top: 20px;
     text-align: center;
 }
