@@ -33,11 +33,20 @@
             <template #2>
               <div class="left-pane">
                 <div class="progress">
-                  <n-progress type="circle" color="green" :percentage="percentage">
+                  <n-progress
+                      type="circle"
+                      :percentage="percentage"
+                      color="#34d399"
+                      rail-color="#f3f4f6" 
+                      style="width: 120px; height: 120px;"
+                    >
                     <template #default>
-                      <div class="progress-text">{{ event.joined }}/{{ event.total }}</div>
+                        <div class="progress-text">
+                            {{ event.numberOfParticipantsRegistered }}/{{ event.numberOfParticipantsTotal }}
+                        </div>
                     </template>
                   </n-progress>
+
                   <div class="progress-label">Participants</div>
                 </div>
 
@@ -147,7 +156,7 @@ const initMap = async () => {
 }
 
 const percentage = computed(() =>
-  event.value?.total ? Math.round((event.value.joined / event.value.total) * 100) : 0
+  event.value?.numberOfParticipantsTotal ? Math.round((event.value.numberOfParticipantsRegistered / event.value.numberOfParticipantsTotal) * 100) : 0
 )
 
 const formattedDate = computed(() =>
@@ -225,6 +234,7 @@ const handleEditSubmit = async (eventDetails: SportEvent) => {
     display: flex;
     flex-direction: column;
     align-items: center;
+    background-color: transparent;
 }
 
 .progress-text {
