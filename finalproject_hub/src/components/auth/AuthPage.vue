@@ -6,6 +6,7 @@
 
         <div class="right-panel">
             <SignInForm v-if="isSignIn" @switchToSignUp="isSignIn = false" />
+            <SignUpForm v-else @switchToSignIn="isSignIn = true" />
         </div>
     </div>
 </template>
@@ -13,6 +14,7 @@
 <script setup>
 import { ref } from 'vue'
 import SignInForm from './SignInForm.vue'
+import SignUpForm from './SignUpForm.vue'
 
 const isSignIn = ref(true)
 </script>
