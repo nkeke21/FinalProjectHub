@@ -3,6 +3,7 @@ import EventListPage from '@/components/events/List/EventListPage.vue'
 import SportEventDetail from '@/components/events/Details/SportEventDetail.vue'
 import AboutPage from '@/components/about/AboutPage.vue' 
 import AuthPageVue from '../components/auth/AuthPage.vue'
+import ProfileComponent from '@/components/profile/ProfileComponent.vue'
 
 const routes = [
   {
@@ -11,7 +12,7 @@ const routes = [
     component: AuthPageVue
   },
   {
-    path: '/',
+    path: '/homepage',
     name: 'EventList',
     component: EventListPage
   },
@@ -25,6 +26,11 @@ const routes = [
     path: '/about',
     name: 'About',
     component: AboutPage
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: ProfileComponent
   }
 ]
 
