@@ -1,7 +1,7 @@
 <template>
 	<n-message-provider>
 		<div class="app">
-			<Sidebar />
+			<Sidebar v-if="showSidebar" />
 			<!-- <ProfileComponent /> -->
 			<router-view />
 		</div>
@@ -10,8 +10,13 @@
 
 <script setup>
 import { NMessageProvider } from 'naive-ui'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import Sidebar from './components/Sidebar/Sidebar.vue'
 import ProfileComponent from './components/profile/ProfileComponent.vue';
+
+const route = useRoute()
+const showSidebar = computed(() => route.path !== '/')
 </script>
 
 <style lang="scss">
