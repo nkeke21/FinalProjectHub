@@ -1,17 +1,22 @@
 <template>
 	<n-message-provider>
 		<div class="app">
-			<Sidebar />
-			<ProfileComponent />
-			<!-- <router-view /> -->
+			<Sidebar v-if="showSidebar" />
+			<!-- <ProfileComponent /> -->
+			<router-view />
 		</div>
 	</n-message-provider>
 </template>
 
 <script setup>
 import { NMessageProvider } from 'naive-ui'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import Sidebar from './components/Sidebar/Sidebar.vue'
 import ProfileComponent from './components/profile/ProfileComponent.vue';
+
+const route = useRoute()
+const showSidebar = computed(() => route.path !== '/')
 </script>
 
 <style lang="scss">

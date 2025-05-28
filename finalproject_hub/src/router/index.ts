@@ -2,8 +2,14 @@ import { createRouter, createWebHistory } from 'vue-router'
 import EventListPage from '@/components/events/List/EventListPage.vue'
 import SportEventDetail from '@/components/events/Details/SportEventDetail.vue'
 import AboutPage from '@/components/about/AboutPage.vue' 
+import AuthPageVue from '../components/auth/AuthPage.vue'
 
 const routes = [
+  {
+    path: '/',
+    name: 'Auth',
+    component: AuthPageVue
+  },
   {
     path: '/',
     name: 'EventList',
