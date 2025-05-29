@@ -13,4 +13,5 @@ public interface UserRepository {
     void delete(UUID id);
     List<User> getAll();
     void clear();
+    List<User> findByNameStartsWithIgnoreCaseOrEmailStartsWithIgnoreCase(String queryString);
 }
