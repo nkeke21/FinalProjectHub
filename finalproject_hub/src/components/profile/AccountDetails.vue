@@ -64,13 +64,13 @@
   
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from 'vue'
-import { useProfileStore } from '@/store/profile/profileStore'
+import { useUserStore } from '@/store/profile/userStore'
 import { NFormItem, NInput, NButton, NSkeleton, useMessage  } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { UserUpdateDTO } from '@/models/UserUpdateDTO'
 
-const profileStore = useProfileStore()
-const { profile, isLoading } = storeToRefs(profileStore)
+const userStore = useUserStore()
+const { profile, isLoading } = storeToRefs(userStore)
 
 const isSubmitting = ref(false)
 const isEditing = ref(false)
@@ -95,7 +95,7 @@ const formData = reactive({
 const userId = '13fa5e4e-1d9e-4a2a-9a20-7385f24e9097'
 
 onMounted(async () => {
-    profileStore.fetchProfile(userId)
+    userStore.fetchProfile(userId)
 })
 
 watch(profile, (data) => {
@@ -118,7 +118,7 @@ async function submitChanges() {
             description: formData.description
         }
 
-        const updated = await profileStore.updateProfile(userId, updateData)
+        const updated = await userStore.updateProfile(userId, updateData)
         
         isEditing.value = false
         message.success('Your account details were updated successfully!')

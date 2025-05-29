@@ -1,50 +1,37 @@
 <template>
     <n-auto-complete
-        v-model:value="searchQuery"
-        :options="userOptions"
-        placeholder="Search users"
-        clearable
-        @update:value="onSearch"
-        @select="onSelect"
+      v-model:value="searchQuery"
+      :options="userOptions"
+      placeholder="Search users"
+      clearable
+      @update:value="onSearch"
+      @select="onSelect"
     />
-</template>
+  </template>
   
 <script setup lang="ts">
-import { ref, defineEmits } from 'vue'
+import { ref, computed, defineEmits } from 'vue'
 import { NAutoComplete } from 'naive-ui'
-
-interface User {
-    id: string
-    name: string
-    email: string
-}
+import { useUserStore } from '@/store/profile/userStore'
 
 const searchQuery = ref('')
-const userOptions = ref<{ label: string; value: string }[]>([])
+const userStore = useUserStore()
 const emit = defineEmits(['user-selected'])
 
+const userOptions = computed(() =>
+    userStore.searchResults.map(user => ({
+        label: `${user.name} (${user.email})`,
+        value: user.email
+    }))
+)
+
 const onSearch = async (query: string) => {
-if (!query.trim()) {
-    userOptions.value = []
-    return
-}
-
-try {
-    const response = await fetch(`/api/users/search?query=${encodeURIComponent(query)}`)
-    if (response.ok) {
-        const users: User[] = await response.json()
-
-        userOptions.value = users.map(user => ({
-            label: `${user.name} (${user.email})`,
-            value: user.email
-        }))
-    } else {
-        userOptions.value = []
+    if (!query.trim()) {
+        userStore.searchResults = []
+        return
     }
-    } catch (error) {
-        console.error('Error fetching users:', error)
-        userOptions.value = []
-    }
+
+    await userStore.searchUsers(query)
 }
 
 const onSelect = (selectedValue: string) => {

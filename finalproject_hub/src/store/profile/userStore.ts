@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import { getUserDetails, UserDetailsResponse, updateUserDetails } from '@/services/apis/ProfileDetailsService'
+import { searchUsers, type UserSearchResult } from '@/services/apis/UserSearchService'
 import { UserUpdateDTO } from '@/models/UserUpdateDTO'
 
-export const useProfileStore = defineStore('profile', {
+export const useUserStore = defineStore('user', {
     state: () => ({
         profile: null as UserDetailsResponse | null,
+        searchResults: [] as UserSearchResult[],
         isLoading: false,
         error: null as string | null
     }),
@@ -34,6 +36,20 @@ export const useProfileStore = defineStore('profile', {
             } catch (err: any) {
                 this.error = err.message
                 throw err
+            } finally {
+                this.isLoading = false
+            }
+        },
+
+        async searchUsers(query: string) {
+            this.isLoading = true
+            this.error = null
+
+            try {
+                this.searchResults = await searchUsers(query)
+            } catch (err: any) {
+                this.error = err.message
+                this.searchResults = []
             } finally {
                 this.isLoading = false
             }
