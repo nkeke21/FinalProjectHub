@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -28,11 +29,13 @@ public class FriendRequestService {
         return repository.getPendingRequestsForUser(userId);
     }
 
-    public boolean respondToRequest(UUID requestId, FriendRequestStatus status) {
-        if (repository.findById(requestId).isPresent()) {
-            repository.updateStatus(requestId, status);
-            return true;
+    public FriendRequest respondToRequest(UUID requestId, FriendRequestStatus status) {
+        Optional<FriendRequest> optional = repository.findById(requestId);
+        if (optional.isPresent()) {
+            FriendRequest req = optional.get();
+            req.setStatus(status);
+            return req;
         }
-        return false;
+        throw new RuntimeException("Friend request not found");
     }
 }
