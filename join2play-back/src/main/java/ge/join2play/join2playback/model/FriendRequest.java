@@ -1,5 +1,7 @@
 package ge.join2play.join2playback.model;
 
+import ge.join2play.join2playback.enums.FriendRequestStatus;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -9,10 +11,6 @@ public class FriendRequest {
     private UUID toUserId;
     private LocalDateTime sentAt;
     private FriendRequestStatus status;
-
-    public enum FriendRequestStatus {
-        PENDING, ACCEPTED, REJECTED
-    }
 
     public FriendRequest(UUID requestId, UUID fromUserId, UUID toUserId, LocalDateTime sentAt, FriendRequestStatus status) {
         this.requestId = requestId;
