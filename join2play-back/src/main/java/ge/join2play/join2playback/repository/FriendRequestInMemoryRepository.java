@@ -1,43 +1,44 @@
 package ge.join2play.join2playback.repository;
 
+import ge.join2play.join2playback.enums.FriendRequestStatus;
 import ge.join2play.join2playback.model.FriendRequest;
 import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
-public class FriendRequestInMemoryRepository implements FriendRequestRepository {
+public class FriendRequestInMemoryRepository implements FriendRequestRepository{
     private final Map<UUID, FriendRequest> requests = new HashMap<>();
 
-    @Override
-    public FriendRequest save(FriendRequest request) {
+    public FriendRequest sendRequest(UUID fromUserId, UUID toUserId) {
+        FriendRequest request = new FriendRequest(
+                UUID.randomUUID(),
+                fromUserId,
+                toUserId,
+                LocalDateTime.now(),
+                FriendRequestStatus.PENDING
+        );
+
         requests.put(request.getRequestId(), request);
         return request;
     }
 
-    @Override
-    public FriendRequest update(FriendRequest request) {
-        requests.put(request.getRequestId(), request);
-        return request;
+    public List<FriendRequest> getPendingRequestsForUser(UUID userId) {
+        return requests.values().stream()
+                .filter(req -> req.getToUserId().equals(userId) && req.getStatus() == FriendRequestStatus.PENDING)
+                .collect(Collectors.toList());
     }
 
-    @Override
-    public FriendRequest findById(UUID requestId) {
-        return requests.get(requestId);
+    public Optional<FriendRequest> findById(UUID requestId) {
+        return Optional.ofNullable(requests.get(requestId));
     }
 
-    @Override
-    public List<FriendRequest> findRequestsByUser(UUID userId) {
-        List<FriendRequest> result = new ArrayList<>();
-        for (FriendRequest req : requests.values()) {
-            if (req.getToUserId().equals(userId)) {
-                result.add(req);
-            }
+    public void updateStatus(UUID requestId, FriendRequestStatus status) {
+        FriendRequest request = requests.get(requestId);
+        if (request != null) {
+            request.setStatus(status);
         }
-        return result;
-    }
-
-    @Override
-    public List<FriendRequest> getAll() {
-        return new ArrayList<>(requests.values());
     }
 }
