@@ -110,6 +110,19 @@ public class ApplicationService {
         return convertUserToUserDetailsResponse(userRepository.getById(id));
     }
 
+    public List<UserResponse> searchUsers(String query) {
+        List<User> matchedUsers = userRepository
+                .findByNameStartsWithIgnoreCaseOrEmailStartsWithIgnoreCase(query);
+
+        return matchedUsers.stream()
+                .map(user -> new UserResponse(
+                        user.getId().toString(),
+                        user.getName(),
+                        user.getEmail()
+                ))
+                .collect(Collectors.toList());
+    }
+
     private UserDetailsResponse convertUserToUserDetailsResponse(User user) {
         return new UserDetailsResponse(user.getName(), user.getEmail(), user.getPhoneNumber(), user.getBirthDate(), user.getDescription());
     }

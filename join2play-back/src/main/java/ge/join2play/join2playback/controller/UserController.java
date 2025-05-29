@@ -2,9 +2,11 @@ package ge.join2play.join2playback.controller;
 
 import ge.join2play.join2playback.model.EventResponse;
 import ge.join2play.join2playback.model.UserDetailsResponse;
+import ge.join2play.join2playback.model.UserResponse;
 import ge.join2play.join2playback.model.UserUpdateDTO;
 import ge.join2play.join2playback.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,5 +40,11 @@ public class UserController {
     @GetMapping("/events/registered/{id}")
     public List<EventResponse> getUserRegisteredEvents(@PathVariable UUID id){
         return applicationService.getUserRegisteredEvents(id);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<UserResponse>> searchUsers(@RequestParam("query") String query) {
+        List<UserResponse> responses = applicationService.searchUsers(query);
+        return ResponseEntity.ok(responses);
     }
 }
