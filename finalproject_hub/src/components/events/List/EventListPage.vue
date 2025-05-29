@@ -1,5 +1,9 @@
 <template>
     <div class="homepage">
+        <div class="search-container">
+            <UserSearchAutocomplete @user-selected="handleUserSelected" />
+        </div>
+
         <div class="loader-wrapper" v-if="isLoading">
             <n-spin size="large" />
         </div>
@@ -17,17 +21,21 @@ import { onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSportEventStore } from '@/store/events/useSportEventStore'
 import EventListTable from '@/components/events/List/EventListTable.vue'
+import UserSearchAutocomplete from '@/components/search/UserSearchAutocomplete.vue'
 import { NSpin } from 'naive-ui'
 
 const sportEventStore = useSportEventStore()
 const { events } = storeToRefs(sportEventStore)
-
 const isLoading = ref(true)
 
 onMounted(async () => {
     await sportEventStore.fetchAllEvents()
     isLoading.value = false
 })
+
+const handleUserSelected = (email: string) => {
+  console.log('User selected:', email)
+}
 </script>
 
 <style scoped>
@@ -36,6 +44,11 @@ onMounted(async () => {
     width: 100%;
     height: 100%;
     box-sizing: border-box;
+}
+
+.search-container {
+    width: 30%;
+    margin-bottom: 20px;
 }
 
 .loader-wrapper {
