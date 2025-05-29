@@ -126,7 +126,7 @@ const rowProps = (row: any) => ({
 <style>
 .table-container {
     width: 100%;
-    margin: 40px auto;
+    margin: 20px auto;
     padding: 20px;
 }
 

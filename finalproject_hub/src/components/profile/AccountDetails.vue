@@ -68,6 +68,7 @@ import { useUserStore } from '@/store/profile/userStore'
 import { NFormItem, NInput, NButton, NSkeleton, useMessage  } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { UserUpdateDTO } from '@/models/UserUpdateDTO'
+import { useRoute } from 'vue-router'
 
 const userStore = useUserStore()
 const { profile, isLoading } = storeToRefs(userStore)
@@ -92,7 +93,8 @@ const formData = reactive({
     description: ''
 })
 
-const userId = '13fa5e4e-1d9e-4a2a-9a20-7385f24e9097'
+const route = useRoute()
+const userId = route.params.id as string
 
 onMounted(async () => {
     userStore.fetchProfile(userId)

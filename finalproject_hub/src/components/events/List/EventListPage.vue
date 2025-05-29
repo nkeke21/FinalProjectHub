@@ -19,6 +19,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
 import { useSportEventStore } from '@/store/events/useSportEventStore'
 import EventListTable from '@/components/events/List/EventListTable.vue'
 import UserSearchAutocomplete from '@/components/search/UserSearchAutocomplete.vue'
@@ -28,13 +29,15 @@ const sportEventStore = useSportEventStore()
 const { events } = storeToRefs(sportEventStore)
 const isLoading = ref(true)
 
+const router = useRouter()
+
 onMounted(async () => {
     await sportEventStore.fetchAllEvents()
     isLoading.value = false
 })
 
-const handleUserSelected = (email: string) => {
-  console.log('User selected:', email)
+const handleUserSelected = (userId: string) => {
+    router.push(`/profile/${userId}`)
 }
 </script>
 
@@ -48,7 +51,7 @@ const handleUserSelected = (email: string) => {
 
 .search-container {
     width: 30%;
-    margin-bottom: 20px;
+    margin-left: 20px;
 }
 
 .loader-wrapper {

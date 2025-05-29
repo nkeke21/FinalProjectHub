@@ -21,7 +21,7 @@ const emit = defineEmits(['user-selected'])
 const userOptions = computed(() =>
     userStore.searchResults.map(user => ({
         label: `${user.name} (${user.email})`,
-        value: user.email
+        value: user.id
     }))
 )
 
@@ -34,8 +34,8 @@ const onSearch = async (query: string) => {
     await userStore.searchUsers(query)
 }
 
-const onSelect = (selectedValue: string) => {
-    emit('user-selected', selectedValue)
+const onSelect = (selectedUserId: string) => {
+    emit('user-selected', selectedUserId)
 }
 </script>
   

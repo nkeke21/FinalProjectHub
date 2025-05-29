@@ -16,11 +16,13 @@ import { NSpin } from 'naive-ui'
 import EventListTable from '@/components/events/List/EventListTable.vue'
 import { useProfileEventStore } from '@/store/profile/profileEventStore'
 import { storeToRefs } from 'pinia'
+import { useRoute } from 'vue-router'
 
 const profileEventStore = useProfileEventStore()
 const { registeredEvents, isLoading, error } = storeToRefs(profileEventStore)
 
-const userId = '13fa5e4e-1d9e-4a2a-9a20-7385f24e9097'
+const route = useRoute()
+const userId = route.params.id as string
 
 onMounted(() => {
   profileEventStore.fetchRegisteredEvents(userId)
