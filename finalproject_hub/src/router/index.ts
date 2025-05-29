@@ -4,8 +4,14 @@ import SportEventDetail from '@/components/events/Details/SportEventDetail.vue'
 import AboutPage from '@/components/about/AboutPage.vue' 
 import AuthPageVue from '../components/auth/AuthPage.vue'
 import ProfileComponent from '@/components/profile/ProfileComponent.vue'
+import NotificationsPage from '@/components/notification/NotificationsPage.vue'
 
 const routes = [
+  {
+    path: '/notifications',
+    name: 'Notifications',
+    component: NotificationsPage
+  },
   {
     path: '/',
     name: 'Auth',
