@@ -25,7 +25,7 @@
 </template>
   
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, h } from 'vue'
 import { NButton, NMenu, NTag } from 'naive-ui'
 
 import AccountDetails from '@/components/profile/AccountDetails.vue'
@@ -37,9 +37,38 @@ const logout = () => {
 }
 
 const menuOptions = [
-    { label: 'Hosted Events', key: 'hosted-events' },
-    { label: 'Account Details', key: 'account-details' },
-    { label: 'Registered Events', key: 'registered-events' },
+  {
+    key: 'hosted-events',
+    label: () =>
+      h('div', { class: 'menu-label' }, [
+        h('span', { class: 'material-icons' }, 'event'),
+        h('span', { class: 'menu-text' }, 'Hosted Events')
+      ])
+  },
+  {
+    key: 'account-details',
+    label: () =>
+      h('div', { class: 'menu-label' }, [
+        h('span', { class: 'material-icons' }, 'account_circle'),
+        h('span', { class: 'menu-text' }, 'Account Details')
+      ])
+  },
+  {
+    key: 'registered-events',
+    label: () =>
+      h('div', { class: 'menu-label' }, [
+        h('span', { class: 'material-icons' }, 'assignment_turned_in'),
+        h('span', { class: 'menu-text' }, 'Registered Events')
+      ])
+  },
+  {
+    key: 'add-friend',
+    label: () =>
+      h('div', { class: 'menu-label' }, [
+        h('span', { class: 'material-icons' }, 'person_add'),
+        h('span', { class: 'menu-text' }, 'Add Friend')
+      ])
+  }
 ]
 
 const selectedKey = ref('hosted-events')
@@ -63,7 +92,7 @@ const currentComponent = computed(() => {
 
 </script>
 
-<style scoped>
+<style>
 .account-container {
   display: flex;
   flex-direction: column;
@@ -96,6 +125,26 @@ const currentComponent = computed(() => {
   font-weight: 500;
   font-size: 16px;
   padding: 10px 24px;
+}
+
+.menu-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.material-icons {
+  font-size: 22px; 
+  color: inherit; 
+  margin-right: 0;
+  vertical-align: middle;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.menu-text {
+  font-weight: 500;
+  font-size: 16px;
 }
 
 .topbar-right {
