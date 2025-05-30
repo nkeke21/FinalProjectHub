@@ -25,28 +25,79 @@
 </template>
   
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, h } from 'vue'
 import { NButton, NMenu, NTag } from 'naive-ui'
-
+import { useUserStore } from '@/store/profile/userStore'
+import { useMessage } from 'naive-ui'
+import { useRoute } from 'vue-router'
 import AccountDetails from '@/components/profile/AccountDetails.vue'
 import HostedEvents from '@/components/profile/HostedEvents.vue'
 import RegisteredEvents from '@/components/profile/RegisteredEvents.vue'
+
+const userStore = useUserStore()
+const message = useMessage()
+const route = useRoute()
+
+const loggedInUserId = '13fa5e4e-1d9e-4a2a-9a20-7385f24e9097'
+const profileUserId = computed(() => route.params.id as string)
+
+const handleMenuChange = async (key: string) => {
+  if (key === 'add-friend') {
+    try {
+      await userStore.sendFriendRequest({
+        fromUserId: loggedInUserId,
+        toUserId: profileUserId.value
+      })
+      message.success('Friend request sent!')
+    } catch (err) {
+      message.error('Failed to send friend request')
+    }
+    return
+  }
+
+  selectedKey.value = key
+}
 
 const logout = () => {
   console.log('Logging out...')
 }
 
 const menuOptions = [
-    { label: 'Hosted Events', key: 'hosted-events' },
-    { label: 'Account Details', key: 'account-details' },
-    { label: 'Registered Events', key: 'registered-events' },
+  {
+    key: 'hosted-events',
+    label: () =>
+      h('div', { class: 'menu-label' }, [
+        h('span', { class: 'material-icons' }, 'event'),
+        h('span', { class: 'menu-text' }, 'Hosted Events')
+      ])
+  },
+  {
+    key: 'account-details',
+    label: () =>
+      h('div', { class: 'menu-label' }, [
+        h('span', { class: 'material-icons' }, 'account_circle'),
+        h('span', { class: 'menu-text' }, 'Account Details')
+      ])
+  },
+  {
+    key: 'registered-events',
+    label: () =>
+      h('div', { class: 'menu-label' }, [
+        h('span', { class: 'material-icons' }, 'assignment_turned_in'),
+        h('span', { class: 'menu-text' }, 'Registered Events')
+      ])
+  },
+  {
+    key: 'add-friend',
+    label: () =>
+      h('div', { class: 'menu-label' }, [
+        h('span', { class: 'material-icons' }, 'person_add'),
+        h('span', { class: 'menu-text' }, 'Add Friend')
+      ])
+  }
 ]
 
 const selectedKey = ref('hosted-events')
-
-const handleMenuChange = (key: string) => {
-  selectedKey.value = key
-}
 
 const currentComponent = computed(() => {
   switch (selectedKey.value) {
@@ -63,7 +114,7 @@ const currentComponent = computed(() => {
 
 </script>
 
-<style scoped>
+<style>
 .account-container {
   display: flex;
   flex-direction: column;
@@ -96,6 +147,26 @@ const currentComponent = computed(() => {
   font-weight: 500;
   font-size: 16px;
   padding: 10px 24px;
+}
+
+.menu-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.material-icons {
+  font-size: 22px; 
+  color: inherit; 
+  margin-right: 0;
+  vertical-align: middle;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.menu-text {
+  font-weight: 500;
+  font-size: 16px;
 }
 
 .topbar-right {
