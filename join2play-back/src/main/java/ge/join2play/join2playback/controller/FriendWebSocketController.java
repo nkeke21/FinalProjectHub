@@ -30,10 +30,7 @@ public class FriendWebSocketController {
     public ResponseEntity<String> sendFriendRequest(@RequestBody FriendRequestDTO dto) {
         FriendRequest request = service.sendRequest(dto.getFromUserId(), dto.getToUserId());
 
-        FriendRequestNotification notification = new FriendRequestNotification();
-        notification.setRequestId(request.getRequestId());
-        notification.setFromUserId(dto.getFromUserId());
-        notification.setMessage("You have a new friend request!");
+        FriendRequestNotification notification = service.buildNotification(request);
 
         messagingTemplate.convertAndSend("/topic/friend-requests/" + dto.getToUserId(), notification);
 
