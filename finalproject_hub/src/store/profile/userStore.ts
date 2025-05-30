@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { getUserDetails, UserDetailsResponse, updateUserDetails } from '@/services/apis/ProfileDetailsService'
 import { searchUsers, type UserSearchResult } from '@/services/apis/UserSearchService'
+import { sendFriendRequest, FriendRequestPayload } from '@/services/apis/FriendRequestService'
 import { UserUpdateDTO } from '@/models/UserUpdateDTO'
 
 export const useUserStore = defineStore('user', {
@@ -50,6 +51,19 @@ export const useUserStore = defineStore('user', {
             } catch (err: any) {
                 this.error = err.message
                 this.searchResults = []
+            } finally {
+                this.isLoading = false
+            }
+        },
+
+        async sendFriendRequest(payload: FriendRequestPayload) {
+            this.isLoading = true
+            this.error = null
+            try {
+                await sendFriendRequest(payload)
+            } catch (err: any) {
+                this.error = err.message
+                throw err
             } finally {
                 this.isLoading = false
             }

@@ -1,19 +1,23 @@
 <template>
 	<n-message-provider>
-		<div class="app">
-			<Sidebar v-if="showSidebar" />
-			<!-- <ProfileComponent /> -->
-			<router-view />
-		</div>
+		<n-notification-provider>
+			<div class="app">
+				<FriendRequestNotification />
+				<Sidebar v-if="showSidebar" />
+				<!-- <ProfileComponent /> -->
+				<router-view />
+			</div>
+		</n-notification-provider>
 	</n-message-provider>
 </template>
 
 <script setup>
-import { NMessageProvider } from 'naive-ui'
+import { NMessageProvider, NNotificationProvider } from 'naive-ui'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import Sidebar from './components/Sidebar/Sidebar.vue'
 import ProfileComponent from './components/profile/ProfileComponent.vue';
+import FriendRequestNotification from '@/components/common/requests/FriendRequestNotification.vue'
 
 const route = useRoute()
 const showSidebar = computed(() => route.path !== '/')
