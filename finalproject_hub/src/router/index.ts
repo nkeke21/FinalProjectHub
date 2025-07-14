@@ -5,6 +5,7 @@ import AboutPage from '@/components/about/AboutPage.vue'
 import AuthPageVue from '../components/auth/AuthPage.vue'
 import ProfileComponent from '@/components/profile/ProfileComponent.vue'
 import NotificationsPage from '@/components/notification/NotificationsPage.vue'
+import CommunityPage from '@/components/community/CommunityPage.vue'
 
 const routes = [
   {
@@ -37,6 +38,11 @@ const routes = [
     path: '/profile/:id',
     name: 'Profile',
     component: ProfileComponent
+  },
+  {
+    path: '/community',
+    name: 'Community',
+    component: CommunityPage
   }
 ]
 

@@ -26,9 +26,9 @@
 				<span class="material-icons">person</span>
 				<span class="text">Profile</span>
 			</router-link>
-			<router-link to="/contact" class="button">
-				<span class="material-icons">email</span>
-				<span class="text">Contact</span>
+			<router-link to="/community" class="button">
+				<span class="material-icons">groups</span>
+				<span class="text">Community</span>
 			</router-link>
 		</div>
 
