@@ -1,10 +1,8 @@
-package ge.join2play.join2playback.model;
+package ge.join2play.join2playback.model.dto;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
-public class User {
-    private UUID id;
+public class SignUpRequest {
     private String name;
     private String email;
     private String phoneNumber;
@@ -12,22 +10,15 @@ public class User {
     private String description;
     private String password;
 
-    public User(UUID id, String name, String email, String phoneNumber, Long birthDate, String description, String password) {
-        this.id = id;
+    public SignUpRequest() {}
+
+    public SignUpRequest(String name, String email, String phoneNumber, Long birthDate, String description, String password) {
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.birthDate = birthDate;
         this.description = description;
         this.password = password;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -77,4 +68,4 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-}
+} 

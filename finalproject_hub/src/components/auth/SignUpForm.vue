@@ -1,26 +1,22 @@
 <template>
     <n-card title="Sign Up" class="auth-card">
         <n-form>
-            <n-form-item label="Name">
+            <n-form-item label="Name" :feedback="nameError" :validation-status="nameError ? 'error' : undefined">
                 <n-input v-model:value="name" placeholder="Full Name" />
             </n-form-item>
 
             <div class="form-row">
-                <n-form-item label="Email" class="half">
+                <n-form-item label="Email" class="half" :feedback="emailError" :validation-status="emailError ? 'error' : undefined">
                     <n-input v-model:value="email" placeholder="Email address" />
                 </n-form-item>
 
-                <n-form-item label="Phone Number" class="half">
+                <n-form-item label="Phone Number" class="half" :feedback="phoneError" :validation-status="phoneError ? 'error' : undefined">
                     <n-input v-model:value="phoneNumber" placeholder="Phone Number" />
                 </n-form-item>
             </div>
 
             <div class="form-row">
-                <n-form-item label="Age" class="half">
-                    <n-input v-model:value="age" type="number" placeholder="Age" />
-                </n-form-item>
-
-                <n-form-item label="Birth Date" class="half">
+                <n-form-item label="Birth Date" class="half" :feedback="birthDateError" :validation-status="birthDateError ? 'error' : undefined">
                     <n-date-picker v-model:value="birthDate" type="date" placeholder="Birth Date" />
                 </n-form-item>
             </div>
@@ -30,15 +26,15 @@
             </n-form-item>
 
             <div class="form-row">
-                <n-form-item label="Password" class="half">
+                <n-form-item label="Password" class="half" :feedback="passwordError" :validation-status="passwordError ? 'error' : undefined">
                     <n-input type="password" v-model:value="password" placeholder="Create password" />
                 </n-form-item>
 
                 <n-form-item
                     label="Repeat Password"
                     class="half"
-                    :feedback="passwordMismatch ? 'Passwords do not match' : ''"
-                    :validation-status="passwordMismatch ? 'error' : undefined"
+                    :feedback="repeatPasswordError"
+                    :validation-status="repeatPasswordError ? 'error' : undefined"
                 >
                     <n-input type="password" v-model:value="repeatPassword" placeholder="Repeat password" />
                 </n-form-item>
@@ -58,33 +54,99 @@
   
 <script setup>
 import { ref, computed } from 'vue'
-import { NInput, NButton, NForm, NFormItem, NCard, NDatePicker } from 'naive-ui'
+import { NInput, NButton, NForm, NFormItem, NCard, NDatePicker, useMessage } from 'naive-ui'
+import { AuthService } from '@/services/apis/AuthService'
 
 const name = ref('')
 const email = ref('')
 const phoneNumber = ref('')
-const age = ref(null)
 const birthDate = ref(null)
 const description = ref('')
 const password = ref('')
 const repeatPassword = ref('')
+const message = useMessage()
 
 const passwordMismatch = computed(() => {
   return repeatPassword.value && password.value !== repeatPassword.value
 })
 
-const signUp = () => {
-    if (passwordMismatch.value) return
+const nameError = ref('')
+const emailError = ref('')
+const phoneError = ref('')
+const passwordError = ref('')
+const repeatPasswordError = ref('')
+const birthDateError = ref('')
 
-    console.log('Registering user:', {
-        name: name.value,
-        email: email.value,
-        phoneNumber: phoneNumber.value,
-        age: age.value,
-        birthDate: birthDate.value,
-        description: description.value,
-        password: password.value
-    })
+const clearErrors = () => {
+    nameError.value = ''
+    emailError.value = ''
+    phoneError.value = ''
+    passwordError.value = ''
+    repeatPasswordError.value = ''
+    birthDateError.value = ''
+}
+
+const validateForm = () => {
+    clearErrors()
+    let valid = true
+    if (!name.value.trim()) {
+        nameError.value = 'Name is required'
+        valid = false
+    }
+    if (!email.value.includes('@')) {
+        emailError.value = 'Email must contain "@"'
+        valid = false
+    } else {
+        const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+        if (!emailRegex.test(email.value)) {
+            emailError.value = 'Invalid email format'
+            valid = false
+        }
+    }
+    if (!phoneNumber.value.match(/^\d+$/)) {
+        phoneError.value = 'Phone number must contain only digits'
+        valid = false
+    }
+    if (!birthDate.value) {
+        birthDateError.value = 'Birth date is required'
+        valid = false
+    }
+    if (password.value.length < 8) {
+        passwordError.value = 'Password must be at least 8 characters'
+        valid = false
+    }
+    if (passwordMismatch.value) {
+        repeatPasswordError.value = 'Passwords do not match'
+        valid = false
+    }
+    return valid
+}
+
+const signUp = async () => {
+    if (!validateForm()) return
+
+    try {
+        const response = await AuthService.signUp({
+            name: name.value,
+            email: email.value,
+            phoneNumber: phoneNumber.value,
+            birthDate: birthDate.value,
+            description: description.value,
+            password: password.value
+        })
+        
+        localStorage.setItem('user', JSON.stringify({
+            id: response.userId,
+            name: response.name,
+            email: response.email
+        }))
+        
+        message.success('Registration successful!')
+        console.log('Registration successful:', response)
+    } catch (error) {
+        message.error(error.message || 'Registration failed')
+        console.error('Registration error:', error)
+    }
 }
 </script>
 

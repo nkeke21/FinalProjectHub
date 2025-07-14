@@ -11,6 +11,8 @@ import ge.join2play.join2playback.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -124,7 +126,13 @@ public class ApplicationService {
     }
 
     private UserDetailsResponse convertUserToUserDetailsResponse(User user) {
-        return new UserDetailsResponse(user.getName(), user.getEmail(), user.getPhoneNumber(), user.getBirthDate(), user.getDescription());
+        LocalDate birthDate = null;
+        if (user.getBirthDate() != null) {
+            birthDate = Instant.ofEpochMilli(user.getBirthDate())
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+        }
+        return new UserDetailsResponse(user.getName(), user.getEmail(), user.getPhoneNumber(), birthDate, user.getDescription());
     }
 
     public UserUpdateDTO updateUserDetails(UUID id, UserUpdateDTO userUpdateDTO) {

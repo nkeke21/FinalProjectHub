@@ -14,4 +14,6 @@ public interface UserRepository {
     List<User> getAll();
     void clear();
     List<User> findByNameStartsWithIgnoreCaseOrEmailStartsWithIgnoreCase(String queryString);
+    User findByEmail(String email);
+    User findByEmailOrName(String emailOrName);
 }

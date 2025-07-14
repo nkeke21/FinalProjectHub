@@ -6,6 +6,7 @@ import ge.join2play.join2playback.model.errors.UserDoesNotExistError;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -19,7 +20,7 @@ public class UserInMemoryRepository implements UserRepository {
                 "Kakha Salukvadze",
                 "kakha@example.com",
                 "+995555123456",
-                LocalDate.of(1995, 6, 15),
+                LocalDate.of(1995, 6, 15).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(),
                 "Sports enthusiast and backend developer.",
                 "securepassword123"
         );
@@ -29,7 +30,7 @@ public class UserInMemoryRepository implements UserRepository {
                 "John Doe",
                 "john.doe@example.com",
                 "+995555987654",
-                LocalDate.of(1990, 3, 22),
+                LocalDate.of(1990, 3, 22).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(),
                 "Loves football and tennis.",
                 "john123"
         );
@@ -39,7 +40,7 @@ public class UserInMemoryRepository implements UserRepository {
                 "Jane Smith",
                 "jane.smith@example.com",
                 "+995599123789",
-                LocalDate.of(1988, 11, 5),
+                LocalDate.of(1988, 11, 5).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(),
                 "Basketball player and outdoor enthusiast.",
                 "jane123"
         );
@@ -49,7 +50,7 @@ public class UserInMemoryRepository implements UserRepository {
                 "Mike Johnson",
                 "mike.j@example.com",
                 "+995591234567",
-                LocalDate.of(1992, 8, 10),
+                LocalDate.of(1992, 8, 10).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(),
                 "Runner and sports event organizer.",
                 "mike123"
         );
@@ -59,7 +60,7 @@ public class UserInMemoryRepository implements UserRepository {
                 "Emily Davis",
                 "emily.d@example.com",
                 "+995592345678",
-                LocalDate.of(1993, 1, 30),
+                LocalDate.of(1993, 1, 30).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(),
                 "Volleyball fan and team leader.",
                 "emily123"
         );
@@ -117,5 +118,22 @@ public class UserInMemoryRepository implements UserRepository {
                 .filter(user -> user.getName().toLowerCase().startsWith(query) ||
                         user.getEmail().toLowerCase().startsWith(query))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        return users.values().stream()
+                .filter(user -> user.getEmail().equalsIgnoreCase(email))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public User findByEmailOrName(String emailOrName) {
+        return users.values().stream()
+                .filter(user -> user.getEmail().equalsIgnoreCase(emailOrName) || 
+                               user.getName().equalsIgnoreCase(emailOrName))
+                .findFirst()
+                .orElse(null);
     }
 }
