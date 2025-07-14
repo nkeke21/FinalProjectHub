@@ -5,10 +5,10 @@ export const ENDPOINTS = {
     USER_DETAILS: (id: string) => `/users/details/${id}`,
     USER_REGISTERED_EVENTS: (id: string) => `/users/events/registered/${id}`,
     USER_HOSTED_EVENTS: (id: string) => `/users/events/hosted/${id}`,
-    CURRENT_USER_DETAILS: '/users/me/details',
-    CURRENT_USER_REGISTERED_EVENTS: '/users/me/events/registered',
-    CURRENT_USER_HOSTED_EVENTS: '/users/me/events/hosted',
-    UPDATE_CURRENT_USER_DETAILS: '/users/me/details'
+    CURRENT_USER_DETAILS: '/users/details',
+    CURRENT_USER_REGISTERED_EVENTS: '/users/events/registered',
+    CURRENT_USER_HOSTED_EVENTS: '/users/events/hosted',
+    UPDATE_CURRENT_USER_DETAILS: '/users/details'
 }
 
 export const HEADERS = {

@@ -53,4 +53,10 @@ public class AuthenticationController {
                     .body(new AuthResponse(null, null, null, "Login failed: " + e.getMessage()));
         }
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpSession session) {
+        session.invalidate();
+        return ResponseEntity.ok("Logged out successfully");
+    }
 } 

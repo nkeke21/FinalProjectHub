@@ -26,6 +26,7 @@
   
 <script setup lang="ts">
 import { ref, computed, h } from 'vue'
+import { useRouter } from 'vue-router'
 import { NButton, NMenu, NTag } from 'naive-ui'
 import { useUserStore } from '@/store/profile/userStore'
 import { useMessage } from 'naive-ui'
@@ -37,6 +38,7 @@ import RegisteredEvents from '@/components/profile/RegisteredEvents.vue'
 const userStore = useUserStore()
 const message = useMessage()
 const route = useRoute()
+const router = useRouter()
 
 const isOwnProfile = computed(() => {
     return !route.params.id
@@ -69,9 +71,28 @@ const handleMenuChange = async (key: string) => {
   selectedKey.value = key
 }
 
-const logout = () => {
-  localStorage.removeItem('user')
-  console.log('Logging out...')
+const logout = async () => {
+  try {
+    const response = await fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include'
+    })
+    
+    if (response.ok) {
+      localStorage.removeItem('user')
+      message.success('Logged out successfully')
+      
+      router.push('/')
+    } else {
+      message.error('Logout failed')
+    }
+  } catch (error) {
+    console.error('Logout error:', error)
+    message.error('Logout failed')
+    
+    localStorage.removeItem('user')
+    router.push('/')
+  }
 }
 
 const menuOptions = computed(() => {
