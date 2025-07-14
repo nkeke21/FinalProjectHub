@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -46,7 +47,7 @@ public class EventControllerTests {
                 "Jane Doe",
                 "j.doe@gmail.com",
                 "+999",
-                LocalDate.parse("2000-04-16"),
+                LocalDate.parse("2000-04-16").atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(),
                 "I love sport",
                 "secure_passworD"
         );
