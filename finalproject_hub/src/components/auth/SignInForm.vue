@@ -21,13 +21,32 @@
 
 <script setup>
 import { ref } from 'vue'
-import { NInput, NButton, NForm, NFormItem, NCard } from 'naive-ui'
+import { NInput, NButton, NForm, NFormItem, NCard, useMessage } from 'naive-ui'
+import { AuthService } from '@/services/apis/AuthService'
 
 const username = ref('')
 const password = ref('')
+const message = useMessage()
 
-const signIn = () => {
-    console.log('Sign-in with', username.value, password.value)
+const signIn = async () => {
+    try {
+        const response = await AuthService.signIn({
+            username: username.value,
+            password: password.value
+        })
+        
+        localStorage.setItem('user', JSON.stringify({
+            id: response.userId,
+            name: response.name,
+            email: response.email
+        }))
+        
+        message.success('Login successful!')
+        console.log('Login successful:', response)
+    } catch (error) {
+        message.error(error.message || 'Login failed')
+        console.error('Login error:', error)
+    }
 }
 </script>
 

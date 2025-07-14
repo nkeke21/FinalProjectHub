@@ -58,7 +58,8 @@
   
 <script setup>
 import { ref, computed } from 'vue'
-import { NInput, NButton, NForm, NFormItem, NCard, NDatePicker } from 'naive-ui'
+import { NInput, NButton, NForm, NFormItem, NCard, NDatePicker, useMessage } from 'naive-ui'
+import { AuthService } from '@/services/apis/AuthService'
 
 const name = ref('')
 const email = ref('')
@@ -68,23 +69,41 @@ const birthDate = ref(null)
 const description = ref('')
 const password = ref('')
 const repeatPassword = ref('')
+const message = useMessage()
 
 const passwordMismatch = computed(() => {
   return repeatPassword.value && password.value !== repeatPassword.value
 })
 
-const signUp = () => {
-    if (passwordMismatch.value) return
+const signUp = async () => {
+    if (passwordMismatch.value) {
+        message.error('Passwords do not match')
+        return
+    }
 
-    console.log('Registering user:', {
-        name: name.value,
-        email: email.value,
-        phoneNumber: phoneNumber.value,
-        age: age.value,
-        birthDate: birthDate.value,
-        description: description.value,
-        password: password.value
-    })
+    try {
+        const response = await AuthService.signUp({
+            name: name.value,
+            email: email.value,
+            phoneNumber: phoneNumber.value,
+            age: age.value,
+            birthDate: birthDate.value,
+            description: description.value,
+            password: password.value
+        })
+        
+        localStorage.setItem('user', JSON.stringify({
+            id: response.userId,
+            name: response.name,
+            email: response.email
+        }))
+        
+        message.success('Registration successful!')
+        console.log('Registration successful:', response)
+    } catch (error) {
+        message.error(error.message || 'Registration failed')
+        console.error('Registration error:', error)
+    }
 }
 </script>
 
