@@ -63,4 +63,8 @@ public class AuthenticationService {
                 "Login successful"
         );
     }
-} 
+
+    public User getUserByUsernameOrEmail(String usernameOrEmail) {
+        return userRepository.findByEmailOrName(usernameOrEmail);
+    }
+}
