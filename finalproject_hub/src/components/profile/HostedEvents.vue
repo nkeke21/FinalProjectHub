@@ -4,30 +4,31 @@
             <n-spin size="large" />
         </div>
 
-        <EventListTable
-            v-else
-            :events="hostedEvents"
-            :show-add-event="true"
-        />
+        <div v-else>
+            <EventListTable
+                :events="hostedEvents"
+                :show-add-event="isOwnProfile"
+            />
+        </div>
     </div>
 </template>
   
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, defineProps } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useProfileEventStore } from '@/store/profile/profileEventStore'
 import EventListTable from '@/components/events/List/EventListTable.vue'
 import { NSpin } from 'naive-ui'
 import { useRoute } from 'vue-router'
 
+const props = defineProps({
+    isOwnProfile: Boolean
+})
+
 const profileEventStore = useProfileEventStore()
 const { hostedEvents, isLoading } = storeToRefs(profileEventStore)
 
 const route = useRoute()
-
-const isOwnProfile = computed(() => {
-    return !route.params.id
-})
 
 const getUserId = () => {
     return route.params.id as string
@@ -36,7 +37,7 @@ const getUserId = () => {
 const userId = getUserId()
 
 onMounted(() => {
-    if (isOwnProfile.value) {
+    if (props.isOwnProfile) {
         profileEventStore.fetchCurrentUserHostedEvents()
     } else if (userId) {
         profileEventStore.fetchHostedEvents(userId)

@@ -19,7 +19,7 @@
         </div>
 
         <div class="main-content">
-            <component :is="currentComponent" />
+            <component :is="currentComponent" :is-own-profile="isOwnProfile" />
         </div>
     </div>
 </template>
