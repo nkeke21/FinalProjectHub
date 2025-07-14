@@ -30,6 +30,10 @@
 				<span class="material-icons">groups</span>
 				<span class="text">Community</span>
 			</router-link>
+			<router-link to="/notifications" class="button">
+				<span class="material-icons">notifications</span>
+				<span class="text">Notifications</span>
+			</router-link>
 		</div>
 
 		<div class="flex"></div>
