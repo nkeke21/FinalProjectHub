@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import javax.servlet.http.HttpSession;
+import ge.join2play.join2playback.model.User;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -37,9 +39,11 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<AuthResponse> signIn(@RequestBody SignInRequest signInRequest) {
+    public ResponseEntity<AuthResponse> signIn(@RequestBody SignInRequest signInRequest, HttpSession session) {
         try {
             AuthResponse response = authenticationService.signIn(signInRequest);
+            User user = authenticationService.getUserByUsernameOrEmail(signInRequest.getUsername());
+            session.setAttribute("user", user);
             return ResponseEntity.ok(response);
         } catch (InvalidCredentialsError e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
