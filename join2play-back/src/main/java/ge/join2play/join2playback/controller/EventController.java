@@ -4,6 +4,7 @@ import ge.join2play.join2playback.model.*;
 import ge.join2play.join2playback.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +25,12 @@ public class EventController {
     }
 
     @PostMapping
-    public EventResponse createEvent(@RequestBody EventRequest eventRequest) {
+    public EventResponse createEvent(@RequestBody EventRequest eventRequest, HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            throw new RuntimeException("Not authenticated");
+        }
+        eventRequest.setHostId(currentUser.getId());
         return applicationService.createEvent(eventRequest);
     }
 
@@ -34,7 +40,12 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
-    public EventResponse updateEvent(@RequestBody EventRequest eventRequest, @PathVariable UUID id) {
+    public EventResponse updateEvent(@RequestBody EventRequest eventRequest, @PathVariable UUID id, HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            throw new RuntimeException("Not authenticated");
+        }
+        eventRequest.setHostId(currentUser.getId());
         return applicationService.updateEvent(eventRequest, id);
     }
 
