@@ -38,19 +38,30 @@ const userStore = useUserStore()
 const message = useMessage()
 const route = useRoute()
 
-const loggedInUserId = '13fa5e4e-1d9e-4a2a-9a20-7385f24e9097'
-const profileUserId = computed(() => route.params.id as string)
+const isOwnProfile = computed(() => {
+    return !route.params.id
+})
+
+const profileUserId = computed(() => {
+    return route.params.id as string
+})
 
 const handleMenuChange = async (key: string) => {
   if (key === 'add-friend') {
-    try {
-      await userStore.sendFriendRequest({
-        fromUserId: loggedInUserId,
-        toUserId: profileUserId.value
-      })
-      message.success('Friend request sent!')
-    } catch (err) {
-      message.error('Failed to send friend request')
+    if (!isOwnProfile.value) {
+      try {
+        const userStr = localStorage.getItem('user')
+        const loggedInUser = userStr ? JSON.parse(userStr) : null
+        const fromUserId = loggedInUser?.id || ''
+        
+        await userStore.sendFriendRequest({
+          fromUserId: fromUserId,
+          toUserId: profileUserId.value
+        })
+        message.success('Friend request sent!')
+      } catch (err) {
+        message.error('Failed to send friend request')
+      }
     }
     return
   }
@@ -59,43 +70,51 @@ const handleMenuChange = async (key: string) => {
 }
 
 const logout = () => {
+  localStorage.removeItem('user')
   console.log('Logging out...')
 }
 
-const menuOptions = [
-  {
-    key: 'hosted-events',
-    label: () =>
-      h('div', { class: 'menu-label' }, [
-        h('span', { class: 'material-icons' }, 'event'),
-        h('span', { class: 'menu-text' }, 'Hosted Events')
-      ])
-  },
-  {
-    key: 'account-details',
-    label: () =>
-      h('div', { class: 'menu-label' }, [
-        h('span', { class: 'material-icons' }, 'account_circle'),
-        h('span', { class: 'menu-text' }, 'Account Details')
-      ])
-  },
-  {
-    key: 'registered-events',
-    label: () =>
-      h('div', { class: 'menu-label' }, [
-        h('span', { class: 'material-icons' }, 'assignment_turned_in'),
-        h('span', { class: 'menu-text' }, 'Registered Events')
-      ])
-  },
-  {
-    key: 'add-friend',
-    label: () =>
-      h('div', { class: 'menu-label' }, [
-        h('span', { class: 'material-icons' }, 'person_add'),
-        h('span', { class: 'menu-text' }, 'Add Friend')
-      ])
+const menuOptions = computed(() => {
+  const baseOptions = [
+    {
+      key: 'hosted-events',
+      label: () =>
+        h('div', { class: 'menu-label' }, [
+          h('span', { class: 'material-icons' }, 'event'),
+          h('span', { class: 'menu-text' }, 'Hosted Events')
+        ])
+    },
+    {
+      key: 'account-details',
+      label: () =>
+        h('div', { class: 'menu-label' }, [
+          h('span', { class: 'material-icons' }, 'account_circle'),
+          h('span', { class: 'menu-text' }, 'Account Details')
+        ])
+    },
+    {
+      key: 'registered-events',
+      label: () =>
+        h('div', { class: 'menu-label' }, [
+          h('span', { class: 'material-icons' }, 'assignment_turned_in'),
+          h('span', { class: 'menu-text' }, 'Registered Events')
+        ])
+    }
+  ]
+
+  if (!isOwnProfile.value) {
+    baseOptions.push({
+      key: 'add-friend',
+      label: () =>
+        h('div', { class: 'menu-label' }, [
+          h('span', { class: 'material-icons' }, 'person_add'),
+          h('span', { class: 'menu-text' }, 'Add Friend')
+        ])
+    })
   }
-]
+
+  return baseOptions
+})
 
 const selectedKey = ref('hosted-events')
 

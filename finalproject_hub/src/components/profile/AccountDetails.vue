@@ -63,7 +63,7 @@
   </template>
   
 <script setup lang="ts">
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, computed } from 'vue'
 import { useUserStore } from '@/store/profile/userStore'
 import { NFormItem, NInput, NButton, NSkeleton, useMessage  } from 'naive-ui'
 import { storeToRefs } from 'pinia'
@@ -94,10 +94,23 @@ const formData = reactive({
 })
 
 const route = useRoute()
-const userId = route.params.id as string
+
+const isOwnProfile = computed(() => {
+    return !route.params.id
+})
+
+const getUserId = () => {
+    return route.params.id as string
+}
+
+const userId = getUserId()
 
 onMounted(async () => {
-    userStore.fetchProfile(userId)
+    if (isOwnProfile.value) {
+        userStore.fetchCurrentUserProfile()
+    } else if (userId) {
+        userStore.fetchProfile(userId)
+    }
 })
 
 watch(profile, (data) => {
@@ -120,7 +133,11 @@ async function submitChanges() {
             description: formData.description
         }
 
-        const updated = await userStore.updateProfile(userId, updateData)
+        if (isOwnProfile.value) {
+            await userStore.updateCurrentUserProfile(updateData)
+        } else if (userId) {
+            await userStore.updateProfile(userId, updateData)
+        }
         
         isEditing.value = false
         message.success('Your account details were updated successfully!')

@@ -13,7 +13,7 @@
 </template>
   
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useProfileEventStore } from '@/store/profile/profileEventStore'
 import EventListTable from '@/components/events/List/EventListTable.vue'
@@ -24,10 +24,23 @@ const profileEventStore = useProfileEventStore()
 const { hostedEvents, isLoading } = storeToRefs(profileEventStore)
 
 const route = useRoute()
-const userId = route.params.id as string
+
+const isOwnProfile = computed(() => {
+    return !route.params.id
+})
+
+const getUserId = () => {
+    return route.params.id as string
+}
+
+const userId = getUserId()
 
 onMounted(() => {
-    profileEventStore.fetchHostedEvents(userId)
+    if (isOwnProfile.value) {
+        profileEventStore.fetchCurrentUserHostedEvents()
+    } else if (userId) {
+        profileEventStore.fetchHostedEvents(userId)
+    }
 })
 </script>
   

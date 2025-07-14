@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { NSpin } from 'naive-ui'
 import EventListTable from '@/components/events/List/EventListTable.vue'
 import { useProfileEventStore } from '@/store/profile/profileEventStore'
@@ -22,10 +22,23 @@ const profileEventStore = useProfileEventStore()
 const { registeredEvents, isLoading, error } = storeToRefs(profileEventStore)
 
 const route = useRoute()
-const userId = route.params.id as string
+
+const isOwnProfile = computed(() => {
+    return !route.params.id
+})
+
+const getUserId = () => {
+    return route.params.id as string
+}
+
+const userId = getUserId()
 
 onMounted(() => {
-  profileEventStore.fetchRegisteredEvents(userId)
+  if (isOwnProfile.value) {
+    profileEventStore.fetchCurrentUserRegisteredEvents()
+  } else if (userId) {
+    profileEventStore.fetchRegisteredEvents(userId)
+  }
 })
 </script>
 
