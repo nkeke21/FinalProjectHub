@@ -35,6 +35,11 @@ const routes = [
     component: AboutPage
   },
   {
+    path: '/profile',
+    name: 'MyProfile',
+    component: ProfileComponent
+  },
+  {
     path: '/profile/:id',
     name: 'Profile',
     component: ProfileComponent

@@ -58,8 +58,11 @@
                   </ul>
 
                   <div style="text-align: right;">
-                    <n-button type="primary" color="orange" size="medium" @click="onEditClick">
+                    <n-button v-if="isHost" type="primary" color="orange" size="medium" @click="onEditClick">
                       Edit
+                    </n-button>
+                    <n-button v-else type="primary" color="green" size="medium" @click="onJoinClick">
+                      Join Event
                     </n-button>
                   </div>
                 </n-card>
@@ -106,6 +109,20 @@ const message = useMessage()
 const isUpdating = ref(false)
 
 const event = computed(() => store.selectedEvent)
+
+const loggedInUserId = computed(() => {
+  const userStr = localStorage.getItem('user')
+  if (!userStr) return null
+  try {
+    return JSON.parse(userStr).id
+  } catch {
+    return null
+  }
+})
+
+const isHost = computed(() => {
+  return event.value && loggedInUserId.value && event.value.hostId === loggedInUserId.value
+})
 
 onMounted(async () => {
   isUpdating.value = true
@@ -182,6 +199,10 @@ const handleEditSubmit = async (eventDetails: SportEvent) => {
   } finally {
     isUpdating.value = false
   }
+}
+
+const onJoinClick = () => {
+  message.success('Joined the event!')
 }
 </script>
 

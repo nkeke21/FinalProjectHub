@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { getUserDetails, UserDetailsResponse, updateUserDetails } from '@/services/apis/ProfileDetailsService'
+import { getUserDetails, UserDetailsResponse, updateUserDetails, getCurrentUserDetails, updateCurrentUserDetails } from '@/services/apis/ProfileDetailsService'
 import { searchUsers, type UserSearchResult } from '@/services/apis/UserSearchService'
 import { sendFriendRequest, FriendRequestPayload } from '@/services/apis/FriendRequestService'
 import { UserUpdateDTO } from '@/models/UserUpdateDTO'
@@ -27,12 +27,41 @@ export const useUserStore = defineStore('user', {
             }
         },
 
+        async fetchCurrentUserProfile() {
+            this.isLoading = true
+            this.error = null
+
+            try {
+                const result = await getCurrentUserDetails()
+                this.profile = result
+            } catch (err: any) {
+                this.error = err.message
+            } finally {
+                this.isLoading = false
+            }
+        },
+
         async updateProfile(userId: string, updateData: UserUpdateDTO) {
             this.isLoading = true
             this.error = null
       
             try {
                 const updated = await updateUserDetails(userId, updateData)
+                this.profile = { ...this.profile, ...updated }
+            } catch (err: any) {
+                this.error = err.message
+                throw err
+            } finally {
+                this.isLoading = false
+            }
+        },
+
+        async updateCurrentUserProfile(updateData: UserUpdateDTO) {
+            this.isLoading = true
+            this.error = null
+      
+            try {
+                const updated = await updateCurrentUserDetails(updateData)
                 this.profile = { ...this.profile, ...updated }
             } catch (err: any) {
                 this.error = err.message

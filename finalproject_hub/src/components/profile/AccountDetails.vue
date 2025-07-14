@@ -21,7 +21,8 @@
                 <n-input
                 v-model:value="formData.name"
                 placeholder="Enter your name"
-                @focus="startEditing"
+                :disabled="!isOwnProfile"
+                @focus="isOwnProfile ? startEditing() : null"
                 />
             </n-form-item>
     
@@ -33,7 +34,8 @@
                 <n-input
                 v-model:value="formData.phoneNumber"
                 placeholder="Phone Number"
-                @focus="startEditing"
+                :disabled="!isOwnProfile"
+                @focus="isOwnProfile ? startEditing() : null"
                 />
             </n-form-item>
     
@@ -47,12 +49,13 @@
                 type="textarea"
                 placeholder="Write a bit about yourself..."
                 :autosize="{ minRows: 3, maxRows: 6 }"
-                @focus="startEditing"
+                :disabled="!isOwnProfile"
+                @focus="isOwnProfile ? startEditing() : null"
                 />
             </n-form-item>
         </div>
   
-            <div v-if="isEditing" class="action-buttons">
+            <div v-if="isOwnProfile && isEditing" class="action-buttons">
                 <n-button type="primary" :loading="isSubmitting" @click="submitChanges">
                     Submit
                 </n-button>
@@ -63,12 +66,16 @@
   </template>
   
 <script setup lang="ts">
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, computed, defineProps } from 'vue'
 import { useUserStore } from '@/store/profile/userStore'
 import { NFormItem, NInput, NButton, NSkeleton, useMessage  } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { UserUpdateDTO } from '@/models/UserUpdateDTO'
 import { useRoute } from 'vue-router'
+
+const props = defineProps({
+    isOwnProfile: Boolean
+})
 
 const userStore = useUserStore()
 const { profile, isLoading } = storeToRefs(userStore)
@@ -94,10 +101,21 @@ const formData = reactive({
 })
 
 const route = useRoute()
-const userId = route.params.id as string
+
+const isOwnProfile = computed(() => props.isOwnProfile)
+
+const getUserId = () => {
+    return route.params.id as string
+}
+
+const userId = getUserId()
 
 onMounted(async () => {
-    userStore.fetchProfile(userId)
+    if (isOwnProfile.value) {
+        userStore.fetchCurrentUserProfile()
+    } else if (userId) {
+        userStore.fetchProfile(userId)
+    }
 })
 
 watch(profile, (data) => {
@@ -108,7 +126,9 @@ watch(profile, (data) => {
 })
 
 function startEditing() {
-    isEditing.value = true
+    if (isOwnProfile.value) {
+        isEditing.value = true
+    }
 }
 
 async function submitChanges() {
@@ -120,7 +140,11 @@ async function submitChanges() {
             description: formData.description
         }
 
-        const updated = await userStore.updateProfile(userId, updateData)
+        if (isOwnProfile.value) {
+            await userStore.updateCurrentUserProfile(updateData)
+        } else if (userId) {
+            await userStore.updateProfile(userId, updateData)
+        }
         
         isEditing.value = false
         message.success('Your account details were updated successfully!')
