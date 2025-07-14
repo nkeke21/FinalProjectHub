@@ -16,10 +16,6 @@
             </div>
 
             <div class="form-row">
-                <n-form-item label="Age" class="half">
-                    <n-input v-model:value="age" type="number" placeholder="Age" />
-                </n-form-item>
-
                 <n-form-item label="Birth Date" class="half">
                     <n-date-picker v-model:value="birthDate" type="date" placeholder="Birth Date" />
                 </n-form-item>
@@ -64,7 +60,6 @@ import { AuthService } from '@/services/apis/AuthService'
 const name = ref('')
 const email = ref('')
 const phoneNumber = ref('')
-const age = ref(null)
 const birthDate = ref(null)
 const description = ref('')
 const password = ref('')
@@ -86,7 +81,6 @@ const signUp = async () => {
             name: name.value,
             email: email.value,
             phoneNumber: phoneNumber.value,
-            age: age.value,
             birthDate: birthDate.value,
             description: description.value,
             password: password.value

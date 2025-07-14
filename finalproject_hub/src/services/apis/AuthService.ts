@@ -4,8 +4,7 @@ export interface SignUpRequest {
     name: string
     email: string
     phoneNumber: string
-    age: number | null
-    birthDate: string | null
+    birthDate: number | null
     description: string
     password: string
 }

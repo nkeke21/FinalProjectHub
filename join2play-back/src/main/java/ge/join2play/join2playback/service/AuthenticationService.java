@@ -30,7 +30,7 @@ public class AuthenticationService {
                 signUpRequest.getName(),
                 signUpRequest.getEmail(),
                 signUpRequest.getPhoneNumber(),
-                signUpRequest.getBirthDate(), // pass as Long
+                signUpRequest.getBirthDate(),
                 signUpRequest.getDescription(),
                 signUpRequest.getPassword()
         );
