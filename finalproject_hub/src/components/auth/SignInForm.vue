@@ -21,12 +21,14 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { NInput, NButton, NForm, NFormItem, NCard, useMessage } from 'naive-ui'
 import { AuthService } from '@/services/apis/AuthService'
 
 const username = ref('')
 const password = ref('')
 const message = useMessage()
+const router = useRouter()
 
 const signIn = async () => {
     try {
@@ -43,6 +45,8 @@ const signIn = async () => {
         
         message.success('Login successful!')
         console.log('Login successful:', response)
+        
+        router.push('/homepage')
     } catch (error) {
         message.error(error.message || 'Login failed')
         console.error('Login error:', error)
