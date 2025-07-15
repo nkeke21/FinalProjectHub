@@ -23,30 +23,6 @@
             <div class="stat-label">Total Members</div>
           </div>
         </div>
-        
-        <div class="stat-card">
-          <div class="stat-icon">
-            <n-icon size="24" color="#64748b">
-              <FootballOutline />
-            </n-icon>
-          </div>
-          <div class="stat-content">
-            <div class="stat-number">12</div>
-            <div class="stat-label">Active Events</div>
-          </div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-icon">
-            <n-icon size="24" color="#64748b">
-              <LocationOutline />
-            </n-icon>
-          </div>
-          <div class="stat-content">
-            <div class="stat-number">5</div>
-            <div class="stat-label">Locations</div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -275,10 +251,9 @@ const handlePageSizeChange = (size: number) => {
 }
 
 .stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  max-width: 800px;
+  display: flex;
+  justify-content: center;
+  max-width: 400px;
   margin: 0 auto;
 }
 
