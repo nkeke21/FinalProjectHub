@@ -59,7 +59,7 @@
         </div>
 
         <div class="event-content">
-          <h3 class="event-title">{{ event.description || 'Sport Event' }}</h3>
+          <h3 class="event-title">{{ truncateDescription(event.description) || 'Sport Event' }}</h3>
           
           <div class="event-meta">
             <div class="meta-item">
@@ -237,6 +237,12 @@ const handlePageChange = (page: number) => {
 const handlePageSizeChange = (size: number) => {
   pageSize.value = size
 }
+
+const truncateDescription = (description: string) => {
+  if (!description) return null
+  if (description.length <= 60) return description
+  return description.substring(0, 60) + '...'
+}
 </script>
 
 <style scoped>
@@ -287,6 +293,9 @@ const handlePageSizeChange = (size: number) => {
   overflow: hidden;
   transition: all 0.3s ease;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .event-card:hover {
@@ -331,6 +340,9 @@ const handlePageSizeChange = (size: number) => {
 
 .event-content {
   padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .event-title {
@@ -339,6 +351,9 @@ const handlePageSizeChange = (size: number) => {
   color: #1e293b;
   margin-bottom: 1rem;
   line-height: 1.4;
+  min-height: 3.5rem;
+  display: flex;
+  align-items: center;
 }
 
 .event-meta {
@@ -358,6 +373,7 @@ const handlePageSizeChange = (size: number) => {
 
 .participants-section {
   margin-bottom: 1.5rem;
+  margin-top: auto;
 }
 
 .participants-info {
@@ -396,6 +412,7 @@ const handlePageSizeChange = (size: number) => {
   padding: 1rem 1.5rem;
   background: #f8fafc;
   border-top: 1px solid #e2e8f0;
+  margin-top: auto;
 }
 
 .view-details-btn {
