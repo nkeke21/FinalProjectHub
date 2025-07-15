@@ -52,5 +52,20 @@ export async function updateSportEvent(id: string, event: SportEvent): Promise<R
         })
     })
 }
-  
+
+export async function joinEvent(id: string): Promise<Response> {
+    return fetch(`${API_BASE_URL}/api/events/${id}/join`, {
+        method: 'POST',
+        headers: HEADERS.JSON,
+        credentials: 'include'
+    })
+}
+
+export async function checkParticipation(id: string): Promise<Response> {
+    return fetch(`${API_BASE_URL}/api/events/${id}/participating`, {
+        method: 'GET',
+        headers: HEADERS.JSON,
+        credentials: 'include'
+    })
+}
   
