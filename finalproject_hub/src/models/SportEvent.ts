@@ -1,6 +1,7 @@
 export interface ParticipantInfo {
     userId: string;
     name: string;
+    email: string;
     age: number;
 }
 

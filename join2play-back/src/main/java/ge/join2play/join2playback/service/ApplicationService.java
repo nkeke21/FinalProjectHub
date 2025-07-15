@@ -70,7 +70,7 @@ public class ApplicationService {
                 .map(ep -> {
                     User participant = userRepository.getById(ep.getParticipantId());
                     int age = calculateAge(participant.getBirthDate());
-                    return new ParticipantInfo(participant.getId(), participant.getName(), age);
+                    return new ParticipantInfo(participant.getId(), participant.getName(), participant.getEmail(), age);
                 })
                 .collect(Collectors.toList());
         
