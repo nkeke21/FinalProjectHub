@@ -91,6 +91,7 @@
                   </div>
                   <div class="participant-info">
                     <div class="participant-name">{{ participant.name }}</div>
+                    <div class="participant-email">{{ participant.email }}</div>
                     <div class="participant-age">{{ participant.age }} years old</div>
                   </div>
                 </div>
@@ -560,6 +561,12 @@ const onJoinClick = async () => {
 .participant-name {
   font-weight: 600;
   color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.participant-email {
+  font-size: 0.875rem;
+  color: #64748b;
   margin-bottom: 0.25rem;
 }
 
