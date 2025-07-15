@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { SportEvent } from '@/models/sportEvent'
-import { createSportEvent, getSportEventById, updateSportEvent, getAllSportEvents  } from '@/services/apis/SportEventService'
+import { createSportEvent, getSportEventById, updateSportEvent, getAllSportEvents, joinEvent, checkParticipation } from '@/services/apis/SportEventService'
 
 export const useSportEventStore = defineStore('sportEvent', {
   state: () => ({
@@ -82,6 +82,52 @@ export const useSportEventStore = defineStore('sportEvent', {
         this.events = await response.json()
       } catch (error) {
         console.error('Failed to fetch all events:', error)
+      }
+    },
+
+    async joinEvent(id: string) {
+      try {
+        const response = await joinEvent(id)
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          console.error('Error joining event:', errorData)
+          throw new Error(errorData.message || 'Failed to join event')
+        }
+        
+        const updatedEvent = await response.json()
+        console.log('✅ Joined event:', updatedEvent)
+        
+        if (this.selectedEvent && this.selectedEvent.eventId === id) {
+          this.selectedEvent = updatedEvent
+        }
+        
+        const eventIndex = this.events.findIndex(e => e.eventId === id)
+        if (eventIndex !== -1) {
+          this.events[eventIndex] = updatedEvent
+        }
+        
+        return updatedEvent
+      } catch (error) {
+        console.error('❌ Failed to join event:', error)
+        throw error
+      }
+    },
+
+    async checkParticipation(id: string): Promise<boolean> {
+      try {
+        const response = await checkParticipation(id)
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          console.error('Error checking participation:', errorData)
+          return false
+        }
+        
+        return await response.json()
+      } catch (error) {
+        console.error('❌ Failed to check participation:', error)
+        return false
       }
     }
   },

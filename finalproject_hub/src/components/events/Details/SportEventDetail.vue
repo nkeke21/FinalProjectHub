@@ -61,6 +61,12 @@
                     <n-button v-if="isHost" type="primary" color="orange" size="medium" @click="onEditClick">
                       Edit
                     </n-button>
+                    <n-button v-else-if="isParticipating" type="primary" color="blue" size="medium" disabled>
+                      Already Joined
+                    </n-button>
+                    <n-button v-else-if="isEventFull" type="primary" color="red" size="medium" disabled>
+                      Event Full
+                    </n-button>
                     <n-button v-else type="primary" color="green" size="medium" @click="onJoinClick">
                       Join Event
                     </n-button>
@@ -124,9 +130,21 @@ const isHost = computed(() => {
   return event.value && loggedInUserId.value && event.value.hostId === loggedInUserId.value
 })
 
+const isParticipating = ref(false)
+
+const isEventFull = computed(() => {
+  return event.value && event.value.numberOfParticipantsRegistered >= event.value.numberOfParticipantsTotal
+})
+
 onMounted(async () => {
   isUpdating.value = true
   await store.fetchEventById(route.params.id as string)
+  
+  // Check if user is participating in this event
+  if (loggedInUserId.value && !isHost.value) {
+    isParticipating.value = await store.checkParticipation(route.params.id as string)
+  }
+  
   isUpdating.value = false
 })
 
@@ -201,8 +219,17 @@ const handleEditSubmit = async (eventDetails: SportEvent) => {
   }
 }
 
-const onJoinClick = () => {
-  message.success('Joined the event!')
+const onJoinClick = async () => {
+  try {
+    isUpdating.value = true
+    await store.joinEvent(route.params.id as string)
+    isParticipating.value = true
+    message.success('Successfully joined the event!')
+  } catch (err: any) {
+    message.error(err.message || 'Failed to join the event. Please try again.')
+  } finally {
+    isUpdating.value = false
+  }
 }
 </script>
 

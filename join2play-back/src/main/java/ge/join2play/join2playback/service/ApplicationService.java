@@ -104,6 +104,54 @@ public class ApplicationService {
         return eventParticipants.stream().map(ep -> eventRepository.getById(ep.getEventId())).map(this::convertEventToEventResponse).collect(Collectors.toList());
     }
 
+    public EventResponse joinEvent(UUID eventId, UUID userId) {
+        if(userRepository.getById(userId) == null){
+            throw new UserDoesNotExistError(
+                    String.format("User with id %s does not exist.", userId));
+        }
+        
+        Event event = eventRepository.getById(eventId);
+        if(event == null){
+            throw new RuntimeException("Event with id " + eventId + " does not exist.");
+        }
+        
+        List<EventParticipant> existingParticipants = eventParticipantsRepository.getAllParticipantsOf(eventId);
+        boolean alreadyParticipating = existingParticipants.stream()
+                .anyMatch(ep -> ep.getParticipantId().equals(userId));
+        
+        if(alreadyParticipating) {
+            throw new RuntimeException("User is already participating in this event.");
+        }
+        
+        if(event.getNumberOfParticipantsRegistered() >= event.getNumberOfParticipantsTotal()) {
+            throw new RuntimeException("Event is already full.");
+        }
+        
+        EventParticipant eventParticipant = new EventParticipant(eventId, UUID.randomUUID(), userId);
+        eventParticipantsRepository.save(eventParticipant);
+        
+        event.setNumberOfParticipantsRegistered(event.getNumberOfParticipantsRegistered() + 1);
+        eventRepository.update(event);
+        
+        return convertEventToEventResponse(event);
+    }
+
+    public boolean isUserParticipating(UUID eventId, UUID userId) {
+        if(userRepository.getById(userId) == null){
+            throw new UserDoesNotExistError(
+                    String.format("User with id %s does not exist.", userId));
+        }
+        
+        Event event = eventRepository.getById(eventId);
+        if(event == null){
+            throw new RuntimeException("Event with id " + eventId + " does not exist.");
+        }
+        
+        List<EventParticipant> existingParticipants = eventParticipantsRepository.getAllParticipantsOf(eventId);
+        return existingParticipants.stream()
+                .anyMatch(ep -> ep.getParticipantId().equals(userId));
+    }
+
     public UserDetailsResponse getUserDetails(UUID id) {
         if(userRepository.getById(id) == null){
             throw new UserDoesNotExistError(

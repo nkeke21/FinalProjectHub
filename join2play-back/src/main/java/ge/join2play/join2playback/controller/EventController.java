@@ -53,4 +53,22 @@ public class EventController {
     public List<EventResponse> getEvents() {
         return applicationService.getAllEvents();
     }
+
+    @PostMapping("/{id}/join")
+    public EventResponse joinEvent(@PathVariable UUID id, HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            throw new RuntimeException("Not authenticated");
+        }
+        return applicationService.joinEvent(id, currentUser.getId());
+    }
+
+    @GetMapping("/{id}/participating")
+    public boolean isUserParticipating(@PathVariable UUID id, HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            throw new RuntimeException("Not authenticated");
+        }
+        return applicationService.isUserParticipating(id, currentUser.getId());
+    }
 }
