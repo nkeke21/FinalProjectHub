@@ -14,6 +14,26 @@ public class EventInMemoryRepository implements EventRepository {
     private final Map<UUID, Event> events = new HashMap<>();
 
     public EventInMemoryRepository() {
+        UUID mockEventId = UUID.fromString("e5d1d580-a4cf-4677-8220-a50c5decccfa");
+        UUID mockHostId = UUID.fromString("13fa5e4e-1d9e-4a2a-9a20-7385f24e9097"); // Kakha Salukvadze
+        Instant mockEventTime = Instant.parse("2025-04-16T10:15:30.00Z");
+        
+        Event mockEvent = new Event(
+                mockEventId,
+                mockHostId,
+                18,
+                35,
+                "Weekend Football Match - Join us for a friendly game!",
+                mockEventTime,
+                41.725788,
+                44.727753,
+                "Vake Park, Tbilisi",
+                10,
+                3,
+                SportType.FOOTBALL
+        );
+        
+        events.put(mockEventId, mockEvent);
     }
     @Override
     public Event getById(UUID id) {

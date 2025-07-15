@@ -1,108 +1,202 @@
 <template>
-  <div class="event-page">
-    <n-card class="event-card" bordered>
-        <n-spin class="event-content" :show="isUpdating" size="large">
-
-          <div v-if="event" class="event-detail">
-            <h1>{{ event.title }}</h1>
-            <div class="event-meta">
-              <div class="meta-item">
-                <n-icon :component="LocationIcon" />
-                <span>{{ event.location }}</span>
-              </div>
-              <div class="meta-item">
-                <n-icon :component="CalendarIcon" />
-                <span>{{ formattedDate }}</span>
-              </div>
+  <div class="event-detail-page">
+    <div class="event-header">
+      <div class="event-hero">
+        <div class="event-badge">
+          <n-icon size="24" color="#065f46">
+            <FootballOutline />
+          </n-icon>
+          <span class="sport-type">{{ event?.sportType }}</span>
+        </div>
+        <h1 class="event-title">{{ event?.description }}</h1>
+        <div class="event-meta">
+          <div class="meta-item">
+            <n-icon size="16" color="white">
+              <LocationOutline />
+            </n-icon>
+            <span>{{ event?.location }}</span>
           </div>
+          <div class="meta-item">
+            <n-icon size="16" color="white">
+              <CalendarOutline />
+            </n-icon>
+            <span>{{ formattedDate }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-          <n-split direction="horizontal" style="height: auto; height: 80%;" :max="0.75" :min="0.25">
-            <template #1>
-              <div class="right-pane">
-                <n-card title="Event Details" :bordered="false">
-                  <p><strong>Sport:</strong> {{ event.sportType }}</p>
-                  <p><strong>Age Range:</strong> {{ event.ageRange }}</p>
-                  <p><strong>Host:</strong> {{ event.hostName }}</p>
-                </n-card>
-                <n-card title="Description" style="margin-top: 16px;" :bordered="false">
-                  <p>{{ event.description }}</p>
-                </n-card>
+    <div class="event-content">
+      <div class="content-grid">
+        <div class="left-column">
+          <n-card class="detail-card" title="Event Information">
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Host</div>
+                <div class="info-value">{{ event?.hostName }}</div>
               </div>
-            </template>
+              <div class="info-item">
+                <div class="info-label">Age Range</div>
+                <div class="info-value">{{ event?.ageRange }} years</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Sport Type</div>
+                <div class="info-value">{{ event?.sportType }}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Capacity</div>
+                <div class="info-value">{{ event?.numberOfParticipantsTotal }} participants</div>
+              </div>
+            </div>
+            
+            <div class="description-section">
+              <h3>About this event</h3>
+              <p>{{ event?.description }}</p>
+            </div>
+          </n-card>
 
-            <template #2>
-              <div class="left-pane">
-                <div class="progress">
-                  <n-progress
-                      type="circle"
-                      :percentage="percentage"
-                      color="#34d399"
-                      rail-color="#f3f4f6" 
-                      style="width: 120px; height: 120px;"
-                    >
-                    <template #default>
-                        <div class="progress-text">
-                            {{ event.numberOfParticipantsRegistered }}/{{ event.numberOfParticipantsTotal }}
-                        </div>
-                    </template>
-                  </n-progress>
+          <!-- Map Section -->
+          <n-card class="map-card" title="Location">
+            <div id="map" class="google-map" />
+          </n-card>
+        </div>
 
-                  <div class="progress-label">Participants</div>
+        <div class="right-column">
+          <n-card class="participants-card" title="Participants">
+            <div class="participants-header">
+              <div class="participants-count">
+                <div class="count-circle">
+                  <span class="count-number">{{ event?.numberOfParticipantsRegistered }}</span>
+                  <span class="count-total">/{{ event?.numberOfParticipantsTotal }}</span>
                 </div>
-
-                <n-card title="Participants" :bordered="false" style="margin-top: 24px;">
-                  <ul>
-                    <li v-for="(participant, index) in event.participantsList" :key="index">
-                      {{ participant.name }} ({{ participant.age }} y/o)
-                    </li>
-                  </ul>
-
-                  <div style="text-align: right;">
-                    <n-button v-if="isHost" type="primary" color="orange" size="medium" @click="onEditClick">
-                      Edit
-                    </n-button>
-                    <n-button v-else-if="isParticipating" type="primary" color="blue" size="medium" disabled>
-                      Already Joined
-                    </n-button>
-                    <n-button v-else-if="isEventFull" type="primary" color="red" size="medium" disabled>
-                      Event Full
-                    </n-button>
-                    <n-button v-else type="primary" color="green" size="medium" @click="onJoinClick">
-                      Join Event
-                    </n-button>
-                  </div>
-                </n-card>
+                <div class="count-label">Joined</div>
               </div>
-            </template>
-          </n-split>
+              <div class="progress-bar">
+                <div 
+                  class="progress-fill" 
+                  :style="{ width: `${percentage}%` }"
+                ></div>
+              </div>
+            </div>
 
-          <!-- Modal for editing -->
-          <CustomModal :show="showEditModal" @close="showEditModal = false">
-            <h2 style="margin-bottom: 1rem;">Edit Sport Event</h2>
-            <AddSportEventModalContent
-              :initial-data="event"
-              submit-button-text="Edit Event"
-              @submit="handleEditSubmit"
-            />
-          </CustomModal>
+            <div class="participants-list">
+              <div v-if="event?.participantsList && event.participantsList.length > 0" class="participants-grid">
+                <div 
+                  v-for="participant in event.participantsList" 
+                  :key="participant.userId"
+                  class="participant-item"
+                >
+                  <div class="participant-avatar">
+                    {{ participant.name.charAt(0).toUpperCase() }}
+                  </div>
+                  <div class="participant-info">
+                    <div class="participant-name">{{ participant.name }}</div>
+                    <div class="participant-age">{{ participant.age }} years old</div>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="no-participants">
+                <n-icon size="48" color="#cbd5e1">
+                  <PeopleOutline />
+                </n-icon>
+                <p>No participants yet</p>
+                <span>Be the first to join!</span>
+              </div>
+            </div>
+
+            <div class="action-section">
+              <n-button 
+                v-if="isHost" 
+                type="primary" 
+                color="#f97316" 
+                size="large" 
+                @click="onEditClick"
+                class="action-button"
+              >
+                <template #icon>
+                  <n-icon><PencilOutline /></n-icon>
+                </template>
+                Edit Event
+              </n-button>
+              
+              <n-button 
+                v-else-if="isParticipating" 
+                type="primary" 
+                color="#3b82f6" 
+                size="large" 
+                disabled
+                class="action-button"
+              >
+                <template #icon>
+                  <n-icon><CheckmarkCircleOutline /></n-icon>
+                </template>
+                Already Joined
+              </n-button>
+              
+              <n-button 
+                v-else-if="isEventFull" 
+                type="primary" 
+                color="#ef4444" 
+                size="large" 
+                disabled
+                class="action-button"
+              >
+                <template #icon>
+                  <n-icon><CloseCircleOutline /></n-icon>
+                </template>
+                Event Full
+              </n-button>
+              
+              <n-button 
+                v-else 
+                type="primary" 
+                color="#22c55e" 
+                size="large" 
+                @click="onJoinClick"
+                class="action-button"
+                :loading="isUpdating"
+              >
+                <template #icon>
+                  <n-icon><AddCircleOutline /></n-icon>
+                </template>
+                Join Event
+              </n-button>
+            </div>
+          </n-card>
         </div>
-        <div v-else style="text-align: center; padding: 40px;">
-          <n-spin size="large" />
-        </div>
-      </n-spin>
+      </div>
+    </div>
 
-    </n-card>
-
-    <h2 class="map-title">Location Map</h2>
-    <div id="map" class="google-map" />
+    <CustomModal :show="showEditModal" @close="showEditModal = false">
+      <h2 style="margin-bottom: 1rem;">Edit Sport Event</h2>
+      <AddSportEventModalContent
+        :initial-data="event"
+        submit-button-text="Edit Event"
+        @submit="handleEditSubmit"
+      />
+    </CustomModal>
   </div>
 </template>
 
-
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { NProgress, NCard, NIcon, NSplit, NButton, useMessage, NSpin } from 'naive-ui'
-import { LocationOutline as LocationIcon, CalendarOutline as CalendarIcon } from '@vicons/ionicons5'
+import { 
+  NCard, 
+  NIcon, 
+  NButton, 
+  useMessage, 
+  NSpin 
+} from 'naive-ui'
+import { 
+  LocationOutline, 
+  CalendarOutline, 
+  FootballOutline,
+  PeopleOutline,
+  PencilOutline,
+  CheckmarkCircleOutline,
+  CloseCircleOutline,
+  AddCircleOutline
+} from '@vicons/ionicons5'
 import { SportEvent } from '../../../models/SportEvent'
 import { useSportEventStore } from '../../../store/events/useSportEventStore'
 import { useRoute } from 'vue-router'
@@ -136,22 +230,34 @@ const isEventFull = computed(() => {
   return event.value && event.value.numberOfParticipantsRegistered >= event.value.numberOfParticipantsTotal
 })
 
+const percentage = computed(() =>
+  event.value?.numberOfParticipantsTotal ? Math.round((event.value.numberOfParticipantsRegistered / event.value.numberOfParticipantsTotal) * 100) : 0
+)
+
+const formattedDate = computed(() =>
+  event.value?.eventTime ? new Date(event.value.eventTime).toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }) : ''
+)
+
 onMounted(async () => {
   isUpdating.value = true
   await store.fetchEventById(route.params.id as string)
   
-  // Check if user is participating in this event
   if (loggedInUserId.value && !isHost.value) {
     isParticipating.value = await store.checkParticipation(route.params.id as string)
   }
   
   isUpdating.value = false
-})
-
-watch(isUpdating, async (newVal) => {
-  if (!newVal) {
-    await initMap()
-  }
+  
+  setTimeout(() => {
+    initMap()
+  }, 100)
 })
 
 const loadGoogleMapsScript = () => {
@@ -161,8 +267,7 @@ const loadGoogleMapsScript = () => {
     }
 
     const script = document.createElement('script')
-    script.src =
-      'https://maps.googleapis.com/maps/api/js?key=&libraries=places'
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=&libraries=places'
     script.async = true
     script.onload = () => resolve((window as any).google)
     script.onerror = reject
@@ -171,32 +276,43 @@ const loadGoogleMapsScript = () => {
 }
 
 const initMap = async () => {
-  const google = await loadGoogleMapsScript()
+  try {
+    const google = await loadGoogleMapsScript()
 
-  const location = event.value
-    ? { lat: event.value.latitude, lng: event.value.longitude }
-    : { lat: 37.7866, lng: -122.4133 }
+    const location = event.value
+      ? { lat: event.value.latitude, lng: event.value.longitude }
+      : { lat: 37.7866, lng: -122.4133 }
 
-  const map = new google.maps.Map(document.getElementById('map') as HTMLElement, {
-    zoom: 13,
-    center: location,
-    mapId: 'DEMO_MAP_ID'
-  })
+    const map = new google.maps.Map(document.getElementById('map') as HTMLElement, {
+      zoom: 15,
+      center: location,
+      mapId: 'DEMO_MAP_ID',
+      styles: [
+        {
+          featureType: 'poi',
+          elementType: 'labels',
+          stylers: [{ visibility: 'off' }]
+        }
+      ]
+    })
 
-  new google.maps.Marker({
-    position: location,
-    map,
-    title: 'Event Location'
-  })
+    new google.maps.Marker({
+      position: location,
+      map,
+      title: 'Event Location',
+      icon: {
+        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#22c55e"/>
+          </svg>
+        `),
+        scaledSize: new google.maps.Size(24, 24)
+      }
+    })
+  } catch (error) {
+    console.error('Failed to initialize map:', error)
+  }
 }
-
-const percentage = computed(() =>
-  event.value?.numberOfParticipantsTotal ? Math.round((event.value.numberOfParticipantsRegistered / event.value.numberOfParticipantsTotal) * 100) : 0
-)
-
-const formattedDate = computed(() =>
-  event.value?.date ? event.value.date.toLocaleString() : ''
-)
 
 const showEditModal = ref(false)
 
@@ -210,7 +326,6 @@ const handleEditSubmit = async (eventDetails: SportEvent) => {
     await store.updateEvent(route.params.id as string, eventDetails)
     message.success('Event updated successfully!')
     showEditModal.value = false
-
     await store.fetchEventById(route.params.id as string)
   } catch (err) {
     message.error('Failed to update the event. Please try again.')
@@ -233,104 +348,293 @@ const onJoinClick = async () => {
 }
 </script>
 
-<style>
-.event-page {
+<style scoped>
+.event-detail-page {
   width: 100%;
-  display: flex;
-  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.event-header {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.event-hero {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.event-badge {
+  display: inline-flex;
   align-items: center;
-  padding: 40px 16px;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  margin-bottom: 1rem;
+  backdrop-filter: blur(10px);
 }
 
-.event-card {
-  width: 65%;
-  height: 60%;
-  margin: 0 auto 32px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
+.sport-type {
+  font-weight: 600;
+  font-size: 0.875rem;
 }
 
-.event-content {
-  height: 100%;
-}
-
-.event-detail {
-  width: 100%;
-  height: 100%;
-  font-family: sans-serif;
+.event-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
 }
 
 .event-meta {
-    display: flex;
-    gap: 16px;
-    margin: 8px 0 24px;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
 }
 
 .meta-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #555;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
 }
 
-.left-pane, .right-pane {
-    padding: 16px;
+.event-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
-.progress {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: transparent;
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 2rem;
+  align-items: start;
 }
 
-.progress-text {
-    font-size: 16px;
-    font-weight: bold;
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
-.progress-label {
-    margin-top: 8px;
-    font-size: 14px;
-    color: #666;
+.right-column {
+  position: sticky;
+  top: 2rem;
 }
 
-.map-wrapper {
-  position: relative;
-  width: 65%;
-  height: 40%;
-  margin: 2rem auto 0;
+.detail-card, .participants-card, .map-card {
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: none;
+  width: 100%;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.info-label {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.description-section h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #1e293b;
+}
+
+.description-section p {
+  color: #475569;
+  line-height: 1.6;
+}
+
+.participants-header {
+  margin-bottom: 2rem;
+}
+
+.participants-count {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.count-circle {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.count-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #22c55e;
+}
+
+.count-total {
+  font-size: 1.25rem;
+  color: #64748b;
+}
+
+.count-label {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+  transition: width 0.3s ease;
+}
+
+.participants-list {
+  margin-bottom: 2rem;
+}
+
+.participants-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.participant-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+}
+
+.participant-avatar {
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.participant-info {
+  flex: 1;
+}
+
+.participant-name {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.participant-age {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.no-participants {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #64748b;
+}
+
+.no-participants p {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem;
+}
+
+.no-participants span {
+  font-size: 0.875rem;
+}
+
+.action-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.action-button {
+  width: 100%;
+  height: 3rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
 }
 
 .google-map {
   width: 100%;
-  height: 100%;
-  border-radius: 12px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  height: 350px;
+  border-radius: 0.75rem;
   overflow: hidden;
 }
 
-.google-map {
-  width: 65%;
-  height: 40%;
-  margin: 2rem auto 0;
-  border-radius: 12px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+@media (max-width: 1200px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .right-column {
+    position: static;
+  }
 }
 
-.map-title {
-  max-width: 800px;
-  margin: 2rem auto 0;
-  font-size: 20px;
-  font-weight: 600;
-  text-align: center;
-  color: #333;
-}
-
-.n-spin-content {
-  height: 100%;
+@media (max-width: 768px) {
+  .event-header {
+    padding: 2rem 1rem;
+  }
+  
+  .event-title {
+    font-size: 2rem;
+  }
+  
+  .event-meta {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .event-content {
+    padding: 1rem;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
   

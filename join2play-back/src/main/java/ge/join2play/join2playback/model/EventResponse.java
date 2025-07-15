@@ -1,5 +1,6 @@
 package ge.join2play.join2playback.model;
 
+import java.util.List;
 import java.util.UUID;
 
 public class EventResponse {
@@ -15,9 +16,10 @@ public class EventResponse {
     private int numberOfParticipantsTotal;
     private int numberOfParticipantsRegistered;
     private String sportType;
+    private List<ParticipantInfo> participantsList;
 
     public EventResponse(UUID eventId, UUID hostId, String hostName, String ageRange, String description, long eventTime, double latitude,
-                         double longitude, String location, int numberOfParticipantsTotal, int numberOfParticipantsRegistered, String sportType) {
+                         double longitude, String location, int numberOfParticipantsTotal, int numberOfParticipantsRegistered, String sportType, List<ParticipantInfo> participantsList) {
         this.eventId = eventId;
         this.hostId = hostId;
         this.hostName = hostName;
@@ -30,6 +32,7 @@ public class EventResponse {
         this.numberOfParticipantsTotal = numberOfParticipantsTotal;
         this.numberOfParticipantsRegistered = numberOfParticipantsRegistered;
         this.sportType = sportType;
+        this.participantsList = participantsList;
     }
 
     public UUID getEventId() {
@@ -126,5 +129,13 @@ public class EventResponse {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public List<ParticipantInfo> getParticipantsList() {
+        return participantsList;
+    }
+
+    public void setParticipantsList(List<ParticipantInfo> participantsList) {
+        this.participantsList = participantsList;
     }
 }

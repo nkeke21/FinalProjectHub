@@ -64,9 +64,28 @@ public class ApplicationService {
     public EventResponse convertEventToEventResponse(Event event) {
         String ageRange = event.getMinAge() + "-" + event.getMaxAge();
         String hostName = userRepository.getById(event.getHostId()).getName();
+        
+        List<EventParticipant> eventParticipants = eventParticipantsRepository.getAllParticipantsOf(event.getId());
+        List<ParticipantInfo> participantsList = eventParticipants.stream()
+                .map(ep -> {
+                    User participant = userRepository.getById(ep.getParticipantId());
+                    int age = calculateAge(participant.getBirthDate());
+                    return new ParticipantInfo(participant.getId(), participant.getName(), age);
+                })
+                .collect(Collectors.toList());
+        
         return new EventResponse(event.getId(), event.getHostId(), hostName, ageRange, event.getDescription(), event.getEventTime().toEpochMilli(),
                 event.getLatitude(), event.getLongitude(), event.getLocation(), event.getNumberOfParticipantsTotal(), event.getNumberOfParticipantsRegistered(),
-                event.getSportType().toString());
+                event.getSportType().toString(), participantsList);
+    }
+
+    private int calculateAge(long birthDateMillis) {
+        LocalDate birthDate = Instant.ofEpochMilli(birthDateMillis)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+        LocalDate currentDate = LocalDate.now();
+        return currentDate.getYear() - birthDate.getYear() - 
+               (currentDate.getDayOfYear() < birthDate.getDayOfYear() ? 1 : 0);
     }
 
     public EventResponse createEvent(EventRequest eventRequest) {
