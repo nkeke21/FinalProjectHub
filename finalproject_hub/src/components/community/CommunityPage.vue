@@ -3,7 +3,7 @@
     <div class="community-header">
       <div class="header-content">
         <div class="header-title">
-          <n-icon size="32" color="#3b82f6">
+          <n-icon size="32" color="#64748b">
             <PeopleOutline />
           </n-icon>
           <h1>Community</h1>
@@ -14,7 +14,7 @@
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon">
-            <n-icon size="24" color="#22c55e">
+            <n-icon size="24" color="#64748b">
               <PersonOutline />
             </n-icon>
           </div>
@@ -26,7 +26,7 @@
         
         <div class="stat-card">
           <div class="stat-icon">
-            <n-icon size="24" color="#3b82f6">
+            <n-icon size="24" color="#64748b">
               <FootballOutline />
             </n-icon>
           </div>
@@ -38,7 +38,7 @@
         
         <div class="stat-card">
           <div class="stat-icon">
-            <n-icon size="24" color="#f97316">
+            <n-icon size="24" color="#64748b">
               <LocationOutline />
             </n-icon>
           </div>
@@ -110,8 +110,7 @@
         
         <div class="member-actions">
           <n-button 
-            type="primary" 
-            color="#22c55e" 
+            type="default" 
             size="small"
             class="view-profile-btn"
             @click.stop="router.push(`/profile/${member.id}`)"
@@ -241,12 +240,14 @@ const handlePageSizeChange = (size: number) => {
 }
 
 .community-header {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-  color: white;
+  background: white;
+  color: #1e293b;
   padding: 3rem 2rem;
   border-radius: 1rem;
   margin-bottom: 2rem;
   text-align: center;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .header-content {
@@ -282,18 +283,18 @@ const handlePageSizeChange = (size: number) => {
 }
 
 .stat-card {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
+  background: white;
   padding: 1.5rem;
   border-radius: 1rem;
   display: flex;
   align-items: center;
   gap: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .stat-icon {
-  background: rgba(255, 255, 255, 0.2);
+  background: #f8fafc;
   padding: 0.75rem;
   border-radius: 0.75rem;
 }
@@ -319,6 +320,7 @@ const handlePageSizeChange = (size: number) => {
   border-radius: 1rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
+  border: 1px solid #e2e8f0;
 }
 
 .search-container {
@@ -353,6 +355,7 @@ const handlePageSizeChange = (size: number) => {
   display: flex;
   align-items: center;
   gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .member-card:hover {
@@ -363,8 +366,8 @@ const handlePageSizeChange = (size: number) => {
 .member-avatar {
   width: 4rem;
   height: 4rem;
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-  color: white;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: #64748b;
   border-radius: 50%;
   display: flex;
   align-items: center;
