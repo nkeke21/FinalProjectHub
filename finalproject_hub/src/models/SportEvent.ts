@@ -1,3 +1,9 @@
+export interface ParticipantInfo {
+    userId: string;
+    name: string;
+    age: number;
+}
+
 export interface SportEvent {
     eventId: string | null
     hostId: string | null
@@ -12,5 +18,5 @@ export interface SportEvent {
     eventTime: number | null
     sportType: string | null
     description: string | null
-    participantsList?: Array<{ name: string; age: number }>
+    participantsList: ParticipantInfo[]
 }
