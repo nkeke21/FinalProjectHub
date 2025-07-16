@@ -30,13 +30,18 @@
                 <n-input v-model:value="formData.email" disabled />
             </n-form-item>
     
-            <n-form-item label="Phone Number *">
-                <n-input
-                v-model:value="formData.phoneNumber"
-                placeholder="Phone Number"
-                :disabled="!isOwnProfile"
-                @focus="isOwnProfile ? startEditing() : null"
-                />
+            <n-form-item label="Phone Number *" :feedback="phoneError" :validation-status="phoneError ? 'error' : undefined">
+                <div class="phone-input-container">
+                    <span class="country-code">+995</span>
+                    <n-input
+                        v-model:value="formData.phoneNumber"
+                        placeholder="5XX XXX XXX"
+                        class="phone-input-field"
+                        :disabled="!isOwnProfile"
+                        @focus="isOwnProfile ? startEditing() : null"
+                        @input="validatePhone"
+                    />
+                </div>
             </n-form-item>
     
             <n-form-item label="Birth Date *">
@@ -82,6 +87,7 @@ const { profile, isLoading } = storeToRefs(userStore)
 
 const isSubmitting = ref(false)
 const isEditing = ref(false)
+const phoneError = ref('')
 const message = useMessage()
 
 const originalData = reactive({
@@ -110,6 +116,16 @@ const getUserId = () => {
 
 const userId = getUserId()
 
+const validatePhone = () => {
+    formData.phoneNumber = formData.phoneNumber.replace(/\D/g, '')
+    
+    if (formData.phoneNumber.length > 0 && (!formData.phoneNumber.startsWith('5') || formData.phoneNumber.length !== 9)) {
+        phoneError.value = 'Please enter a valid Georgian mobile number (5XX XXX XXX)'
+    } else {
+        phoneError.value = ''
+    }
+}
+
 onMounted(async () => {
     if (isOwnProfile.value) {
         userStore.fetchCurrentUserProfile()
@@ -122,6 +138,10 @@ watch(profile, (data) => {
     if (data) {
         Object.assign(originalData, data)
         Object.assign(formData, data)
+        
+        if (formData.phoneNumber && formData.phoneNumber.startsWith('+995')) {
+            formData.phoneNumber = formData.phoneNumber.substring(4)
+        }
     }
 })
 
@@ -132,11 +152,17 @@ function startEditing() {
 }
 
 async function submitChanges() {
+    // Validate phone number before submitting
+    if (!formData.phoneNumber || formData.phoneNumber.length !== 9 || !formData.phoneNumber.startsWith('5')) {
+        phoneError.value = 'Please enter a valid Georgian mobile number (5XX XXX XXX)'
+        return
+    }
+    
     isSubmitting.value = true
     try {
         const updateData: UserUpdateDTO = {
             name: formData.name,
-            phoneNumber: formData.phoneNumber,
+            phoneNumber: `+995${formData.phoneNumber}`,
             description: formData.description
         }
 
@@ -147,6 +173,7 @@ async function submitChanges() {
         }
         
         isEditing.value = false
+        phoneError.value = ''
         message.success('Your account details were updated successfully!')
     } catch (error) {
         console.error("Update failed:", error)
@@ -159,6 +186,7 @@ async function submitChanges() {
 function cancelChanges() {
     Object.assign(formData, originalData)
     isEditing.value = false
+    phoneError.value = ''
 }
 </script>
 
@@ -199,13 +227,44 @@ function cancelChanges() {
 .skeleton-pair {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
 }
 
 .skeleton-full {
-    grid-column: span 2;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+    grid-column: 1 / -1;
+}
+
+.phone-input-container {
+    display: flex;
+    align-items: center;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.country-code {
+    background-color: #f8fafc;
+    padding: 0.5rem 0.75rem;
+    border-right: 1px solid #e2e8f0;
+    color: #64748b;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.phone-input-field {
+    flex: 1;
+}
+
+.phone-input-field :deep(.n-input) {
+    border: none;
+    box-shadow: none;
+}
+
+.phone-input-field :deep(.n-input:focus) {
+    border: none;
+    box-shadow: none;
 }
 </style>
