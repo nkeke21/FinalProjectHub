@@ -59,7 +59,8 @@ public class EventControllerTests {
     public void testCreateEvent() {
         EventRequest request = new EventRequest(
                 hostId,
-                "18-25",
+                18,
+                25,
                 "Football Match",
                 Instant.parse("2025-04-16T10:15:30.00Z").toEpochMilli(),
                 41.725788,

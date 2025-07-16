@@ -15,7 +15,8 @@ export interface SportEvent {
     participants: number
     numberOfParticipantsTotal: number
     numberOfParticipantsRegistered: number
-    ageRange: string
+    minAge: number
+    maxAge: number
     eventTime: number | null
     sportType: string | null
     description: string | null

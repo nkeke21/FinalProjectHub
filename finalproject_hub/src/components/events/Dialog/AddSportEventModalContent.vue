@@ -17,7 +17,23 @@
     </n-form-item>
 
     <n-form-item label="Age Range">
-        <n-input v-model:value="formValue.ageRange" placeholder="e.g. 18-30" />
+        <div class="age-range-inputs">
+            <n-input-number 
+                v-model:value="formValue.minAge" 
+                placeholder="Min Age" 
+                :min="1" 
+                :max="100"
+                class="age-input"
+            />
+            <span class="age-separator">to</span>
+            <n-input-number 
+                v-model:value="formValue.maxAge" 
+                placeholder="Max Age" 
+                :min="1" 
+                :max="100"
+                class="age-input"
+            />
+        </div>
     </n-form-item>
 
     <n-form-item label="Event Time">
@@ -70,7 +86,8 @@ const formValue = reactive({
   locationLat: 0,
   locationLng: 0,
   participants: 1,
-  ageRange: '',
+  minAge: null as null | number,
+  maxAge: null as null | number,
   eventTime: null as null | number,
   sportType: null as null | string,
   description: ''
@@ -87,7 +104,18 @@ watchEffect(() => {
   if (props.initialData) {
     formValue.location = props.initialData.location || ''
     formValue.participants = props.initialData.total || 1
-    formValue.ageRange = props.initialData.ageRange || ''
+    
+    if (props.initialData.ageRange) {
+      const ages = props.initialData.ageRange.split('-')
+      if (ages.length === 2) {
+        formValue.minAge = parseInt(ages[0])
+        formValue.maxAge = parseInt(ages[1])
+      }
+    } else if (props.initialData.minAge && props.initialData.maxAge) {
+      formValue.minAge = props.initialData.minAge
+      formValue.maxAge = props.initialData.maxAge
+    }
+    
     formValue.eventTime = props.initialData.date ? new Date(props.initialData.date).getTime() : null
     formValue.sportType = props.initialData.sportType || null
     formValue.description = props.initialData.description || ''
@@ -107,11 +135,34 @@ const handleSubmit = () => {
     return
   }
 
+  if (!formValue.minAge || !formValue.maxAge) {
+    locationError.value = 'Please set both minimum and maximum age.'
+    return
+  }
+
+  if (formValue.minAge > formValue.maxAge) {
+    locationError.value = 'Minimum age cannot be greater than maximum age.'
+    return
+  }
+
   emit('submit', { ...formValue })
 }
 </script>
 
 
-<style>
+<style scoped>
+.age-range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
 
+.age-input {
+  flex: 1;
+}
+
+.age-separator {
+  color: #64748b;
+  font-weight: 500;
+}
 </style>

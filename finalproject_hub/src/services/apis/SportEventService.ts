@@ -23,7 +23,8 @@ export async function createSportEvent(event: SportEvent): Promise<Response> {
         headers: HEADERS.JSON,
         credentials: 'include',
         body: JSON.stringify({
-            ageRange: event.ageRange,
+            minAge: event.minAge,
+            maxAge: event.maxAge,
             description: event.description,
             eventTime: event.eventTime,
             latitude: event.locationLat,

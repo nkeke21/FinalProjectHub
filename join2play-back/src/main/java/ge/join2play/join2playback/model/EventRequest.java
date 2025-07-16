@@ -4,7 +4,8 @@ import java.util.UUID;
 
 public class EventRequest {
     private UUID hostId;
-    private String ageRange;
+    private int minAge;
+    private int maxAge;
     private String description;
     private long eventTime;
     private double latitude;
@@ -14,10 +15,11 @@ public class EventRequest {
     private int numberOfParticipantsRegistered;
     private String sportType;
 
-    public EventRequest(UUID hostId, String ageRange, String description, long eventTime, double latitude,
+    public EventRequest(UUID hostId, int minAge, int maxAge, String description, long eventTime, double latitude,
                         double longitude, String location, int numberOfParticipantsTotal, int numberOfParticipantsRegistered, String sportType) {
         this.hostId = hostId;
-        this.ageRange = ageRange;
+        this.minAge = minAge;
+        this.maxAge = maxAge;
         this.description = description;
         this.eventTime = eventTime;
         this.latitude = latitude;
@@ -36,12 +38,20 @@ public class EventRequest {
         this.hostId = hostId;
     }
 
-    public String getAgeRange() {
-        return ageRange;
+    public int getMinAge() {
+        return minAge;
     }
 
-    public void setAgeRange(String ageRange) {
-        this.ageRange = ageRange;
+    public void setMinAge(int minAge) {
+        this.minAge = minAge;
+    }
+
+    public int getMaxAge() {
+        return maxAge;
+    }
+
+    public void setMaxAge(int maxAge) {
+        this.maxAge = maxAge;
     }
 
     public String getDescription() {
