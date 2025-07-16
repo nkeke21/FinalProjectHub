@@ -4,7 +4,11 @@
       <div class="event-hero">
         <div class="event-badge">
           <n-icon size="24" color="#065f46">
-            <FootballOutline />
+            <FootballOutline v-if="event?.sportType === 'Football'" />
+            <BasketballOutline v-else-if="event?.sportType === 'Basketball'" />
+            <TennisballOutline v-else-if="event?.sportType === 'Tennis'" />
+            <FitnessOutline v-else-if="event?.sportType === 'Running'" />
+            <FootballOutline v-else />
           </n-icon>
           <span class="sport-type">{{ event?.sportType }}</span>
         </div>
@@ -192,11 +196,14 @@ import {
   LocationOutline, 
   CalendarOutline, 
   FootballOutline,
+  BasketballOutline,
+  TennisballOutline,
   PeopleOutline,
   PencilOutline,
   CheckmarkCircleOutline,
   CloseCircleOutline,
-  AddCircleOutline
+  AddCircleOutline,
+  FitnessOutline
 } from '@vicons/ionicons5'
 import { SportEvent } from '../../../models/SportEvent'
 import { useSportEventStore } from '../../../store/events/useSportEventStore'
