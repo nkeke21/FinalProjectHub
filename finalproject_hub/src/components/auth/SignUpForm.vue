@@ -11,7 +11,15 @@
                 </n-form-item>
 
                 <n-form-item label="Phone Number" class="half" :feedback="phoneError" :validation-status="phoneError ? 'error' : undefined">
-                    <n-input v-model:value="phoneNumber" placeholder="Phone Number" />
+                    <div class="phone-input-container">
+                        <span class="country-code">+995</span>
+                        <n-input 
+                            v-model:value="phoneNumber" 
+                            placeholder="5XX XXX XXX" 
+                            class="phone-input-field"
+                            @input="validatePhone"
+                        />
+                    </div>
                 </n-form-item>
             </div>
 
@@ -86,13 +94,25 @@ const clearErrors = () => {
     birthDateError.value = ''
 }
 
+const validatePhone = () => {
+    phoneNumber.value = phoneNumber.value.replace(/\D/g, '')
+    
+    if (phoneNumber.value.length > 0 && (!phoneNumber.value.startsWith('5') || phoneNumber.value.length !== 9)) {
+        phoneError.value = 'Please enter a valid Georgian mobile number (5XX XXX XXX)'
+    } else {
+        phoneError.value = ''
+    }
+}
+
 const validateForm = () => {
     clearErrors()
     let valid = true
+    
     if (!name.value.trim()) {
         nameError.value = 'Name is required'
         valid = false
     }
+    
     if (!email.value.includes('@')) {
         emailError.value = 'Email must contain "@"'
         valid = false
@@ -103,22 +123,27 @@ const validateForm = () => {
             valid = false
         }
     }
-    if (!phoneNumber.value.match(/^\d+$/)) {
-        phoneError.value = 'Phone number must contain only digits'
+    
+    if (!phoneNumber.value || phoneNumber.value.length !== 9 || !phoneNumber.value.startsWith('5')) {
+        phoneError.value = 'Please enter a valid Georgian mobile number (5XX XXX XXX)'
         valid = false
     }
+    
     if (!birthDate.value) {
         birthDateError.value = 'Birth date is required'
         valid = false
     }
+    
     if (password.value.length < 8) {
         passwordError.value = 'Password must be at least 8 characters'
         valid = false
     }
+    
     if (passwordMismatch.value) {
         repeatPasswordError.value = 'Passwords do not match'
         valid = false
     }
+    
     return valid
 }
 
@@ -129,7 +154,7 @@ const signUp = async () => {
         const response = await AuthService.signUp({
             name: name.value,
             email: email.value,
-            phoneNumber: phoneNumber.value,
+            phoneNumber: `+995${phoneNumber.value}`,
             birthDate: birthDate.value,
             description: description.value,
             password: password.value
@@ -169,5 +194,36 @@ const signUp = async () => {
 .signin-switch {
     margin-top: 20px;
     text-align: center;
+}
+
+.phone-input-container {
+    display: flex;
+    align-items: center;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.country-code {
+    background-color: #f8fafc;
+    padding: 0.5rem 0.75rem;
+    border-right: 1px solid #e2e8f0;
+    color: #64748b;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.phone-input-field {
+    flex: 1;
+}
+
+.phone-input-field :deep(.n-input) {
+    border: none;
+    box-shadow: none;
+}
+
+.phone-input-field :deep(.n-input:focus) {
+    border: none;
+    box-shadow: none;
 }
 </style>
