@@ -316,7 +316,7 @@ onMounted(() => {
 
 <style scoped>
 .notifications-page {
-  width: 70%;
+  width: 90%;
   margin: 0 auto;
   padding: 2rem;
   min-height: 100vh;

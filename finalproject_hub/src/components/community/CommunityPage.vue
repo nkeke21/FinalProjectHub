@@ -209,7 +209,7 @@ const handlePageSizeChange = (size: number) => {
 
 <style scoped>
 .community-page {
-  width: 70%;
+  width: 90%;
   margin: 0 auto;
   padding: 2rem;
   min-height: 100vh;
@@ -314,7 +314,7 @@ const handlePageSizeChange = (size: number) => {
 
 .members-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -331,6 +331,7 @@ const handlePageSizeChange = (size: number) => {
   align-items: center;
   gap: 1rem;
   margin-bottom: 1rem;
+  min-width: 0;
 }
 
 .member-card:hover {
@@ -354,6 +355,7 @@ const handlePageSizeChange = (size: number) => {
 
 .member-info {
   flex: 1;
+  min-width: 0;
 }
 
 .member-name {
@@ -379,11 +381,13 @@ const handlePageSizeChange = (size: number) => {
 
 .member-actions {
   flex-shrink: 0;
+  min-width: 120px;
 }
 
 .view-profile-btn {
   font-weight: 600;
   border-radius: 0.75rem;
+  white-space: nowrap;
 }
 
 .empty-state {
@@ -437,11 +441,52 @@ const handlePageSizeChange = (size: number) => {
   
   .members-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
   
   .member-card {
     flex-direction: column;
     text-align: center;
+    padding: 1rem;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  
+  .member-info {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .member-actions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+  
+  .view-profile-btn {
+    width: 100%;
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .member-card {
+    padding: 0.75rem;
+  }
+  
+  .member-avatar {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1rem;
+  }
+  
+  .member-name {
+    font-size: 1rem;
+  }
+  
+  .detail-item {
+    font-size: 0.8rem;
   }
 }
 </style> 
