@@ -216,7 +216,7 @@ const currentComponent = computed(() => {
 
 .main-content {
   flex-grow: 1;
-  padding: 48px 64px;
+  padding-top: 48px;
   background-color: #f7f9fc;
 }
 </style>
