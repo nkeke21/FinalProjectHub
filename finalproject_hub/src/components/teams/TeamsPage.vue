@@ -29,8 +29,8 @@
                 </n-icon>
                 <span class="sport-type">{{ team.sportType }}</span>
               </div>
-              <div class="team-role" :class="team.role.toLowerCase()">
-                {{ team.role }}
+              <div class="team-role" :class="getUserRole(team).toLowerCase()">
+                {{ getUserRole(team) }}
               </div>
             </div>
             
@@ -41,7 +41,7 @@
                 <n-icon size="16" color="#64748b">
                   <PersonOutline />
                 </n-icon>
-                <span>{{ team.captain }}</span>
+                <span>{{ team.captainName }}</span>
               </div>
               <div class="meta-item">
                 <n-icon size="16" color="#64748b">
@@ -53,20 +53,20 @@
                 <n-icon size="16" color="#64748b">
                   <CalendarOutline />
                 </n-icon>
-                <span>Created {{ team.createdDate }}</span>
+                <span>Created {{ formatDate(team.createdAt) }}</span>
               </div>
               <div class="meta-item">
                 <n-icon size="16" color="#64748b">
                   <PeopleOutline />
                 </n-icon>
-                <span>{{ team.ageRange }}</span>
+                <span>{{ team.ageRange.min }}-{{ team.ageRange.max }} years</span>
               </div>
             </div>
 
             <div class="team-participants">
-              <span class="participant-count">{{ team.members }}/{{ team.maxMembers }} members</span>
+              <span class="participant-count">{{ team.members.length }}/{{ team.maxMembers }} members</span>
               <div class="progress-bar">
-                <div class="progress-fill" :style="{ width: (team.members / team.maxMembers * 100) + '%' }"></div>
+                <div class="progress-fill" :style="{ width: (team.members.length / team.maxMembers * 100) + '%' }"></div>
               </div>
             </div>
 
@@ -107,7 +107,7 @@
                 <n-icon size="16" color="#64748b">
                   <PersonOutline />
                 </n-icon>
-                <span>Captain: {{ team.captain }}</span>
+                <span>Captain: {{ team.captainName }}</span>
               </div>
               <div class="meta-item">
                 <n-icon size="16" color="#64748b">
@@ -119,20 +119,20 @@
                 <n-icon size="16" color="#64748b">
                   <CalendarOutline />
                 </n-icon>
-                <span>Created {{ team.createdDate }}</span>
+                <span>Created {{ formatDate(team.createdAt) }}</span>
               </div>
               <div class="meta-item">
                 <n-icon size="16" color="#64748b">
                   <PeopleOutline />
                 </n-icon>
-                <span>{{ team.ageRange }}</span>
+                <span>{{ team.ageRange.min }}-{{ team.ageRange.max }} years</span>
               </div>
             </div>
 
             <div class="team-participants">
-              <span class="participant-count">{{ team.members }}/{{ team.maxMembers }} members</span>
+              <span class="participant-count">{{ team.members.length }}/{{ team.maxMembers }} members</span>
               <div class="progress-bar">
-                <div class="progress-fill" :style="{ width: (team.members / team.maxMembers * 100) + '%' }"></div>
+                <div class="progress-fill" :style="{ width: (team.members.length / team.maxMembers * 100) + '%' }"></div>
               </div>
             </div>
 
@@ -174,58 +174,38 @@ import {
   GlobeOutline,
   LocationOutline
 } from '@vicons/ionicons5'
+import { mockTeams } from '@/data/mockTournaments'
+import type { Team } from '@/models/Tournament'
 
-const myTeams = ref([
-  {
-    id: 1,
-    name: 'FC Thunderbolts - Competitive football team',
-    sportType: 'Football',
-    role: 'Captain',
-    captain: 'John Doe',
-    location: 'Tbilisi, Georgia',
-    createdDate: 'March 1, 2025',
-    ageRange: '18-35 years',
-    members: 8,
-    maxMembers: 11
-  },
-  {
-    id: 2,
-    name: 'Red Dragons - Basketball champions',
-    sportType: 'Basketball',
-    role: 'Member',
-    captain: 'Mike Johnson',
-    location: 'Tbilisi, Georgia',
-    createdDate: 'February 15, 2025',
-    ageRange: '20-40 years',
-    members: 5,
-    maxMembers: 5
-  }
-])
+const teams = ref<Team[]>(mockTeams)
 
-const availableTeams = ref([
-  {
-    id: 3,
-    name: 'Blue Eagles - Rising football stars',
-    sportType: 'Football',
-    captain: 'Steve Miller',
-    location: 'Tbilisi, Georgia',
-    createdDate: 'February 20, 2025',
-    ageRange: '18-35 years',
-    members: 9,
-    maxMembers: 11
-  },
-  {
-    id: 4,
-    name: 'Green Lions - Basketball enthusiasts',
-    sportType: 'Basketball',
-    captain: 'Paul Taylor',
-    location: 'Tbilisi, Georgia',
-    createdDate: 'February 25, 2025',
-    ageRange: '20-40 years',
-    members: 4,
-    maxMembers: 5
+const myTeams = ref<Team[]>(teams.value.filter(team => 
+  team.members.some(member => member.userId === 'user-1' || member.userId === 'user-3')
+))
+
+const availableTeams = ref<Team[]>(teams.value.filter(team => 
+  !team.members.some(member => member.userId === 'user-1' || member.userId === 'user-3')
+))
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  })
+}
+
+const getUserRole = (team: Team) => {
+  const user = team.members.find(member => member.userId === 'user-1');
+  if (user) {
+    return 'Captain';
   }
-])
+  const user2 = team.members.find(member => member.userId === 'user-3');
+  if (user2) {
+    return 'Member';
+  }
+  return 'Member'; // Default role if user not found
+};
 </script>
 
 <style scoped>
