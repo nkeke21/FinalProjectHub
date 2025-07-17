@@ -36,7 +36,6 @@ export interface Team {
   members: TeamMember[]
   maxMembers: number
   isPublic: boolean
-  location: string
   ageRange: {
     min: number
     max: number

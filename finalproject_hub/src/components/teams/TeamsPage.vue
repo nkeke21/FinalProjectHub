@@ -6,7 +6,7 @@
     </div>
 
     <div class="teams-actions">
-      <n-button type="primary" color="blue">
+      <n-button type="primary" color="blue" @click="showCreateTeamModal = true">
         <template #icon>
           <n-icon><AddOutline /></n-icon>
         </template>
@@ -18,130 +18,27 @@
       <div class="teams-section">
         <h2>My Teams</h2>
         <div class="teams-grid">
-          <div class="team-card" v-for="team in myTeams" :key="team.id">
-            <div class="team-header">
-              <div class="team-badge">
-                <n-icon size="20" color="#3b82f6">
-                  <FootballOutline v-if="team.sportType === 'Football'" />
-                  <BasketballOutline v-else-if="team.sportType === 'Basketball'" />
-                  <TennisballOutline v-else-if="team.sportType === 'Tennis'" />
-                  <FitnessOutline v-else />
-                </n-icon>
-                <span class="sport-type">{{ team.sportType }}</span>
-              </div>
-              <div class="team-role" :class="getUserRole(team).toLowerCase()">
-                {{ getUserRole(team) }}
-              </div>
-            </div>
-            
-            <h3 class="team-name">{{ team.name }}</h3>
-            
-            <div class="team-meta">
-              <div class="meta-item">
-                <n-icon size="16" color="#64748b">
-                  <PersonOutline />
-                </n-icon>
-                <span>{{ team.captainName }}</span>
-              </div>
-              <div class="meta-item">
-                <n-icon size="16" color="#64748b">
-                  <LocationOutline />
-                </n-icon>
-                <span>{{ team.location }}</span>
-              </div>
-              <div class="meta-item">
-                <n-icon size="16" color="#64748b">
-                  <CalendarOutline />
-                </n-icon>
-                <span>Created {{ formatDate(team.createdAt) }}</span>
-              </div>
-              <div class="meta-item">
-                <n-icon size="16" color="#64748b">
-                  <PeopleOutline />
-                </n-icon>
-                <span>{{ team.ageRange.min }}-{{ team.ageRange.max }} years</span>
-              </div>
-            </div>
-
-            <div class="team-participants">
-              <span class="participant-count">{{ team.members.length }}/{{ team.maxMembers }} members</span>
-              <div class="progress-bar">
-                <div class="progress-fill" :style="{ width: (team.members.length / team.maxMembers * 100) + '%' }"></div>
-              </div>
-            </div>
-
-            <div class="team-actions">
-              <n-button type="primary" color="blue" class="manage-team-btn">
-                Manage Team
-              </n-button>
-            </div>
-          </div>
+          <TeamCard
+            v-for="team in myTeams"
+            :key="team.id"
+            :team="team"
+            :show-role="true"
+            :current-user-id="currentUserId"
+            @manage-team="openTeamManagement"
+          />
         </div>
       </div>
 
       <div class="teams-section">
         <h2>Available Teams to Join</h2>
         <div class="teams-grid">
-          <div class="team-card" v-for="team in availableTeams" :key="team.id">
-            <div class="team-header">
-              <div class="team-badge">
-                <n-icon size="20" color="#3b82f6">
-                  <FootballOutline v-if="team.sportType === 'Football'" />
-                  <BasketballOutline v-else-if="team.sportType === 'Basketball'" />
-                  <TennisballOutline v-else-if="team.sportType === 'Tennis'" />
-                  <FitnessOutline v-else />
-                </n-icon>
-                <span class="sport-type">{{ team.sportType }}</span>
-              </div>
-              <div class="team-privacy">
-                <n-icon size="16" color="#64748b">
-                  <GlobeOutline />
-                </n-icon>
-              </div>
-            </div>
-            
-            <h3 class="team-name">{{ team.name }}</h3>
-            
-            <div class="team-meta">
-              <div class="meta-item">
-                <n-icon size="16" color="#64748b">
-                  <PersonOutline />
-                </n-icon>
-                <span>Captain: {{ team.captainName }}</span>
-              </div>
-              <div class="meta-item">
-                <n-icon size="16" color="#64748b">
-                  <LocationOutline />
-                </n-icon>
-                <span>{{ team.location }}</span>
-              </div>
-              <div class="meta-item">
-                <n-icon size="16" color="#64748b">
-                  <CalendarOutline />
-                </n-icon>
-                <span>Created {{ formatDate(team.createdAt) }}</span>
-              </div>
-              <div class="meta-item">
-                <n-icon size="16" color="#64748b">
-                  <PeopleOutline />
-                </n-icon>
-                <span>{{ team.ageRange.min }}-{{ team.ageRange.max }} years</span>
-              </div>
-            </div>
-
-            <div class="team-participants">
-              <span class="participant-count">{{ team.members.length }}/{{ team.maxMembers }} members</span>
-              <div class="progress-bar">
-                <div class="progress-fill" :style="{ width: (team.members.length / team.maxMembers * 100) + '%' }"></div>
-              </div>
-            </div>
-
-            <div class="team-actions">
-              <n-button type="primary" color="blue" class="join-team-btn">
-                Request to Join
-              </n-button>
-            </div>
-          </div>
+          <TeamCard
+            v-for="team in availableTeams"
+            :key="team.id"
+            :team="team"
+            :show-role="false"
+            @join-team="requestToJoinTeam"
+          />
         </div>
       </div>
     </div>
@@ -153,59 +50,82 @@
       <h3>No teams available</h3>
       <p>Create your first team or browse available teams to join</p>
     </div>
+
+    <!-- Create Team Modal -->
+    <CreateTeamModal
+      v-model:show="showCreateTeamModal"
+      @team-created="handleTeamCreated"
+    />
+
+    <!-- Team Management Modal -->
+    <TeamManagementModal
+      v-model:show="showTeamManagementModal"
+      :team="selectedTeam"
+      :is-captain="isCaptain"
+      @team-updated="handleTeamUpdated"
+      @member-removed="handleMemberRemoved"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { 
-  NButton, 
-  NIcon 
-} from 'naive-ui'
-import { 
-  AddOutline,
-  FootballOutline,
-  BasketballOutline,
-  TennisballOutline,
-  FitnessOutline,
-  PeopleOutline,
-  CalendarOutline,
-  PersonOutline,
-  GlobeOutline,
-  LocationOutline
-} from '@vicons/ionicons5'
+import { ref, computed } from 'vue'
+import { NButton, NIcon } from 'naive-ui'
+import { AddOutline, PeopleOutline } from '@vicons/ionicons5'
 import { mockTeams } from '@/data/mockTournaments'
 import type { Team } from '@/models/Tournament'
+import TeamCard from './TeamCard.vue'
+import CreateTeamModal from './CreateTeamModal.vue'
+import TeamManagementModal from './TeamManagementModal.vue'
 
 const teams = ref<Team[]>(mockTeams)
+const showCreateTeamModal = ref(false)
+const showTeamManagementModal = ref(false)
+const selectedTeam = ref<Team | null>(null)
+const currentUserId = 'user-1'
 
-const myTeams = ref<Team[]>(teams.value.filter(team => 
-  team.members.some(member => member.userId === 'user-1' || member.userId === 'user-3')
-))
+const myTeams = computed(() => 
+  teams.value.filter(team => 
+    team.members.some(member => member.userId === currentUserId || member.userId === 'user-3')
+  )
+)
 
-const availableTeams = ref<Team[]>(teams.value.filter(team => 
-  !team.members.some(member => member.userId === 'user-1' || member.userId === 'user-3')
-))
+const availableTeams = computed(() => 
+  teams.value.filter(team => 
+    !team.members.some(member => member.userId === currentUserId || member.userId === 'user-3') &&
+    team.members.length < team.maxMembers
+  )
+)
 
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  })
+const isCaptain = computed(() => {
+  if (!selectedTeam.value) return false
+  const user = selectedTeam.value.members.find(member => member.userId === currentUserId)
+  return user?.role === 'CAPTAIN'
+})
+
+const openTeamManagement = (team: Team) => {
+  selectedTeam.value = team
+  showTeamManagementModal.value = true
 }
 
-const getUserRole = (team: Team) => {
-  const user = team.members.find(member => member.userId === 'user-1');
-  if (user) {
-    return 'Captain';
+const requestToJoinTeam = (team: Team) => {
+  console.log('Requesting to join team:', team.name)
+}
+
+const handleTeamCreated = (newTeam: Team) => {
+  teams.value.push(newTeam)
+}
+
+const handleTeamUpdated = (updatedTeam: Team) => {
+  const index = teams.value.findIndex(team => team.id === updatedTeam.id)
+  if (index !== -1) {
+    teams.value[index] = updatedTeam
   }
-  const user2 = team.members.find(member => member.userId === 'user-3');
-  if (user2) {
-    return 'Member';
-  }
-  return 'Member'; // Default role if user not found
-};
+}
+
+const handleMemberRemoved = (memberId: string) => {
+  console.log('Member removed:', memberId)
+}
 </script>
 
 <style scoped>
@@ -254,126 +174,6 @@ const getUserRole = (team: Team) => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: 1.5rem;
-}
-
-.team-card {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.team-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.team-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.team-badge {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #eff6ff;
-  padding: 0.5rem 0.75rem;
-  border-radius: 20px;
-}
-
-.sport-type {
-  font-weight: 600;
-  color: #3b82f6;
-  font-size: 0.875rem;
-}
-
-.team-role {
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.team-role.captain {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.team-role.member {
-  background: #dbeafe;
-  color: #1e40af;
-}
-
-.team-privacy {
-  display: flex;
-  align-items: center;
-}
-
-.team-name {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 1rem;
-  line-height: 1.4;
-}
-
-.team-meta {
-  margin-bottom: 1rem;
-}
-
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  color: #64748b;
-  font-size: 0.875rem;
-}
-
-.team-participants {
-  margin-bottom: 1.5rem;
-}
-
-.participant-count {
-  display: block;
-  color: #3b82f6;
-  font-weight: 600;
-  font-size: 0.875rem;
-  margin-bottom: 0.5rem;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background: #e2e8f0;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: #3b82f6;
-  border-radius: 4px;
-  transition: width 0.3s ease;
-}
-
-.team-actions {
-  display: flex;
-  justify-content: center;
-}
-
-.manage-team-btn,
-.join-team-btn {
-  width: 100%;
-  height: 40px;
-  border-radius: 8px;
 }
 
 .empty-state {
