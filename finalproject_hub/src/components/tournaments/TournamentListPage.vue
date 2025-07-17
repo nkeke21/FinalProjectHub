@@ -5,17 +5,178 @@
       <p>Discover and join exciting tournaments in your area</p>
     </div>
 
-    <div class="tournament-filters">
-      <n-button type="primary" color="orange">
-        <template #icon>
-          <n-icon><FilterOutline /></n-icon>
-        </template>
-        Filter Tournaments
-      </n-button>
+    <div class="filters-section">
+      <div class="search-bar">
+        <n-input
+          v-model:value="searchQuery"
+          placeholder="Search tournaments..."
+          clearable
+          size="large"
+        >
+          <template #prefix>
+            <n-icon><SearchOutline /></n-icon>
+          </template>
+        </n-input>
+      </div>
+
+      <div class="filter-controls">
+        <n-button 
+          type="primary" 
+          color="orange"
+          @click="showFilters = !showFilters"
+        >
+          <template #icon>
+            <n-icon><FilterOutline /></n-icon>
+          </template>
+          {{ showFilters ? 'Hide' : 'Show' }} Filters
+        </n-button>
+        
+        <n-button 
+          v-if="hasActiveFilters"
+          @click="clearFilters"
+          size="small"
+        >
+          Clear All
+        </n-button>
+      </div>
+
+      <div v-if="showFilters" class="advanced-filters">
+        <div class="filter-row">
+          <div class="filter-group">
+            <label>Sport Type</label>
+            <n-select
+              v-model:value="filters.sportType"
+              :options="sportTypeOptions"
+              placeholder="All Sports"
+              clearable
+              size="medium"
+            />
+          </div>
+
+          <div class="filter-group">
+            <label>Status</label>
+            <n-select
+              v-model:value="filters.status"
+              :options="statusOptions"
+              placeholder="All Statuses"
+              clearable
+              size="medium"
+            />
+          </div>
+
+          <div class="filter-group">
+            <label>Format</label>
+            <n-select
+              v-model:value="filters.format"
+              :options="formatOptions"
+              placeholder="All Formats"
+              clearable
+              size="medium"
+            />
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <div class="filter-group">
+            <label>Date Range</label>
+            <n-date-picker
+              v-model:value="filters.dateRange"
+              type="daterange"
+              placeholder="Select date range"
+              clearable
+              size="medium"
+            />
+          </div>
+
+          <div class="filter-group">
+            <label>Location</label>
+            <n-input
+              v-model:value="filters.location"
+              placeholder="Enter location"
+              clearable
+              size="medium"
+            />
+          </div>
+
+          <div class="filter-group">
+            <label>Entry Fee Range</label>
+            <n-slider
+              v-model:value="filters.entryFeeRange"
+              :min="0"
+              :max="200"
+              :step="10"
+              range
+              size="medium"
+            />
+            <div class="slider-labels">
+              <span>{{ filters.entryFeeRange[0] }}₾</span>
+              <span>{{ filters.entryFeeRange[1] }}₾</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <div class="filter-group">
+            <label>Age Range</label>
+            <n-slider
+              v-model:value="filters.ageRange"
+              :min="16"
+              :max="65"
+              :step="1"
+              range
+              size="medium"
+            />
+            <div class="slider-labels">
+              <span>{{ filters.ageRange[0] }}-{{ filters.ageRange[1] }} years</span>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label>Participants</label>
+            <n-slider
+              v-model:value="filters.participantsRange"
+              :min="0"
+              :max="100"
+              :step="1"
+              range
+              size="medium"
+            />
+            <div class="slider-labels">
+              <span>{{ filters.participantsRange[0] }}-{{ filters.participantsRange[1] }} participants</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="hasActiveFilters" class="active-filters">
+        <span class="active-filters-label">Active filters:</span>
+        <n-tag
+          v-for="filter in activeFilterTags"
+          :key="filter.key"
+          :type="filter.type"
+          closable
+          @close="removeFilter(filter.key)"
+          size="small"
+        >
+          {{ filter.label }}
+        </n-tag>
+      </div>
+    </div>
+
+    <div class="results-summary">
+      <span>{{ filteredTournaments.length }} tournament{{ filteredTournaments.length !== 1 ? 's' : '' }} found</span>
+      <div class="sort-controls">
+        <label>Sort by:</label>
+        <n-select
+          v-model:value="sortBy"
+          :options="sortOptions"
+          size="small"
+        />
+      </div>
     </div>
 
     <div class="tournament-grid">
-      <div class="tournament-card" v-for="tournament in tournaments" :key="tournament.id">
+      <div class="tournament-card" v-for="tournament in sortedTournaments" :key="tournament.id">
         <div class="tournament-header">
           <div class="tournament-badge">
             <n-icon size="20" color="#f97316">
@@ -58,6 +219,12 @@
             </n-icon>
             <span>{{ tournament.ageRange.min }}-{{ tournament.ageRange.max }} years</span>
           </div>
+          <div class="meta-item">
+            <n-icon size="16" color="#64748b">
+              <WalletOutline />
+            </n-icon>
+            <span>{{ tournament.entryFee === 0 ? 'Free entry' : `${tournament.entryFee}₾ entry fee` }}</span>
+          </div>
         </div>
 
         <div class="tournament-participants">
@@ -75,24 +242,31 @@
       </div>
     </div>
 
-    <div class="empty-state" v-if="tournaments.length === 0">
+    <div class="empty-state" v-if="filteredTournaments.length === 0">
       <n-icon size="64" color="#cbd5e1">
         <TrophyOutline />
       </n-icon>
-      <h3>No tournaments available</h3>
-      <p>Check back later for upcoming tournaments in your area</p>
+      <h3>No tournaments found</h3>
+      <p v-if="hasActiveFilters">Try adjusting your filters or search terms</p>
+      <p v-else>Check back later for upcoming tournaments in your area</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { 
   NButton, 
-  NIcon 
+  NIcon,
+  NInput,
+  NSelect,
+  NDatePicker,
+  NSlider,
+  NTag
 } from 'naive-ui'
 import { 
   FilterOutline,
+  SearchOutline,
   FootballOutline,
   BasketballOutline,
   TennisballOutline,
@@ -101,12 +275,222 @@ import {
   CalendarOutline,
   PeopleOutline,
   PersonOutline,
-  TrophyOutline
+  TrophyOutline,
+  WalletOutline
 } from '@vicons/ionicons5'
 import { mockTournaments } from '@/data/mockTournaments'
 import type { Tournament } from '@/models/Tournament'
+import { SportType, TournamentStatus, TournamentFormat } from '@/models/Tournament'
 
 const tournaments = ref<Tournament[]>(mockTournaments)
+const searchQuery = ref('')
+const showFilters = ref(false)
+const sortBy = ref('startDate')
+
+const filters = ref({
+  sportType: null as string | null,
+  status: null as string | null,
+  format: null as string | null,
+  dateRange: null as [number, number] | null,
+  location: '',
+  entryFeeRange: [0, 200] as [number, number],
+  ageRange: [16, 65] as [number, number],
+  participantsRange: [0, 100] as [number, number]
+})
+
+const sportTypeOptions = [
+  { label: 'Football', value: 'Football' },
+  { label: 'Basketball', value: 'Basketball' },
+  { label: 'Tennis', value: 'Tennis' },
+  { label: 'Running', value: 'Running' },
+  { label: 'Volleyball', value: 'Volleyball' }
+]
+
+const statusOptions = [
+  { label: 'Registration Open', value: 'REGISTRATION_OPEN' },
+  { label: 'In Progress', value: 'IN_PROGRESS' },
+  { label: 'Completed', value: 'COMPLETED' },
+  { label: 'Registration Closed', value: 'REGISTRATION_CLOSED' },
+  { label: 'Draft', value: 'DRAFT' }
+]
+
+const formatOptions = [
+  { label: 'Single Elimination', value: 'SINGLE_ELIMINATION' },
+  { label: 'Double Elimination', value: 'DOUBLE_ELIMINATION' },
+  { label: 'Round Robin', value: 'ROUND_ROBIN' },
+  { label: 'Swiss System', value: 'SWISS_SYSTEM' }
+]
+
+const sortOptions = [
+  { label: 'Start Date', value: 'startDate' },
+  { label: 'Name', value: 'name' },
+  { label: 'Entry Fee', value: 'entryFee' },
+  { label: 'Participants', value: 'currentParticipants' },
+  { label: 'Created Date', value: 'createdAt' }
+]
+
+const filteredTournaments = computed(() => {
+  return tournaments.value.filter(tournament => {
+    if (searchQuery.value && !tournament.name.toLowerCase().includes(searchQuery.value.toLowerCase()) &&
+        !tournament.description.toLowerCase().includes(searchQuery.value.toLowerCase()) &&
+        !tournament.location.toLowerCase().includes(searchQuery.value.toLowerCase())) {
+      return false
+    }
+
+    if (filters.value.sportType && tournament.sportType !== filters.value.sportType) {
+      return false
+    }
+
+    if (filters.value.status && tournament.status !== filters.value.status) {
+      return false
+    }
+
+    if (filters.value.format && tournament.format !== filters.value.format) {
+      return false
+    }
+
+    if (filters.value.dateRange) {
+      const tournamentStart = new Date(tournament.startDate).getTime()
+      const [start, end] = filters.value.dateRange
+      if (tournamentStart < start || tournamentStart > end) {
+        return false
+      }
+    }
+
+    if (filters.value.location && !tournament.location.toLowerCase().includes(filters.value.location.toLowerCase())) {
+      return false
+    }
+
+    if (tournament.entryFee < filters.value.entryFeeRange[0] || tournament.entryFee > filters.value.entryFeeRange[1]) {
+      return false
+    }
+
+    if (tournament.ageRange.min > filters.value.ageRange[1] || tournament.ageRange.max < filters.value.ageRange[0]) {
+      return false
+    }
+
+    if (tournament.currentParticipants < filters.value.participantsRange[0] || tournament.currentParticipants > filters.value.participantsRange[1]) {
+      return false
+    }
+
+    return true
+  })
+})
+
+const sortedTournaments = computed(() => {
+  const sorted = [...filteredTournaments.value]
+  
+  switch (sortBy.value) {
+    case 'name':
+      return sorted.sort((a, b) => a.name.localeCompare(b.name))
+    case 'entryFee':
+      return sorted.sort((a, b) => a.entryFee - b.entryFee)
+    case 'currentParticipants':
+      return sorted.sort((a, b) => b.currentParticipants - a.currentParticipants)
+    case 'createdAt':
+      return sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    case 'startDate':
+    default:
+      return sorted.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+  }
+})
+
+const hasActiveFilters = computed(() => {
+  return searchQuery.value || 
+         filters.value.sportType || 
+         filters.value.status || 
+         filters.value.format || 
+         filters.value.dateRange || 
+         filters.value.location || 
+         filters.value.entryFeeRange[0] > 0 || 
+         filters.value.entryFeeRange[1] < 200 ||
+         filters.value.ageRange[0] > 16 || 
+         filters.value.ageRange[1] < 65 ||
+         filters.value.participantsRange[0] > 0 || 
+         filters.value.participantsRange[1] < 100
+})
+
+const activeFilterTags = computed(() => {
+  const tags = []
+  
+  if (searchQuery.value) {
+    tags.push({ key: 'search', label: `Search: "${searchQuery.value}"`, type: 'primary' })
+  }
+  if (filters.value.sportType) {
+    tags.push({ key: 'sportType', label: `Sport: ${filters.value.sportType}`, type: 'success' })
+  }
+  if (filters.value.status) {
+    tags.push({ key: 'status', label: `Status: ${filters.value.status.replace('_', ' ')}`, type: 'warning' })
+  }
+  if (filters.value.format) {
+    tags.push({ key: 'format', label: `Format: ${filters.value.format.replace('_', ' ')}`, type: 'info' })
+  }
+  if (filters.value.location) {
+    tags.push({ key: 'location', label: `Location: ${filters.value.location}`, type: 'default' })
+  }
+  if (filters.value.dateRange) {
+    const start = new Date(filters.value.dateRange[0]).toLocaleDateString()
+    const end = new Date(filters.value.dateRange[1]).toLocaleDateString()
+    tags.push({ key: 'dateRange', label: `Date: ${start} - ${end}`, type: 'default' })
+  }
+  if (filters.value.entryFeeRange[0] > 0 || filters.value.entryFeeRange[1] < 200) {
+    tags.push({ key: 'entryFee', label: `Entry Fee: ${filters.value.entryFeeRange[0]}₾ - ${filters.value.entryFeeRange[1]}₾`, type: 'default' })
+  }
+  if (filters.value.ageRange[0] > 16 || filters.value.ageRange[1] < 65) {
+    tags.push({ key: 'ageRange', label: `Age: ${filters.value.ageRange[0]}-${filters.value.ageRange[1]} years`, type: 'default' })
+  }
+  if (filters.value.participantsRange[0] > 0 || filters.value.participantsRange[1] < 100) {
+    tags.push({ key: 'participantsRange', label: `Participants: ${filters.value.participantsRange[0]}-${filters.value.participantsRange[1]}`, type: 'default' })
+  }
+  
+  return tags
+})
+
+const clearFilters = () => {
+  searchQuery.value = ''
+  filters.value = {
+    sportType: null,
+    status: null,
+    format: null,
+    dateRange: null,
+    location: '',
+    entryFeeRange: [0, 200],
+    ageRange: [16, 65],
+    participantsRange: [0, 100]
+  }
+}
+
+const removeFilter = (key: string) => {
+  switch (key) {
+    case 'search':
+      searchQuery.value = ''
+      break
+    case 'sportType':
+      filters.value.sportType = null
+      break
+    case 'status':
+      filters.value.status = null
+      break
+    case 'format':
+      filters.value.format = null
+      break
+    case 'location':
+      filters.value.location = ''
+      break
+    case 'dateRange':
+      filters.value.dateRange = null
+      break
+    case 'entryFee':
+      filters.value.entryFeeRange = [0, 200]
+      break
+    case 'ageRange':
+      filters.value.ageRange = [16, 65]
+      break
+    case 'participantsRange':
+      filters.value.participantsRange = [0, 100]
+      break
+  }
+}
 
 const formatDateRange = (startDate: string, endDate: string) => {
   const start = new Date(startDate).toLocaleDateString();
@@ -138,10 +522,101 @@ const formatDateRange = (startDate: string, endDate: string) => {
   font-size: 1.1rem;
 }
 
-.tournament-filters {
+.filters-section {
   margin-bottom: 2rem;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.search-bar {
+  margin-bottom: 1rem;
+}
+
+.filter-controls {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.advanced-filters {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-group label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+.active-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.active-filters-label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.results-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.sort-controls label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sort-controls .n-select {
+  min-width: 160px;
+}
+
+.sort-controls .n-base-select-menu {
+  min-width: 160px;
 }
 
 .tournament-grid {
@@ -215,6 +690,11 @@ const formatDateRange = (startDate: string, endDate: string) => {
 .tournament-status.registration-closed {
   background: #fee2e2;
   color: #991b1b;
+}
+
+.tournament-status.draft {
+  background: #f3f4f6;
+  color: #374151;
 }
 
 .tournament-title {
@@ -303,5 +783,25 @@ const formatDateRange = (startDate: string, endDate: string) => {
   .page-header h1 {
     font-size: 2rem;
   }
+
+  .filter-row {
+    grid-template-columns: 1fr;
+  }
+
+  .results-summary {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+}
+
+:deep(.n-base-select-option) {
+  white-space: nowrap;
+  overflow: visible;
+}
+
+:deep(.n-base-select-option__label) {
+  white-space: nowrap;
+  overflow: visible;
 }
 </style> 
