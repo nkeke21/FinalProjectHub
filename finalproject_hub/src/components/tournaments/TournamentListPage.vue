@@ -15,7 +15,7 @@
     </div>
 
     <div class="tournament-grid">
-      <div class="tournament-card" v-for="tournament in mockTournaments" :key="tournament.id">
+      <div class="tournament-card" v-for="tournament in tournaments" :key="tournament.id">
         <div class="tournament-header">
           <div class="tournament-badge">
             <n-icon size="20" color="#f97316">
@@ -38,7 +38,7 @@
             <n-icon size="16" color="#64748b">
               <PersonOutline />
             </n-icon>
-            <span>{{ tournament.host }}</span>
+            <span>{{ tournament.hostName }}</span>
           </div>
           <div class="meta-item">
             <n-icon size="16" color="#64748b">
@@ -50,20 +50,20 @@
             <n-icon size="16" color="#64748b">
               <CalendarOutline />
             </n-icon>
-            <span>{{ tournament.dateRange }}</span>
+            <span>{{ formatDateRange(tournament.startDate, tournament.endDate) }}</span>
           </div>
           <div class="meta-item">
             <n-icon size="16" color="#64748b">
               <PeopleOutline />
             </n-icon>
-            <span>{{ tournament.ageRange }}</span>
+            <span>{{ tournament.ageRange.min }}-{{ tournament.ageRange.max }} years</span>
           </div>
         </div>
 
         <div class="tournament-participants">
-          <span class="participant-count">{{ tournament.participants }}/{{ tournament.maxParticipants }} participants</span>
+          <span class="participant-count">{{ tournament.currentParticipants }}/{{ tournament.maxParticipants }} participants</span>
           <div class="progress-bar">
-            <div class="progress-fill" :style="{ width: (tournament.participants / tournament.maxParticipants * 100) + '%' }"></div>
+            <div class="progress-fill" :style="{ width: (tournament.currentParticipants / tournament.maxParticipants * 100) + '%' }"></div>
           </div>
         </div>
 
@@ -75,7 +75,7 @@
       </div>
     </div>
 
-    <div class="empty-state" v-if="mockTournaments.length === 0">
+    <div class="empty-state" v-if="tournaments.length === 0">
       <n-icon size="64" color="#cbd5e1">
         <TrophyOutline />
       </n-icon>
@@ -103,54 +103,16 @@ import {
   PersonOutline,
   TrophyOutline
 } from '@vicons/ionicons5'
+import { mockTournaments } from '@/data/mockTournaments'
+import type { Tournament } from '@/models/Tournament'
 
-const mockTournaments = ref([
-  {
-    id: 1,
-    name: 'Tbilisi Football Championship 2025 - Join the ultimate football competition!',
-    sportType: 'Football',
-    format: 'Team',
-    status: 'Registration Open',
-    host: 'John Doe',
-    location: 'Vake Park, Tbilisi',
-    dateRange: 'Mar 15-20, 2025',
-    ageRange: '18-35 years',
-    participants: 6,
-    maxParticipants: 8,
-    entryFee: '₾50 per team',
-    prizePool: '₾2000'
-  },
-  {
-    id: 2,
-    name: 'Tbilisi Tennis Open 2025 - Individual tennis championship',
-    sportType: 'Tennis',
-    format: 'Individual',
-    status: 'Registration Open',
-    host: 'Jane Smith',
-    location: 'Tennis Club, Tbilisi',
-    dateRange: 'Apr 10-15, 2025',
-    ageRange: '16-50 years',
-    participants: 28,
-    maxParticipants: 32,
-    entryFee: '₾20 per player',
-    prizePool: '₾500'
-  },
-  {
-    id: 3,
-    name: 'Basketball League Spring 2025 - Team basketball tournament',
-    sportType: 'Basketball',
-    format: 'Team',
-    status: 'In Progress',
-    host: 'Mike Johnson',
-    location: 'Saburtalo Arena',
-    dateRange: 'Mar 1-30, 2025',
-    ageRange: '20-40 years',
-    participants: 8,
-    maxParticipants: 8,
-    entryFee: '₾30 per team',
-    prizePool: '₾1500'
-  }
-])
+const tournaments = ref<Tournament[]>(mockTournaments)
+
+const formatDateRange = (startDate: string, endDate: string) => {
+  const start = new Date(startDate).toLocaleDateString();
+  const end = new Date(endDate).toLocaleDateString();
+  return `${start} - ${end}`;
+};
 </script>
 
 <style scoped>
