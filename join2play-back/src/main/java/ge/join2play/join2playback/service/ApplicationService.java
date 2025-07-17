@@ -44,10 +44,6 @@ public class ApplicationService {
     }
 
     public Event convertEventRequestToEvent(EventRequest eventRequest) {
-        String ageRange = eventRequest.getAgeRange();
-        String[] ages = ageRange.split("-");
-        int minAge = Integer.parseInt(ages[0]);
-        int maxAge = Integer.parseInt(ages[1]);
         SportType sportType;
         try {
             sportType = SportType.valueOf(eventRequest.getSportType().toUpperCase());
@@ -55,7 +51,7 @@ public class ApplicationService {
             throw new SportTypeDoesNotExist("Invalid sport type " + eventRequest.getSportType() + " provided.");
         }
         return new Event(
-                UUID.randomUUID(), eventRequest.getHostId(), minAge, maxAge, eventRequest.getDescription(), Instant.ofEpochMilli(eventRequest.getEventTime()),
+                UUID.randomUUID(), eventRequest.getHostId(), eventRequest.getMinAge(), eventRequest.getMaxAge(), eventRequest.getDescription(), Instant.ofEpochMilli(eventRequest.getEventTime()),
                 eventRequest.getLatitude(), eventRequest.getLongitude(), eventRequest.getLocation(), eventRequest.getNumberOfParticipantsTotal(),
                 eventRequest.getNumberOfParticipantsRegistered(), sportType
         );
@@ -124,7 +120,8 @@ public class ApplicationService {
     }
 
     public EventResponse joinEvent(UUID eventId, UUID userId) {
-        if(userRepository.getById(userId) == null){
+        User user = userRepository.getById(userId);
+        if(user == null){
             throw new UserDoesNotExistError(
                     String.format("User with id %s does not exist.", userId));
         }
@@ -132,6 +129,13 @@ public class ApplicationService {
         Event event = eventRepository.getById(eventId);
         if(event == null){
             throw new RuntimeException("Event with id " + eventId + " does not exist.");
+        }
+        
+        int userAge = calculateAge(user.getBirthDate());
+        if (userAge < event.getMinAge() || userAge > event.getMaxAge()) {
+            throw new RuntimeException(
+                String.format("User age %d is outside the event's age range (%d-%d).", 
+                    userAge, event.getMinAge(), event.getMaxAge()));
         }
         
         List<EventParticipant> existingParticipants = eventParticipantsRepository.getAllParticipantsOf(eventId);

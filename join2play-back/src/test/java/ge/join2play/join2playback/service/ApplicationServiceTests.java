@@ -39,7 +39,8 @@ public class ApplicationServiceTests {
     public void testConvertEventRequestToEvent() {
         EventRequest eventRequest = new EventRequest(
                 hostId,
-                "18-25",
+                18,
+                25,
                 "Football Match",
                 Instant.parse("2025-04-16T10:15:30.00Z").toEpochMilli(),
                 41.725788,
@@ -126,7 +127,8 @@ public class ApplicationServiceTests {
 
         EventRequest eventRequest = new EventRequest(
                 hostId,
-                "18-25",
+                18,
+                25,
                 "Football Match",
                 Instant.parse("2025-04-16T10:15:30.00Z").toEpochMilli(),
                 41.725788,
@@ -145,7 +147,7 @@ public class ApplicationServiceTests {
         assertNotNull(eventResponse);
         assertEquals(event.getId(), eventResponse.getEventId());
         assertEquals(eventRequest.getHostId(), eventResponse.getHostId());
-        assertEquals(eventRequest.getAgeRange(), eventResponse.getAgeRange());
+        assertEquals(eventRequest.getMinAge() + "-" + eventRequest.getMaxAge(), eventResponse.getAgeRange());
         assertEquals(eventRequest.getDescription(), eventResponse.getDescription());
         assertEquals(eventRequest.getEventTime(), eventResponse.getEventTime());
         assertEquals(eventRequest.getLatitude(), eventResponse.getLatitude());
@@ -223,7 +225,8 @@ public class ApplicationServiceTests {
         UUID eventId = UUID.randomUUID();
         EventRequest eventRequest = new EventRequest(
                 hostId,
-                "20-30",
+                20,
+                30,
                 "Updated Football Match",
                 Instant.parse("2025-05-16T10:15:30.00Z").toEpochMilli(),
                 41.725788,
