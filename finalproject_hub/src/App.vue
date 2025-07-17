@@ -4,7 +4,6 @@
 			<div class="app">
 				<FriendRequestNotification />
 				<Sidebar v-if="showSidebar" />
-				<!-- <ProfileComponent /> -->
 				<router-view />
 			</div>
 		</n-notification-provider>
