@@ -36,6 +36,18 @@
 			</router-link>
 		</div>
 
+		<h3>Tournaments</h3>
+		<div class="menu">
+			<router-link to="/tournaments" class="button">
+				<span class="material-icons">sports_soccer</span>
+				<span class="text">Tournaments</span>
+			</router-link>
+			<router-link to="/teams" class="button">
+				<span class="material-icons">group</span>
+				<span class="text">Teams</span>
+			</router-link>
+		</div>
+
 		<div class="flex"></div>
 		
 		<div class="menu">
@@ -124,6 +136,7 @@ aside {
 	h3 {
 		color: var(--grey);
 		font-size: 0.875rem;
+		margin-top: 1rem;
 		margin-bottom: 0.5rem;
 		text-transform: uppercase;
 	}

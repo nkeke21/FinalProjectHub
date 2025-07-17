@@ -6,6 +6,8 @@ import AuthPageVue from '../components/auth/AuthPage.vue'
 import ProfileComponent from '@/components/profile/ProfileComponent.vue'
 import NotificationsPage from '@/components/notification/NotificationsPage.vue'
 import CommunityPage from '@/components/community/CommunityPage.vue'
+import TournamentListPage from '@/components/tournaments/TournamentListPage.vue'
+import TeamsPage from '@/components/teams/TeamsPage.vue'
 
 const routes = [
   {
@@ -48,6 +50,16 @@ const routes = [
     path: '/community',
     name: 'Community',
     component: CommunityPage
+  },
+  {
+    path: '/tournaments',
+    name: 'Tournaments',
+    component: TournamentListPage
+  },
+  {
+    path: '/teams',
+    name: 'Teams',
+    component: TeamsPage
   }
 ]
 
