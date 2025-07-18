@@ -138,3 +138,23 @@ export async function deleteFriend(userId: string, friendId: string): Promise<vo
         throw new Error("Could not delete friend")
     }
 }
+
+export async function checkFriendRequestAPI(user1Id: string, user2Id: string): Promise<FriendRequest | null> {
+    const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.CHECK_FRIEND_REQUEST(user1Id, user2Id)}`, {
+        method: 'GET',
+        headers: HEADERS.JSON,
+        credentials: 'include'
+    })
+
+    if (response.status === 404) {
+        return null
+    }
+
+    if (!response.ok) {
+        const errorData = await response.json()
+        console.error("❌ Failed to check friend request:", errorData)
+        throw new Error("Could not check friend request")
+    }
+
+    return await response.json()
+}

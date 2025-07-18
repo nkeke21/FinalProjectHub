@@ -10,6 +10,7 @@ import {
     getFriends,
     getCurrentUserFriends,
     deleteFriend,
+    checkFriendRequestAPI,
     type FriendRequest
 } from '@/services/apis/FriendRequestService'
 import { UserUpdateDTO } from '@/models/UserUpdateDTO'
@@ -20,6 +21,7 @@ export const useUserStore = defineStore('user', {
         searchResults: [] as UserSearchResult[],
         pendingFriendRequests: [] as FriendRequest[],
         friends: [] as string[],
+        existingFriendRequest: null as FriendRequest | null,
         isLoading: false,
         error: null as string | null
     }),
@@ -149,7 +151,7 @@ export const useUserStore = defineStore('user', {
                 const updatedRequest = await respondToFriendRequest(requestId, status)
                 
                 const requestIndex = this.pendingFriendRequests.findIndex(
-                    request => request.requestId === requestId
+                    (request: FriendRequest) => request.requestId === requestId
                 )
                 
                 if (requestIndex !== -1) {
@@ -207,6 +209,22 @@ export const useUserStore = defineStore('user', {
             } catch (err: any) {
                 this.error = err.message
                 throw err
+            } finally {
+                this.isLoading = false
+            }
+        },
+
+        async checkFriendRequest(senderId: string, receiverId: string) {
+            this.isLoading = true
+            this.error = null
+
+            try {
+                this.existingFriendRequest = await checkFriendRequestAPI(senderId, receiverId)
+                return this.existingFriendRequest
+            } catch (err: any) {
+                this.error = err.message
+                this.existingFriendRequest = null
+                return null
             } finally {
                 this.isLoading = false
             }

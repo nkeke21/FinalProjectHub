@@ -64,4 +64,14 @@ public class FriendRequestInMemoryRepository implements FriendRequestRepository 
             || (req.getFromUserId().equals(friendId) && req.getToUserId().equals(userId) && req.getStatus() == FriendRequestStatus.ACCEPTED)
         );
     }
+
+    @Override
+    public Optional<FriendRequest> findRequestBetweenUsers(UUID user1Id, UUID user2Id) {
+        return requests.values().stream()
+                .filter(req -> 
+                    (req.getFromUserId().equals(user1Id) && req.getToUserId().equals(user2Id)) ||
+                    (req.getFromUserId().equals(user2Id) && req.getToUserId().equals(user1Id))
+                )
+                .findFirst();
+    }
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.UUID;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/friends")
@@ -82,6 +83,12 @@ public class FriendRequestController {
         FriendRequest request = service.respondToRequest(responseDTO.getRequestId(), FriendRequestStatus.valueOf(responseDTO.getStatus()));
 
         return ResponseEntity.ok(request);
+    }
+
+    @GetMapping("/check-request/{user1Id}/{user2Id}")
+    public ResponseEntity<FriendRequest> checkRequestBetweenUsers(@PathVariable UUID user1Id, @PathVariable UUID user2Id) {
+        Optional<FriendRequest> request = service.findRequestBetweenUsers(user1Id, user2Id);
+        return request.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     public static class FriendRequestResponseDTO {

@@ -125,4 +125,17 @@ public class FriendRequestService {
         repository.deleteFriend(userId, friendId);
     }
 
+    public Optional<FriendRequest> findRequestBetweenUsers(UUID user1Id, UUID user2Id) {
+        Optional<User> user1 = userRepository.getById(user1Id);
+        if (user1.isEmpty()) {
+            throw new UserDoesNotExistException("User not found with id: " + user1Id);
+        }
+
+        Optional<User> user2 = userRepository.getById(user2Id);
+        if (user2.isEmpty()) {
+            throw new UserDoesNotExistException("User not found with id: " + user2Id);
+        }
+
+        return repository.findRequestBetweenUsers(user1Id, user2Id);
+    }
 }

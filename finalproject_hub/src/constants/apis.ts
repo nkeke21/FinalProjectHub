@@ -15,7 +15,8 @@ export const ENDPOINTS = {
     RESPOND_TO_FRIEND_REQUEST: '/friends/respond',
     GET_FRIENDS: (userId: string) => `/friends/${userId}/`,
     CURRENT_USER_FRIENDS: '/friends/',
-    DELETE_FRIEND: (userId: string, friendId: string) => `/friends/${userId}/friends/${friendId}`
+    DELETE_FRIEND: (userId: string, friendId: string) => `/friends/${userId}/friends/${friendId}`,
+    CHECK_FRIEND_REQUEST: (user1Id: string, user2Id: string) => `/friends/check-request/${user1Id}/${user2Id}`
 }
 
 export const HEADERS = {
