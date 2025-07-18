@@ -274,7 +274,7 @@
             @click="openQuickRegistration(tournament)"
             :loading="registrationLoading"
           >
-            Quick Register
+            Register Now
           </n-button>
           <n-button 
             type="primary" 
@@ -302,7 +302,7 @@
       @tournament-created="handleTournamentCreated"
     />
     
-    <QuickRegistrationModal
+    <TournamentRegistrationForm
       v-model:show="showQuickRegistrationModal"
       :tournament="selectedTournament"
       @registration-success="handleQuickRegistrationSuccess"
@@ -343,7 +343,7 @@ import { mockTournaments } from '@/data/mockTournaments'
 import type { Tournament } from '@/models/Tournament'
 import { SportType, TournamentStatus, TournamentFormat } from '@/models/Tournament'
 import CreateTournamentModal from './CreateTournamentModal.vue'
-import QuickRegistrationModal from './QuickRegistrationModal.vue'
+import TournamentRegistrationForm from './TournamentRegistrationForm.vue'
 import { TournamentRegistrationService } from '@/services/apis/TournamentRegistrationService'
 import type { TournamentRegistration } from '@/models/TournamentRegistration'
 
@@ -617,7 +617,7 @@ const handleQuickRegistrationSuccess = async () => {
 }
 
 const handleQuickRegistrationError = (message: string) => {
-  console.error('Quick registration failed:', message)
+  console.error('Registration failed:', message)
 }
 
 onMounted(() => {

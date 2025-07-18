@@ -133,12 +133,11 @@
                       <n-spin size="small" />
                       <span>Loading registration status...</span>
                     </div>
-                    <n-button 
-                      v-else-if="canRegister" 
-                      type="primary" 
+                                        <n-button
+                      v-else-if="canRegister"
+                      type="primary"
                       size="large"
-                      @click="registerForTournament"
-                      :loading="registering"
+                      @click="showRegistrationForm = true"
                       color="#3b82f6"
                     >
                       Register for Tournament
@@ -214,6 +213,14 @@
       :message="confirmationMessage"
       @confirm="handleConfirmationConfirm"
     />
+    
+    <!-- Tournament Registration Form Modal -->
+    <TournamentRegistrationForm
+      v-model:show="showRegistrationForm"
+      :tournament="tournament"
+      @registration-success="handleRegistrationFormSuccess"
+      @registration-error="handleRegistrationFormError"
+    />
   </div>
 </template>
 
@@ -252,6 +259,7 @@ import type {
 import { TournamentRegistrationService } from '@/services/apis/TournamentRegistrationService'
 import type { TournamentRegistration } from '@/models/TournamentRegistration'
 import RegistrationConfirmationModal from './RegistrationConfirmationModal.vue'
+import TournamentRegistrationForm from './TournamentRegistrationForm.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -271,6 +279,9 @@ const showConfirmationModal = ref(false)
 const confirmationType = ref<'success' | 'error'>('success')
 const confirmationTitle = ref('')
 const confirmationMessage = ref('')
+
+// Registration form state
+const showRegistrationForm = ref(false)
 
 const isRegistered = computed(() => {
   return userRegistration.value?.status === 'REGISTERED'
@@ -390,6 +401,18 @@ const showConfirmation = (type: 'success' | 'error', title: string, message: str
 
 const handleConfirmationConfirm = () => {
   showConfirmationModal.value = false
+}
+
+const handleRegistrationFormSuccess = async () => {
+  // Reload registration data to update the UI
+  if (tournament.value) {
+    await loadRegistrationData(tournament.value.id)
+  }
+  showConfirmation('success', 'Registration Successful', 'You have been successfully registered for this tournament!')
+}
+
+const handleRegistrationFormError = (message: string) => {
+  showConfirmation('error', 'Registration Failed', message)
 }
 
 onMounted(() => {
