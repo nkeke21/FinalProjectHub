@@ -207,6 +207,22 @@
           </div>
         </div>
         
+        <div class="registration-status-badge" v-if="!registrationLoading">
+          <n-tag 
+            :type="isUserRegistered(tournament.id) ? 'success' : 'default'"
+            size="small"
+            :color="isUserRegistered(tournament.id) ? '#10b981' : '#6b7280'"
+          >
+            <template #icon>
+              <n-icon size="12">
+                <CheckmarkCircleOutline v-if="isUserRegistered(tournament.id)" />
+                <PersonOutline v-else />
+              </n-icon>
+            </template>
+            {{ isUserRegistered(tournament.id) ? 'Registered' : 'Not Registered' }}
+          </n-tag>
+        </div>
+        
         <h3 class="tournament-title">{{ tournament.name }}</h3>
         
         <div class="tournament-meta">
@@ -251,6 +267,16 @@
 
         <div class="tournament-actions">
           <n-button 
+            v-if="!isUserRegistered(tournament.id)"
+            type="primary" 
+            color="#3b82f6" 
+            class="quick-register-btn"
+            @click="openQuickRegistration(tournament)"
+            :loading="registrationLoading"
+          >
+            Register Now
+          </n-button>
+          <n-button 
             type="primary" 
             color="orange" 
             class="view-details-btn"
@@ -275,11 +301,18 @@
       v-model:show="showCreateModal"
       @tournament-created="handleTournamentCreated"
     />
+    
+    <TournamentRegistrationForm
+      v-model:show="showQuickRegistrationModal"
+      :tournament="selectedTournament"
+      @registration-success="handleQuickRegistrationSuccess"
+      @registration-error="handleQuickRegistrationError"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
   NButton, 
@@ -303,12 +336,16 @@ import {
   PersonOutline,
   TrophyOutline,
   WalletOutline,
-  AddOutline
+  AddOutline,
+  CheckmarkCircleOutline
 } from '@vicons/ionicons5'
 import { mockTournaments } from '@/data/mockTournaments'
 import type { Tournament } from '@/models/Tournament'
 import { SportType, TournamentStatus, TournamentFormat } from '@/models/Tournament'
 import CreateTournamentModal from './CreateTournamentModal.vue'
+import TournamentRegistrationForm from './TournamentRegistrationForm.vue'
+import { TournamentRegistrationService } from '@/services/apis/TournamentRegistrationService'
+import type { TournamentRegistration } from '@/models/TournamentRegistration'
 
 const router = useRouter()
 const tournaments = ref<Tournament[]>(mockTournaments)
@@ -316,6 +353,12 @@ const searchQuery = ref('')
 const showFilters = ref(false)
 const sortBy = ref('startDate')
 const showCreateModal = ref(false)
+
+const userRegistrations = ref<Map<string, TournamentRegistration>>(new Map())
+const registrationLoading = ref(false)
+
+const showQuickRegistrationModal = ref(false)
+const selectedTournament = ref<Tournament | null>(null)
 
 const filters = ref({
   sportType: null as string | null,
@@ -532,6 +575,54 @@ const handleTournamentCreated = (newTournament: Tournament) => {
   tournaments.value.push(newTournament)
   showCreateModal.value = false
 }
+
+const loadUserRegistrations = async () => {
+  try {
+    registrationLoading.value = true
+    const registrations = new Map<string, TournamentRegistration>()
+    
+    for (const tournament of tournaments.value) {
+      const registration = await TournamentRegistrationService.getUserRegistration(tournament.id)
+      if (registration) {
+        registrations.set(tournament.id, registration)
+      }
+    }
+    
+    userRegistrations.value = registrations
+  } catch (error) {
+    console.error('Error loading user registrations:', error)
+  } finally {
+    registrationLoading.value = false
+  }
+}
+
+const isUserRegistered = (tournamentId: string): boolean => {
+  const registration = userRegistrations.value.get(tournamentId)
+  return registration?.status === 'REGISTERED'
+}
+
+const getUserRegistrationStatus = (tournamentId: string): string => {
+  const registration = userRegistrations.value.get(tournamentId)
+  if (!registration) return 'not-registered'
+  return registration.status.toLowerCase()
+}
+
+const openQuickRegistration = (tournament: Tournament) => {
+  selectedTournament.value = tournament
+  showQuickRegistrationModal.value = true
+}
+
+const handleQuickRegistrationSuccess = async () => {
+  await loadUserRegistrations()
+}
+
+const handleQuickRegistrationError = (message: string) => {
+  console.error('Registration failed:', message)
+}
+
+onMounted(() => {
+  loadUserRegistrations()
+})
 </script>
 
 <style scoped>
@@ -666,7 +757,7 @@ const handleTournamentCreated = (newTournament: Tournament) => {
 
 .tournament-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -742,6 +833,12 @@ const handleTournamentCreated = (newTournament: Tournament) => {
   color: #374151;
 }
 
+.registration-status-badge {
+  margin: 0.75rem 0;
+  display: flex;
+  justify-content: flex-start;
+}
+
 .tournament-title {
   font-size: 1.25rem;
   font-weight: 600;
@@ -792,13 +889,22 @@ const handleTournamentCreated = (newTournament: Tournament) => {
 
 .tournament-actions {
   display: flex;
+  gap: 0.75rem;
   justify-content: center;
 }
 
-.view-details-btn {
-  width: 100%;
+.quick-register-btn {
+  min-width: 120px;
   height: 40px;
   border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.view-details-btn {
+  min-width: 120px;
+  height: 40px;
+  border-radius: 8px;
+  flex-shrink: 0;
 }
 
 .empty-state {

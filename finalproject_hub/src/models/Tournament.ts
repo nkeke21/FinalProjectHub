@@ -4,6 +4,7 @@ export interface Tournament {
   description: string
   sportType: SportType
   format: TournamentFormat
+  tournamentType: TournamentType
   status: TournamentStatus
   hostId: string
   hostName: string

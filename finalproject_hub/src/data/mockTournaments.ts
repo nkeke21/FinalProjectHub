@@ -9,10 +9,10 @@ import {
   TournamentStatus, 
   TeamRole, 
   ParticipantStatus, 
-  MatchStatus 
-} from '@/models/Tournament'
+  MatchStatus,
+  TournamentType
+} from '../models/Tournament'
 
-// Mock Tournaments
 export const mockTournaments: Tournament[] = [
   {
     id: '1',
@@ -20,6 +20,7 @@ export const mockTournaments: Tournament[] = [
     description: 'Join the ultimate football competition in Tbilisi! This championship brings together the best teams from across the city for an exciting tournament with great prizes.',
     sportType: SportType.FOOTBALL,
     format: TournamentFormat.SINGLE_ELIMINATION,
+    tournamentType: 'team',
     status: TournamentStatus.REGISTRATION_OPEN,
     hostId: 'user-1',
     hostName: 'John Doe',
@@ -49,6 +50,7 @@ export const mockTournaments: Tournament[] = [
     description: 'Individual tennis championship for players of all skill levels. Compete in a single elimination bracket for cash prizes and recognition.',
     sportType: SportType.TENNIS,
     format: TournamentFormat.SINGLE_ELIMINATION,
+    tournamentType: 'individual',
     status: TournamentStatus.REGISTRATION_OPEN,
     hostId: 'user-2',
     hostName: 'Jane Smith',
@@ -78,6 +80,7 @@ export const mockTournaments: Tournament[] = [
     description: 'Team basketball tournament featuring the best local teams. Double elimination format ensures every team gets multiple chances to compete.',
     sportType: SportType.BASKETBALL,
     format: TournamentFormat.DOUBLE_ELIMINATION,
+    tournamentType: 'team',
     status: TournamentStatus.IN_PROGRESS,
     hostId: 'user-3',
     hostName: 'Mike Johnson',
@@ -107,6 +110,7 @@ export const mockTournaments: Tournament[] = [
     description: 'Annual city marathon with multiple distance categories. Open to runners of all levels with beautiful routes through Tbilisi.',
     sportType: SportType.RUNNING,
     format: TournamentFormat.ROUND_ROBIN,
+    tournamentType: 'individual',
     status: TournamentStatus.REGISTRATION_OPEN,
     hostId: 'user-4',
     hostName: 'Sarah Wilson',
@@ -136,6 +140,7 @@ export const mockTournaments: Tournament[] = [
     description: 'Beach volleyball tournament at Turtle Lake. Teams of 2 players compete in a Swiss system format.',
     sportType: SportType.VOLLEYBALL,
     format: TournamentFormat.SWISS_SYSTEM,
+    tournamentType: 'team',
     status: TournamentStatus.DRAFT,
     hostId: 'user-5',
     hostName: 'Alex Brown',
@@ -181,7 +186,6 @@ export const mockTeams: Team[] = [
     ],
     maxMembers: 11,
     isPublic: true,
-    location: 'Tbilisi, Georgia',
     ageRange: { min: 18, max: 35 },
     createdAt: '2025-03-01T10:00:00Z',
     updatedAt: '2025-03-08T17:00:00Z'
@@ -202,7 +206,6 @@ export const mockTeams: Team[] = [
     ],
     maxMembers: 5,
     isPublic: true,
-    location: 'Tbilisi, Georgia',
     ageRange: { min: 20, max: 40 },
     createdAt: '2025-02-15T10:00:00Z',
     updatedAt: '2025-02-19T14:00:00Z'
@@ -227,7 +230,6 @@ export const mockTeams: Team[] = [
     ],
     maxMembers: 11,
     isPublic: true,
-    location: 'Tbilisi, Georgia',
     ageRange: { min: 18, max: 35 },
     createdAt: '2025-02-20T10:00:00Z',
     updatedAt: '2025-02-28T18:00:00Z'

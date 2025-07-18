@@ -129,12 +129,16 @@
                   </div>
                   
                   <div class="registration-actions">
-                    <n-button 
-                      v-if="canRegister" 
-                      type="primary" 
+                    <div v-if="registrationLoading" class="registration-loading">
+                      <n-spin size="small" />
+                      <span>Loading registration status...</span>
+                    </div>
+                                        <n-button
+                      v-else-if="canRegister"
+                      type="primary"
                       size="large"
-                      @click="registerForTournament"
-                      :loading="registering"
+                      @click="showRegistrationForm = true"
+                      color="#3b82f6"
                     >
                       Register for Tournament
                     </n-button>
@@ -153,7 +157,7 @@
                       size="large"
                       disabled
                     >
-                      Registration Closed
+                      Already Registered
                     </n-button>
                   </div>
                 </div>
@@ -201,6 +205,22 @@
         </n-tab-pane>
       </n-tabs>
     </div>
+    
+    <RegistrationConfirmationModal
+      v-model:show="showConfirmationModal"
+      :type="confirmationType"
+      :title="confirmationTitle"
+      :message="confirmationMessage"
+      @confirm="handleConfirmationConfirm"
+    />
+    
+    <!-- Tournament Registration Form Modal -->
+    <TournamentRegistrationForm
+      v-model:show="showRegistrationForm"
+      :tournament="tournament"
+      @registration-success="handleRegistrationFormSuccess"
+      @registration-error="handleRegistrationFormError"
+    />
   </div>
 </template>
 
@@ -236,6 +256,10 @@ import type {
   TournamentParticipant,
   ParticipantStatus
 } from '@/models/Tournament'
+import { TournamentRegistrationService } from '@/services/apis/TournamentRegistrationService'
+import type { TournamentRegistration } from '@/models/TournamentRegistration'
+import RegistrationConfirmationModal from './RegistrationConfirmationModal.vue'
+import TournamentRegistrationForm from './TournamentRegistrationForm.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -247,16 +271,20 @@ const registering = ref(false)
 const withdrawing = ref(false)
 const participantFilter = ref<string>('all')
 
-const canRegister = computed(() => {
-  if (!tournament.value) return false
-  return tournament.value.status === 'Registration Open' && 
-         tournament.value.currentParticipants < tournament.value.maxParticipants
-})
+const userRegistration = ref<TournamentRegistration | null>(null)
+const canRegister = ref(false)
+const registrationLoading = ref(false)
+
+const showConfirmationModal = ref(false)
+const confirmationType = ref<'success' | 'error'>('success')
+const confirmationTitle = ref('')
+const confirmationMessage = ref('')
+
+// Registration form state
+const showRegistrationForm = ref(false)
 
 const isRegistered = computed(() => {
-  return participants.value.some(p => 
-    p.participantId === 'user-1' && p.status === 'Confirmed'
-  )
+  return userRegistration.value?.status === 'REGISTERED'
 })
 
 const participantFilterOptions = [
@@ -286,10 +314,27 @@ const loadTournamentData = async () => {
     tournament.value = tournamentData
     participants.value = getTournamentParticipants(tournamentId)
     
+    await loadRegistrationData(tournamentId)
+    
   } catch (error) {
     console.error('Error loading tournament data:', error)
   } finally {
     loading.value = false
+  }
+}
+
+const loadRegistrationData = async (tournamentId: string) => {
+  try {
+    registrationLoading.value = true
+    
+    userRegistration.value = await TournamentRegistrationService.getUserRegistration(tournamentId)
+    
+    canRegister.value = await TournamentRegistrationService.canRegisterForTournament(tournamentId)
+    
+  } catch (error) {
+    console.error('Error loading registration data:', error)
+  } finally {
+    registrationLoading.value = false
   }
 }
 
@@ -298,22 +343,18 @@ const registerForTournament = async () => {
   
   try {
     registering.value = true
-    await new Promise(resolve => setTimeout(resolve, 1000))
     
-    const newParticipant: TournamentParticipant = {
-      id: `participant-${Date.now()}`,
-      tournamentId: tournament.value.id,
-      participantId: 'user-1',
-      participantName: 'John Doe',
-      participantType: 'individual',
-      registrationDate: new Date().toISOString(),
-      status: 'Confirmed'
+    const response = await TournamentRegistrationService.registerForTournament({
+      tournamentId: tournament.value.id
+    })
+    
+    if (response.success && response.registration) {
+      userRegistration.value = response.registration
+      canRegister.value = false
+      showConfirmation('success', 'Registration Successful', 'You have been successfully registered for this tournament!')
+    } else {
+      showConfirmation('error', 'Registration Failed', response.message)
     }
-    
-    participants.value.push(newParticipant)
-    tournament.value.currentParticipants++
-    
-    console.log('Successfully registered for tournament')
   } catch (error) {
     console.error('Error registering for tournament:', error)
   } finally {
@@ -326,15 +367,16 @@ const withdrawFromTournament = async () => {
   
   try {
     withdrawing.value = true
-    await new Promise(resolve => setTimeout(resolve, 1000))
     
-    const userParticipant = participants.value.find(p => p.participantId === 'user-1')
-    if (userParticipant) {
-      userParticipant.status = 'Withdrawn'
-      tournament.value.currentParticipants--
+    const response = await TournamentRegistrationService.withdrawFromTournament(tournament.value.id)
+    
+    if (response.success && response.registration) {
+      userRegistration.value = response.registration
+      canRegister.value = true
+      showConfirmation('success', 'Withdrawal Successful', 'You have successfully withdrawn from this tournament.')
+    } else {
+      showConfirmation('error', 'Withdrawal Failed', response.message)
     }
-    
-    console.log('Successfully withdrew from tournament')
   } catch (error) {
     console.error('Error withdrawing from tournament:', error)
   } finally {
@@ -348,6 +390,29 @@ const formatDate = (dateString: string) => {
     month: 'long', 
     day: 'numeric' 
   })
+}
+
+const showConfirmation = (type: 'success' | 'error', title: string, message: string) => {
+  confirmationType.value = type
+  confirmationTitle.value = title
+  confirmationMessage.value = message
+  showConfirmationModal.value = true
+}
+
+const handleConfirmationConfirm = () => {
+  showConfirmationModal.value = false
+}
+
+const handleRegistrationFormSuccess = async () => {
+  // Reload registration data to update the UI
+  if (tournament.value) {
+    await loadRegistrationData(tournament.value.id)
+  }
+  showConfirmation('success', 'Registration Successful', 'You have been successfully registered for this tournament!')
+}
+
+const handleRegistrationFormError = (message: string) => {
+  showConfirmation('error', 'Registration Failed', message)
 }
 
 onMounted(() => {
@@ -612,6 +677,14 @@ onMounted(() => {
   background: #3b82f6;
   border-radius: 4px;
   transition: width 0.3s ease;
+}
+
+.registration-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748b;
+  font-size: 0.875rem;
 }
 
 .participants-content,
