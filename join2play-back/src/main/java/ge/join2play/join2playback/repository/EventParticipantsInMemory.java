@@ -1,8 +1,8 @@
 package ge.join2play.join2playback.repository;
 
 import ge.join2play.join2playback.model.EventParticipant;
-import ge.join2play.join2playback.model.errors.EventParticipantAlreadyExistsError;
-import ge.join2play.join2playback.model.errors.EventParticipantDoesNotExistError;
+import ge.join2play.join2playback.model.exceptions.EventParticipantAlreadyExistsException;
+import ge.join2play.join2playback.model.exceptions.EventParticipantDoesNotExistException;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -50,7 +50,7 @@ public class EventParticipantsInMemory implements EventParticipantsRepository {
     @Override
     public EventParticipant save(EventParticipant eventParticipant) {
         if (getById(eventParticipant.getId()) != null) {
-            throw new EventParticipantAlreadyExistsError("Cannot save: event-participant pair with ID " + eventParticipant.getId() + "already exists.");
+            throw new EventParticipantAlreadyExistsException("Cannot save: event-participant pair with ID " + eventParticipant.getId() + "already exists.");
         }
         eventsParticipants.put(eventParticipant.getId(), eventParticipant);
         return eventParticipant;
@@ -60,7 +60,7 @@ public class EventParticipantsInMemory implements EventParticipantsRepository {
     public EventParticipant update(EventParticipant eventParticipant) {
         EventParticipant oldEventParticipant = eventsParticipants.replace(eventParticipant.getId(), eventParticipant);
         if (oldEventParticipant == null) {
-            throw new EventParticipantDoesNotExistError("Cannot update: event-participant pair with ID " + eventParticipant.getId() + " does not exist.");
+            throw new EventParticipantDoesNotExistException("Cannot update: event-participant pair with ID " + eventParticipant.getId() + " does not exist.");
         }
         return eventParticipant;
     }

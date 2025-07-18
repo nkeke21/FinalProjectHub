@@ -1,6 +1,6 @@
 package ge.join2play.join2playback.controller;
 
-import ge.join2play.join2playback.enums.FriendRequestStatus;
+import ge.join2play.join2playback.model.enums.FriendRequestStatus;
 import ge.join2play.join2playback.model.FriendRequest;
 import ge.join2play.join2playback.model.FriendRequestNotification;
 import ge.join2play.join2playback.model.FriendResponseNotification;
@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -26,9 +27,27 @@ public class FriendWebSocketController {
         this.messagingTemplate = messagingTemplate;
     }
 
+    @GetMapping("/{id}/requests")
+    public ResponseEntity<List<FriendRequest>> getFriendRequests(@PathVariable UUID id) {
+        List<FriendRequest> requests = service.getPendingRequests(id);
+        return ResponseEntity.ok(requests);
+    }
+
+    @GetMapping("/{id}/")
+    public ResponseEntity<List<UUID>> getFriends(@PathVariable UUID id) {
+        List<UUID> requests = service.getFriends(id);
+        return ResponseEntity.ok(requests);
+    }
+
+    @DeleteMapping("/{userId}/friends/{friendId}")
+    public ResponseEntity<String> deleteFriend(@PathVariable UUID userId, @PathVariable UUID friendId) {
+        service.deleteFriend(userId, friendId);
+        return ResponseEntity.ok("Friend deleted successfully");
+    }
+
     @PostMapping("/send")
     public ResponseEntity<String> sendFriendRequest(@RequestBody FriendRequestDTO dto) {
-        FriendRequest request = service.sendRequest(dto.getFromUserId(), dto.getToUserId());
+        FriendRequest request = service.saveRequest(dto.getFromUserId(), dto.getToUserId());
 
         FriendRequestNotification notification = service.buildNotification(request);
 

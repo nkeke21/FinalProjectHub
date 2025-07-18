@@ -3,8 +3,8 @@ package ge.join2play.join2playback.controller;
 import ge.join2play.join2playback.model.dto.AuthResponse;
 import ge.join2play.join2playback.model.dto.SignInRequest;
 import ge.join2play.join2playback.model.dto.SignUpRequest;
-import ge.join2play.join2playback.model.errors.EmailAlreadyExistsError;
-import ge.join2play.join2playback.model.errors.InvalidCredentialsError;
+import ge.join2play.join2playback.model.exceptions.EmailAlreadyExistsException;
+import ge.join2play.join2playback.model.exceptions.InvalidCredentialsException;
 import ge.join2play.join2playback.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,7 +29,7 @@ public class AuthenticationController {
         try {
             AuthResponse response = authenticationService.signUp(signUpRequest);
             return ResponseEntity.ok(response);
-        } catch (EmailAlreadyExistsError e) {
+        } catch (EmailAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new AuthResponse(null, null, null, e.getMessage()));
         } catch (Exception e) {
@@ -45,7 +45,7 @@ public class AuthenticationController {
             User user = authenticationService.getUserByUsernameOrEmail(signInRequest.getUsername());
             session.setAttribute("user", user);
             return ResponseEntity.ok(response);
-        } catch (InvalidCredentialsError e) {
+        } catch (InvalidCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new AuthResponse(null, null, null, e.getMessage()));
         } catch (Exception e) {

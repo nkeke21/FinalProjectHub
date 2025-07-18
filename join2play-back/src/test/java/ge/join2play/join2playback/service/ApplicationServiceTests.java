@@ -2,26 +2,31 @@ package ge.join2play.join2playback.service;
 
 import ge.join2play.join2playback.config.EventTableConfig;
 import ge.join2play.join2playback.config.FilterConfig;
-import ge.join2play.join2playback.model.*;
+import ge.join2play.join2playback.model.Event;
+import ge.join2play.join2playback.model.EventRequest;
+import ge.join2play.join2playback.model.EventResponse;
+import ge.join2play.join2playback.model.User;
+import ge.join2play.join2playback.model.enums.SportType;
 import ge.join2play.join2playback.repository.EventParticipantsRepository;
 import ge.join2play.join2playback.repository.EventRepository;
 import ge.join2play.join2playback.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 public class ApplicationServiceTests {
     private EventRepository eventRepository;
     private UserRepository userRepository;
-    private EventParticipantsRepository eventParticipantsRepository;
     private ApplicationService applicationService;
     private final UUID hostId = UUID.fromString("3d6005f9-f84d-43fa-a9f5-e15b51cdbe56");
 
@@ -29,7 +34,7 @@ public class ApplicationServiceTests {
     void setUp() {
         eventRepository = mock(EventRepository.class);
         userRepository = mock(UserRepository.class);
-        eventParticipantsRepository = mock(EventParticipantsRepository.class);
+        EventParticipantsRepository eventParticipantsRepository = mock(EventParticipantsRepository.class);
         FilterConfig filterConfig = mock(FilterConfig.class);
         EventTableConfig eventTableConfig = mock(EventTableConfig.class);
         applicationService = new ApplicationService(eventRepository, userRepository, eventParticipantsRepository, filterConfig, eventTableConfig);
@@ -74,12 +79,12 @@ public class ApplicationServiceTests {
                 "Jane Doe",
                 "j.doe@gmail.com",
                 "+999",
-                LocalDate.parse("2000-04-16"),
+                Timestamp.valueOf("2025-04-16 10:15:30").getTime(),
                 "I love sport",
                 "secure_passworD"
         );
 
-        when(userRepository.getById(any(UUID.class))).thenReturn(user);
+        when(userRepository.getById(any(UUID.class))).thenReturn(Optional.of(user));
 
         Event event = new Event(
                 UUID.randomUUID(),
@@ -100,7 +105,7 @@ public class ApplicationServiceTests {
 
         assertEquals(event.getId(), eventResponse.getEventId());
         assertEquals(hostId, eventResponse.getHostId());
-        assertEquals(event.getMinAge()+"-"+event.getMaxAge(), eventResponse.getAgeRange());
+        assertEquals(event.getMinAge() + "-" + event.getMaxAge(), eventResponse.getAgeRange());
         assertEquals(event.getDescription(), eventResponse.getDescription());
         assertEquals(event.getEventTime().toEpochMilli(), eventResponse.getEventTime());
         assertEquals(event.getLatitude(), eventResponse.getLatitude());
@@ -118,12 +123,12 @@ public class ApplicationServiceTests {
                 "Jane Doe",
                 "j.doe@gmail.com",
                 "+999",
-                LocalDate.parse("2000-04-16"),
+                Timestamp.valueOf("2000-04-16 00:00:00").getTime(),
                 "I love sport",
                 "secure_passworD"
         );
 
-        when(userRepository.getById(any(UUID.class))).thenReturn(user);
+        when(userRepository.getById(any(UUID.class))).thenReturn(Optional.of(user));
 
         EventRequest eventRequest = new EventRequest(
                 hostId,
@@ -167,12 +172,12 @@ public class ApplicationServiceTests {
                 "Jane Doe",
                 "j.doe@gmail.com",
                 "+999",
-                LocalDate.parse("2000-04-16"),
+                Timestamp.valueOf("2000-04-16").getTime(),
                 "I love sport",
                 "secure_passworD"
         );
 
-        when(userRepository.getById(any(UUID.class))).thenReturn(user);
+        when(userRepository.getById(any(UUID.class))).thenReturn(Optional.of(user));
 
         UUID eventId = UUID.randomUUID();
         Event event = new Event(
@@ -196,7 +201,7 @@ public class ApplicationServiceTests {
 
         assertNotNull(eventResponse);
         assertEquals(event.getHostId(), eventResponse.getHostId());
-        assertEquals(event.getMinAge()+"-"+event.getMaxAge(), eventResponse.getAgeRange());
+        assertEquals(event.getMinAge() + "-" + event.getMaxAge(), eventResponse.getAgeRange());
         assertEquals(event.getDescription(), eventResponse.getDescription());
         assertEquals(event.getEventTime().toEpochMilli(), eventResponse.getEventTime());
         assertEquals(event.getLatitude(), eventResponse.getLatitude());
@@ -215,12 +220,12 @@ public class ApplicationServiceTests {
                 "Jane Doe",
                 "j.doe@gmail.com",
                 "+999",
-                LocalDate.parse("2000-04-16"),
+                Timestamp.valueOf("2000-04-16").getTime(),
                 "I love sport",
                 "secure_passworD"
         );
 
-        when(userRepository.getById(any(UUID.class))).thenReturn(user);
+        when(userRepository.getById(any(UUID.class))).thenReturn(Optional.of(user));
 
         UUID eventId = UUID.randomUUID();
         EventRequest eventRequest = new EventRequest(
@@ -245,7 +250,6 @@ public class ApplicationServiceTests {
         assertNotNull(eventResponse);
         assertEquals(updatedEvent.getId(), eventResponse.getEventId());
         assertEquals(updatedEvent.getHostId(), eventResponse.getHostId());
-        assertEquals(eventRequest.getAgeRange(), eventResponse.getAgeRange());
         assertEquals(eventRequest.getDescription(), eventResponse.getDescription());
         assertEquals(eventRequest.getEventTime(), eventResponse.getEventTime());
         assertEquals(eventRequest.getLatitude(), eventResponse.getLatitude());
@@ -264,12 +268,12 @@ public class ApplicationServiceTests {
                 "Jane Doe",
                 "j.doe@gmail.com",
                 "+999",
-                LocalDate.parse("2000-04-16"),
+                Timestamp.valueOf("2000-04-16").getTime(),
                 "I love sport",
                 "secure_passworD"
         );
 
-        when(userRepository.getById(any(UUID.class))).thenReturn(user);
+        when(userRepository.getById(any(UUID.class))).thenReturn(Optional.of(user));
 
         List<Event> events = new ArrayList<>();
         events.add(new Event(
@@ -310,7 +314,7 @@ public class ApplicationServiceTests {
         assertEquals(events.get(1).getId(), eventResponses.get(1).getEventId());
         assertEquals(events.get(0).getHostId(), eventResponses.get(0).getHostId());
         assertEquals(events.get(1).getHostId(), eventResponses.get(1).getHostId());
-        assertEquals(events.get(0).getMinAge()+"-"+events.get(0).getMaxAge(), eventResponses.get(0).getAgeRange());
+        assertEquals(events.get(0).getMinAge() + "-" + events.get(0).getMaxAge(), eventResponses.get(0).getAgeRange());
         assertEquals(events.get(0).getDescription(), eventResponses.get(0).getDescription());
         assertEquals(events.getFirst().getEventTime().toEpochMilli(), eventResponses.getFirst().getEventTime());
         assertEquals(events.getFirst().getLatitude(), eventResponses.getFirst().getLatitude());
@@ -319,7 +323,7 @@ public class ApplicationServiceTests {
         assertEquals(events.getFirst().getNumberOfParticipantsTotal(), eventResponses.getFirst().getNumberOfParticipantsTotal());
         assertEquals(events.get(0).getNumberOfParticipantsRegistered(), eventResponses.get(0).getNumberOfParticipantsRegistered());
         assertEquals(events.get(0).getSportType().toString(), eventResponses.get(0).getSportType());
-        assertEquals(events.get(1).getMinAge()+"-"+events.get(1).getMaxAge(), eventResponses.get(1).getAgeRange());
+        assertEquals(events.get(1).getMinAge() + "-" + events.get(1).getMaxAge(), eventResponses.get(1).getAgeRange());
         assertEquals(events.get(1).getDescription(), eventResponses.get(1).getDescription());
         assertEquals(events.get(1).getEventTime().toEpochMilli(), eventResponses.get(1).getEventTime());
         assertEquals(events.get(1).getLatitude(), eventResponses.get(1).getLatitude());

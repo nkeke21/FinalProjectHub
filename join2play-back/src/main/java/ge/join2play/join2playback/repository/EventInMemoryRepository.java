@@ -1,9 +1,9 @@
 package ge.join2play.join2playback.repository;
 
 import ge.join2play.join2playback.model.Event;
-import ge.join2play.join2playback.model.SportType;
-import ge.join2play.join2playback.model.errors.EventAlreadyExistsError;
-import ge.join2play.join2playback.model.errors.EventDoesNotExistError;
+import ge.join2play.join2playback.model.enums.SportType;
+import ge.join2play.join2playback.model.exceptions.EventAlreadyExistsException;
+import ge.join2play.join2playback.model.exceptions.EventDoesNotExistException;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -43,7 +43,7 @@ public class EventInMemoryRepository implements EventRepository {
     @Override
     public Event save(Event event) {
         if (getById(event.getId()) != null) {
-            throw new EventAlreadyExistsError("Cannot save: event with ID " + event.getId() + "already exists.");
+            throw new EventAlreadyExistsException("Cannot save: event with ID " + event.getId() + "already exists.");
         }
         events.put(event.getId(), event);
         return event;
@@ -53,7 +53,7 @@ public class EventInMemoryRepository implements EventRepository {
     public Event update(Event event) {
         Event oldEvent = events.replace(event.getId(), event);
         if (oldEvent == null) {
-            throw new EventDoesNotExistError("Cannot update: event with ID " + event.getId() + " does not exist.");
+            throw new EventDoesNotExistException("Cannot update: event with ID " + event.getId() + " does not exist.");
         }
         return event;
     }

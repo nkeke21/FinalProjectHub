@@ -1,6 +1,7 @@
 package ge.join2play.join2playback.controller;
 
 import ge.join2play.join2playback.model.*;
+import ge.join2play.join2playback.model.enums.SportType;
 import ge.join2play.join2playback.repository.EventInMemoryRepository;
 import ge.join2play.join2playback.repository.UserInMemoryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -77,7 +78,6 @@ public class EventControllerTests {
         EventResponse responseBody = response.getBody();
         assertThat(responseBody).isNotNull();
         assertThat(responseBody.getHostId()).isEqualTo(hostId);
-        assertThat(responseBody.getAgeRange()).isEqualTo(request.getAgeRange());
         assertThat(responseBody.getDescription()).isEqualTo(request.getDescription());
         assertThat(responseBody.getLatitude()).isEqualTo(request.getLatitude());
         assertThat(responseBody.getLongitude()).isEqualTo(request.getLongitude());
@@ -145,7 +145,7 @@ public class EventControllerTests {
 
         EventRequest updatedRequest = new EventRequest(
                 hostId,
-                "25-35",
+                25, 30,
                 "Updated Football Match",
                 Instant.parse("2025-06-20T10:00:00.00Z").toEpochMilli(),
                 41.8,

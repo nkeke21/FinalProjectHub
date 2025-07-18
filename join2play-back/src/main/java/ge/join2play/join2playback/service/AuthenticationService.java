@@ -4,8 +4,8 @@ import ge.join2play.join2playback.model.User;
 import ge.join2play.join2playback.model.dto.AuthResponse;
 import ge.join2play.join2playback.model.dto.SignInRequest;
 import ge.join2play.join2playback.model.dto.SignUpRequest;
-import ge.join2play.join2playback.model.errors.EmailAlreadyExistsError;
-import ge.join2play.join2playback.model.errors.InvalidCredentialsError;
+import ge.join2play.join2playback.model.exceptions.EmailAlreadyExistsException;
+import ge.join2play.join2playback.model.exceptions.InvalidCredentialsException;
 import ge.join2play.join2playback.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,7 @@ public class AuthenticationService {
     public AuthResponse signUp(SignUpRequest signUpRequest) {
         User existingUser = userRepository.findByEmail(signUpRequest.getEmail());
         if (existingUser != null) {
-            throw new EmailAlreadyExistsError("Email " + signUpRequest.getEmail() + " is already registered.");
+            throw new EmailAlreadyExistsException("Email " + signUpRequest.getEmail() + " is already registered.");
         }
 
         User newUser = new User(
@@ -49,11 +49,11 @@ public class AuthenticationService {
         User user = userRepository.findByEmailOrName(signInRequest.getUsername());
         
         if (user == null) {
-            throw new InvalidCredentialsError("Invalid username or password.");
+            throw new InvalidCredentialsException("Invalid username or password.");
         }
 
         if (!user.getPassword().equals(signInRequest.getPassword())) {
-            throw new InvalidCredentialsError("Invalid username or password.");
+            throw new InvalidCredentialsException("Invalid username or password.");
         }
 
         return new AuthResponse(

@@ -1,6 +1,6 @@
 package ge.join2play.join2playback.model;
 
-import ge.join2play.join2playback.enums.FriendRequestStatus;
+import ge.join2play.join2playback.model.enums.FriendRequestStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

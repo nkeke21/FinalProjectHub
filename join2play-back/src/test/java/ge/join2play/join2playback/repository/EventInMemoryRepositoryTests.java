@@ -1,9 +1,9 @@
 package ge.join2play.join2playback.repository;
 
 import ge.join2play.join2playback.model.Event;
-import ge.join2play.join2playback.model.SportType;
-import ge.join2play.join2playback.model.errors.EventAlreadyExistsError;
-import ge.join2play.join2playback.model.errors.EventDoesNotExistError;
+import ge.join2play.join2playback.model.enums.SportType;
+import ge.join2play.join2playback.model.exceptions.EventAlreadyExistsException;
+import ge.join2play.join2playback.model.exceptions.EventDoesNotExistException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ public class EventInMemoryRepositoryTests {
                 10,
                 5,
                 SportType.FOOTBALL
-                );
+        );
     }
 
     @AfterEach
@@ -99,13 +99,13 @@ public class EventInMemoryRepositoryTests {
                 41.725788,
                 44.727753,
                 "Tbilisi"
-                ,15,
+                , 15,
                 9,
                 SportType.BASKETBALL
         );
 
-        assertThrows(EventDoesNotExistError.class, () -> repository.update(nonExistentEvent),
-                "Updating a nonexistent event should throw EventDoesNotExistError.");
+        assertThrows(EventDoesNotExistException.class, () -> repository.update(nonExistentEvent),
+                "Updating a nonexistent event should throw EventDoesNotExistException.");
     }
 
     @Test
@@ -173,7 +173,7 @@ public class EventInMemoryRepositoryTests {
                 SportType.FOOTBALL
         );
 
-        assertThrows(EventAlreadyExistsError.class, () -> repository.save(sameIdEvent));
+        assertThrows(EventAlreadyExistsException.class, () -> repository.save(sameIdEvent));
     }
 
 }
