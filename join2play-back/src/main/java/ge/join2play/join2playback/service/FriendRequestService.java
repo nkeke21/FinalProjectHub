@@ -58,6 +58,15 @@ public class FriendRequestService {
         return repository.getPendingRequestsForUser(userId);
     }
 
+    public List<FriendRequest> getAllRequests(UUID userId) {
+        Optional<User> optional = userRepository.getById(userId);
+        if (optional.isEmpty()) {
+            throw new UserDoesNotExistException("User not found with id: " + userId);
+        }
+
+        return repository.getAllRequestsForUser(userId);
+    }
+
     public FriendRequest respondToRequest(UUID requestId, FriendRequestStatus status) {
         Optional<FriendRequest> optional = repository.findById(requestId);
         if (optional.isPresent()) {

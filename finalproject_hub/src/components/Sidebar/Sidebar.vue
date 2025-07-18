@@ -33,6 +33,7 @@
 			<router-link to="/notifications" class="button">
 				<span class="material-icons">notifications</span>
 				<span class="text">Notifications</span>
+				<span v-if="pendingFriendRequestsCount > 0" class="badge">{{ pendingFriendRequestsCount }}</span>
 			</router-link>
 		</div>
 
@@ -60,15 +61,29 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useUserStore } from '@/store/profile/userStore'
+import { storeToRefs } from 'pinia'
 import logoURL from '../../assets/Join2Play.png'
 
 const is_expanded = ref(localStorage.getItem("is_expanded") === "true")
+const userStore = useUserStore()
+const { pendingFriendRequests } = storeToRefs(userStore)
+
+const pendingFriendRequestsCount = computed(() => pendingFriendRequests.value.length)
 
 const ToggleMenu = () => {
 	is_expanded.value = !is_expanded.value
 	localStorage.setItem("is_expanded", is_expanded.value)
 }
+
+onMounted(async () => {
+	try {
+		await userStore.fetchCurrentUserPendingFriendRequests()
+	} catch (error) {
+		console.error('Failed to load pending friend requests:', error)
+	}
+})
 </script>
 
 <style lang="scss" scoped>
@@ -177,6 +192,18 @@ aside {
 				.material-icons, .text {
 					color: orange;
 				}
+			}
+
+			.badge {
+				background-color: #ef4444;
+				color: white;
+				border-radius: 50%;
+				padding: 0.25rem 0.5rem;
+				font-size: 0.75rem;
+				font-weight: bold;
+				min-width: 1.5rem;
+				text-align: center;
+				margin-left: auto;
 			}
 		}
 	}

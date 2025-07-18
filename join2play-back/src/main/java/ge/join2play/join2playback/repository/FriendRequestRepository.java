@@ -10,6 +10,7 @@ import java.util.UUID;
 public interface FriendRequestRepository {
     FriendRequest saveRequest(UUID fromUserId, UUID toUserId);
     List<FriendRequest> getPendingRequestsForUser(UUID userId);
+    List<FriendRequest> getAllRequestsForUser(UUID userId);
     Optional<FriendRequest> findById(UUID requestId);
     void updateStatus(UUID requestId, FriendRequestStatus status);
     List<UUID> getAllAcceptedFriendIds(UUID userId);

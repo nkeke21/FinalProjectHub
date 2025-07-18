@@ -3,26 +3,27 @@ package ge.join2play.join2playback.controller;
 import ge.join2play.join2playback.model.enums.FriendRequestStatus;
 import ge.join2play.join2playback.model.FriendRequest;
 import ge.join2play.join2playback.model.FriendRequestNotification;
-import ge.join2play.join2playback.model.FriendResponseNotification;
 import ge.join2play.join2playback.model.dto.FriendRequestDTO;
+import ge.join2play.join2playback.model.User;
 import ge.join2play.join2playback.service.FriendRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/friends")
-public class FriendWebSocketController {
+public class FriendRequestController {
 
     private final FriendRequestService service;
     private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public FriendWebSocketController(FriendRequestService service, SimpMessagingTemplate messagingTemplate) {
+    public FriendRequestController(FriendRequestService service, SimpMessagingTemplate messagingTemplate) {
         this.service = service;
         this.messagingTemplate = messagingTemplate;
     }
@@ -33,10 +34,30 @@ public class FriendWebSocketController {
         return ResponseEntity.ok(requests);
     }
 
+    @GetMapping("/requests")
+    public ResponseEntity<List<FriendRequest>> getCurrentUserFriendRequests(HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return ResponseEntity.status(401).build();
+        }
+        List<FriendRequest> requests = service.getPendingRequests(currentUser.getId());
+        return ResponseEntity.ok(requests);
+    }
+
     @GetMapping("/{id}/")
     public ResponseEntity<List<UUID>> getFriends(@PathVariable UUID id) {
         List<UUID> requests = service.getFriends(id);
         return ResponseEntity.ok(requests);
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<List<UUID>> getCurrentUserFriends(HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return ResponseEntity.status(401).build();
+        }
+        List<UUID> friends = service.getFriends(currentUser.getId());
+        return ResponseEntity.ok(friends);
     }
 
     @DeleteMapping("/{userId}/friends/{friendId}")
@@ -57,19 +78,30 @@ public class FriendWebSocketController {
     }
 
     @PostMapping("/respond")
-    public ResponseEntity<String> respondToRequest(
-            @RequestParam UUID requestId,
-            @RequestParam String status
-    ) {
-        FriendRequest request = service.respondToRequest(requestId, FriendRequestStatus.valueOf(status));
+    public ResponseEntity<FriendRequest> respondToRequest(@RequestBody FriendRequestResponseDTO responseDTO) {
+        FriendRequest request = service.respondToRequest(responseDTO.getRequestId(), FriendRequestStatus.valueOf(responseDTO.getStatus()));
 
-        FriendResponseNotification response = new FriendResponseNotification();
-        response.setRequestId(requestId);
-        response.setResponderId(request.getToUserId());
-        response.setStatus(status);
+        return ResponseEntity.ok(request);
+    }
 
-        messagingTemplate.convertAndSend("/topic/friend-responses/" + request.getFromUserId(), response);
+    public static class FriendRequestResponseDTO {
+        private UUID requestId;
+        private String status;
 
-        return ResponseEntity.ok("Friend request " + status.toLowerCase());
+        public UUID getRequestId() {
+            return requestId;
+        }
+
+        public void setRequestId(UUID requestId) {
+            this.requestId = requestId;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
     }
 }

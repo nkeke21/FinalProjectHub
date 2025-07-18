@@ -31,6 +31,12 @@ public class FriendRequestInMemoryRepository implements FriendRequestRepository 
                 .collect(Collectors.toList());
     }
 
+    public List<FriendRequest> getAllRequestsForUser(UUID userId) {
+        return requests.values().stream()
+                .filter(req -> req.getToUserId().equals(userId))
+                .collect(Collectors.toList());
+    }
+
     public Optional<FriendRequest> findById(UUID requestId) {
         return Optional.ofNullable(requests.get(requestId));
     }

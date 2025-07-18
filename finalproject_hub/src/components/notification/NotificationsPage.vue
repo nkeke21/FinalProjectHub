@@ -93,9 +93,9 @@
         class="notification-card"
         :class="{ unread: !notification.read }"
       >
-        <div v-if="notification.type === 'friend-request'" class="notification-content">
+        <div v-if="notification.type === 'friend-request'" class="notification-content" :class="getNotificationStatusClass(notification.status)">
           <div class="notification-avatar">
-            <div class="avatar-circle friend-request">
+            <div class="avatar-circle" :class="getAvatarClass(notification.status)">
               <n-icon size="24" color="white">
                 <PersonAddOutline />
               </n-icon>
@@ -104,14 +104,17 @@
           <div class="notification-details">
             <div class="notification-header">
               <h3 class="notification-title">
-                <strong>{{ notification.senderName }}</strong> sent you a friend request
+                <strong>{{ notification.senderName }}</strong> 
+                <span v-if="notification.status === 'PENDING'">sent you a friend request</span>
+                <span v-else-if="notification.status === 'ACCEPTED'">friend request accepted</span>
+                <span v-else-if="notification.status === 'REJECTED'">friend request declined</span>
               </h3>
               <span class="notification-time">{{ formatTime(notification.timestamp) }}</span>
             </div>
             <p class="notification-message">
-              {{ notification.senderName }} wants to connect with you on Join2Play!
+              {{ notification.message }}
             </p>
-            <div class="notification-actions">
+            <div v-if="notification.status === 'PENDING'" class="notification-actions">
               <n-button 
                 type="primary" 
                 color="#22c55e" 
@@ -137,6 +140,15 @@
                 </template>
                 Decline
               </n-button>
+            </div>
+            <div v-else class="notification-status">
+              <n-icon size="16" :color="getStatusIconColor(notification.status)">
+                <CheckmarkOutline v-if="notification.status === 'ACCEPTED'" />
+                <CloseOutline v-else-if="notification.status === 'REJECTED'" />
+              </n-icon>
+              <span :class="getStatusTextClass(notification.status)">
+                {{ notification.status === 'ACCEPTED' ? 'Accepted' : 'Declined' }}
+              </span>
             </div>
           </div>
         </div>
@@ -309,8 +321,55 @@ const getEmptyStateMessage = () => {
   }
 }
 
+const getNotificationStatusClass = (status?: string) => {
+  switch (status) {
+    case 'ACCEPTED':
+      return 'notification-accepted'
+    case 'REJECTED':
+      return 'notification-rejected'
+    default:
+      return ''
+  }
+}
+
+const getAvatarClass = (status?: string) => {
+  switch (status) {
+    case 'ACCEPTED':
+      return 'friend-request accepted'
+    case 'REJECTED':
+      return 'friend-request rejected'
+    default:
+      return 'friend-request'
+  }
+}
+
+const getStatusIconColor = (status?: string) => {
+  switch (status) {
+    case 'ACCEPTED':
+      return '#22c55e'
+    case 'REJECTED':
+      return '#ef4444'
+    default:
+      return '#64748b'
+  }
+}
+
+const getStatusTextClass = (status?: string) => {
+  switch (status) {
+    case 'ACCEPTED':
+      return 'status-accepted'
+    case 'REJECTED':
+      return 'status-rejected'
+    default:
+      return ''
+  }
+}
+
 onMounted(() => {
   console.log('Notifications page mounted')
+  console.log('Friend request count:', friendRequestCount.value)
+  console.log('Filtered notifications:', filteredNotifications.value)
+  console.log('All notifications:', notifications.value)
 })
 </script>
 
@@ -488,6 +547,16 @@ onMounted(() => {
   color: #64748b;
 }
 
+.avatar-circle.friend-request.accepted {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  color: #16a34a;
+}
+
+.avatar-circle.friend-request.rejected {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #dc2626;
+}
+
 .avatar-circle.event-invitation {
   background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
   color: #64748b;
@@ -556,6 +625,34 @@ onMounted(() => {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
+}
+
+.notification-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.notification-accepted {
+  border-left-color: #22c55e;
+  background: #f0fdf4;
+}
+
+.notification-rejected {
+  border-left-color: #ef4444;
+  background: #fef2f2;
+}
+
+.status-accepted {
+  color: #16a34a;
+}
+
+.status-rejected {
+  color: #dc2626;
 }
 
 .empty-state {

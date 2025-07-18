@@ -1,13 +1,25 @@
 import { defineStore } from 'pinia'
 import { getUserDetails, UserDetailsResponse, updateUserDetails, getCurrentUserDetails, updateCurrentUserDetails } from '@/services/apis/ProfileDetailsService'
 import { searchUsers, type UserSearchResult } from '@/services/apis/UserSearchService'
-import { sendFriendRequest, FriendRequestPayload } from '@/services/apis/FriendRequestService'
+import { 
+    sendFriendRequest, 
+    FriendRequestPayload, 
+    getPendingFriendRequests,
+    getCurrentUserPendingFriendRequests,
+    respondToFriendRequest,
+    getFriends,
+    getCurrentUserFriends,
+    deleteFriend,
+    type FriendRequest
+} from '@/services/apis/FriendRequestService'
 import { UserUpdateDTO } from '@/models/UserUpdateDTO'
 
 export const useUserStore = defineStore('user', {
     state: () => ({
         profile: null as UserDetailsResponse | null,
         searchResults: [] as UserSearchResult[],
+        pendingFriendRequests: [] as FriendRequest[],
+        friends: [] as string[],
         isLoading: false,
         error: null as string | null
     }),
@@ -90,6 +102,108 @@ export const useUserStore = defineStore('user', {
             this.error = null
             try {
                 await sendFriendRequest(payload)
+            } catch (err: any) {
+                this.error = err.message
+                throw err
+            } finally {
+                this.isLoading = false
+            }
+        },
+
+        async fetchPendingFriendRequests(userId: string) {
+            this.isLoading = true
+            this.error = null
+
+            try {
+                this.pendingFriendRequests = await getPendingFriendRequests(userId)
+            } catch (err: any) {
+                this.error = err.message
+                this.pendingFriendRequests = []
+            } finally {
+                this.isLoading = false
+            }
+        },
+
+        async fetchCurrentUserPendingFriendRequests() {
+            this.isLoading = true
+            this.error = null
+
+            try {
+                console.log('Fetching current user pending friend requests...')
+                this.pendingFriendRequests = await getCurrentUserPendingFriendRequests()
+                console.log('Received pending friend requests:', this.pendingFriendRequests)
+            } catch (err: any) {
+                console.error('Error fetching pending friend requests:', err)
+                this.error = err.message
+                this.pendingFriendRequests = []
+            } finally {
+                this.isLoading = false
+            }
+        },
+
+        async respondToFriendRequest(requestId: string, status: 'ACCEPTED' | 'REJECTED') {
+            this.isLoading = true
+            this.error = null
+
+            try {
+                const updatedRequest = await respondToFriendRequest(requestId, status)
+                
+                const requestIndex = this.pendingFriendRequests.findIndex(
+                    request => request.requestId === requestId
+                )
+                
+                if (requestIndex !== -1) {
+                    this.pendingFriendRequests[requestIndex] = updatedRequest
+                }
+                
+                if (status === 'ACCEPTED') {
+                    await this.fetchCurrentUserFriends()
+                }
+                
+                return updatedRequest
+            } catch (err: any) {
+                this.error = err.message
+                throw err
+            } finally {
+                this.isLoading = false
+            }
+        },
+
+        async fetchFriends(userId: string) {
+            this.isLoading = true
+            this.error = null
+
+            try {
+                this.friends = await getFriends(userId)
+            } catch (err: any) {
+                this.error = err.message
+                this.friends = []
+            } finally {
+                this.isLoading = false
+            }
+        },
+
+        async fetchCurrentUserFriends() {
+            this.isLoading = true
+            this.error = null
+
+            try {
+                this.friends = await getCurrentUserFriends()
+            } catch (err: any) {
+                this.error = err.message
+                this.friends = []
+            } finally {
+                this.isLoading = false
+            }
+        },
+
+        async removeFriend(userId: string, friendId: string) {
+            this.isLoading = true
+            this.error = null
+
+            try {
+                await deleteFriend(userId, friendId)
+                this.friends = this.friends.filter(id => id !== friendId)
             } catch (err: any) {
                 this.error = err.message
                 throw err
