@@ -37,7 +37,7 @@ public class EventInMemoryRepositoryTests {
                 10,
                 5,
                 SportType.FOOTBALL
-                );
+        );
     }
 
     @AfterEach
@@ -99,7 +99,7 @@ public class EventInMemoryRepositoryTests {
                 41.725788,
                 44.727753,
                 "Tbilisi"
-                ,15,
+                , 15,
                 9,
                 SportType.BASKETBALL
         );

@@ -2,8 +2,8 @@ package ge.join2play.join2playback.model;
 
 import ge.join2play.join2playback.model.enums.SportType;
 
-import java.util.UUID;
 import java.time.Instant;
+import java.util.UUID;
 
 
 public class Event {
