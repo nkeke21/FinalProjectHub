@@ -757,7 +757,7 @@ onMounted(() => {
 
 .tournament-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -894,15 +894,17 @@ onMounted(() => {
 }
 
 .quick-register-btn {
-  flex: 1;
+  min-width: 120px;
   height: 40px;
   border-radius: 8px;
+  flex-shrink: 0;
 }
 
 .view-details-btn {
-  flex: 1;
+  min-width: 120px;
   height: 40px;
   border-radius: 8px;
+  flex-shrink: 0;
 }
 
 .empty-state {
