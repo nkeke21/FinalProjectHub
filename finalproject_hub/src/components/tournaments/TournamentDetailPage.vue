@@ -206,6 +206,14 @@
         </n-tab-pane>
       </n-tabs>
     </div>
+    
+    <RegistrationConfirmationModal
+      v-model:show="showConfirmationModal"
+      :type="confirmationType"
+      :title="confirmationTitle"
+      :message="confirmationMessage"
+      @confirm="handleConfirmationConfirm"
+    />
   </div>
 </template>
 
@@ -243,6 +251,7 @@ import type {
 } from '@/models/Tournament'
 import { TournamentRegistrationService } from '@/services/apis/TournamentRegistrationService'
 import type { TournamentRegistration } from '@/models/TournamentRegistration'
+import RegistrationConfirmationModal from './RegistrationConfirmationModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -257,6 +266,11 @@ const participantFilter = ref<string>('all')
 const userRegistration = ref<TournamentRegistration | null>(null)
 const canRegister = ref(false)
 const registrationLoading = ref(false)
+
+const showConfirmationModal = ref(false)
+const confirmationType = ref<'success' | 'error'>('success')
+const confirmationTitle = ref('')
+const confirmationMessage = ref('')
 
 const isRegistered = computed(() => {
   return userRegistration.value?.status === 'REGISTERED'
@@ -326,9 +340,9 @@ const registerForTournament = async () => {
     if (response.success && response.registration) {
       userRegistration.value = response.registration
       canRegister.value = false
-      console.log('Successfully registered for tournament')
+      showConfirmation('success', 'Registration Successful', 'You have been successfully registered for this tournament!')
     } else {
-      console.error('Registration failed:', response.message)
+      showConfirmation('error', 'Registration Failed', response.message)
     }
   } catch (error) {
     console.error('Error registering for tournament:', error)
@@ -348,9 +362,9 @@ const withdrawFromTournament = async () => {
     if (response.success && response.registration) {
       userRegistration.value = response.registration
       canRegister.value = true
-      console.log('Successfully withdrew from tournament')
+      showConfirmation('success', 'Withdrawal Successful', 'You have successfully withdrawn from this tournament.')
     } else {
-      console.error('Withdrawal failed:', response.message)
+      showConfirmation('error', 'Withdrawal Failed', response.message)
     }
   } catch (error) {
     console.error('Error withdrawing from tournament:', error)
@@ -365,6 +379,17 @@ const formatDate = (dateString: string) => {
     month: 'long', 
     day: 'numeric' 
   })
+}
+
+const showConfirmation = (type: 'success' | 'error', title: string, message: string) => {
+  confirmationType.value = type
+  confirmationTitle.value = title
+  confirmationMessage.value = message
+  showConfirmationModal.value = true
+}
+
+const handleConfirmationConfirm = () => {
+  showConfirmationModal.value = false
 }
 
 onMounted(() => {
