@@ -1,8 +1,23 @@
 <template>
   <div class="tournament-list-page">
     <div class="page-header">
-      <h1>Tournaments</h1>
-      <p>Discover and join exciting tournaments in your area</p>
+      <div class="header-content">
+        <div class="header-text">
+          <h1>Tournaments</h1>
+          <p>Discover and join exciting tournaments in your area</p>
+        </div>
+        <n-button 
+          type="primary" 
+          size="large"
+          @click="showCreateModal = true"
+          color="#3b82f6"
+        >
+          <template #icon>
+            <n-icon><AddOutline /></n-icon>
+          </template>
+          Create Tournament
+        </n-button>
+      </div>
     </div>
 
     <div class="filters-section">
@@ -255,6 +270,11 @@
       <p v-if="hasActiveFilters">Try adjusting your filters or search terms</p>
       <p v-else>Check back later for upcoming tournaments in your area</p>
     </div>
+
+    <CreateTournamentModal
+      v-model:show="showCreateModal"
+      @tournament-created="handleTournamentCreated"
+    />
   </div>
 </template>
 
@@ -282,17 +302,20 @@ import {
   PeopleOutline,
   PersonOutline,
   TrophyOutline,
-  WalletOutline
+  WalletOutline,
+  AddOutline
 } from '@vicons/ionicons5'
 import { mockTournaments } from '@/data/mockTournaments'
 import type { Tournament } from '@/models/Tournament'
 import { SportType, TournamentStatus, TournamentFormat } from '@/models/Tournament'
+import CreateTournamentModal from './CreateTournamentModal.vue'
 
 const router = useRouter()
 const tournaments = ref<Tournament[]>(mockTournaments)
 const searchQuery = ref('')
 const showFilters = ref(false)
 const sortBy = ref('startDate')
+const showCreateModal = ref(false)
 
 const filters = ref({
   sportType: null as string | null,
@@ -504,6 +527,11 @@ const formatDateRange = (startDate: string, endDate: string) => {
   const end = new Date(endDate).toLocaleDateString();
   return `${start} - ${end}`;
 };
+
+const handleTournamentCreated = (newTournament: Tournament) => {
+  tournaments.value.push(newTournament)
+  showCreateModal.value = false
+}
 </script>
 
 <style scoped>
@@ -515,7 +543,17 @@ const formatDateRange = (startDate: string, endDate: string) => {
 
 .page-header {
   margin-bottom: 2rem;
-  text-align: center;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.header-text {
+  flex: 1;
 }
 
 .page-header h1 {

@@ -3,6 +3,7 @@
     <n-form
       ref="formRef"
       :model="formData"
+      :rules="rules"
       label-placement="left"
       label-width="auto"
       require-mark-placement="right-hanging"
@@ -284,29 +285,6 @@ const formData = reactive({
   rules: ['All participants must follow fair play rules.']
 })
 
-// Options for select inputs
-const sportTypeOptions = [
-  { label: 'Football', value: 'Football' },
-  { label: 'Basketball', value: 'Basketball' },
-  { label: 'Tennis', value: 'Tennis' },
-  { label: 'Running', value: 'Running' },
-  { label: 'Cycling', value: 'Cycling' },
-  { label: 'Volleyball', value: 'Volleyball' },
-  { label: 'Swimming', value: 'Swimming' }
-]
-
-const formatOptions = [
-  { label: 'Single Elimination', value: 'Single Elimination' },
-  { label: 'Double Elimination', value: 'Double Elimination' },
-  { label: 'Round Robin', value: 'Round Robin' },
-  { label: 'Swiss System', value: 'Swiss System' }
-]
-
-const tournamentTypeOptions = [
-  { label: 'Individual', value: 'individual' },
-  { label: 'Team', value: 'team' }
-]
-
 // Form validation rules
 const rules = {
   name: [
@@ -330,17 +308,56 @@ const rules = {
     { required: true, message: 'Location is required', trigger: 'blur' }
   ],
   startDate: [
-    { required: true, message: 'Start date is required', trigger: 'blur' }
+    { 
+      required: true, 
+      message: 'Start date is required', 
+      trigger: 'change',
+      validator: (rule: any, value: any) => {
+        if (!value) {
+          return new Error('Start date is required')
+        }
+        return true
+      }
+    }
   ],
   endDate: [
-    { required: true, message: 'End date is required', trigger: 'blur' }
+    { 
+      required: true, 
+      message: 'End date is required', 
+      trigger: 'change',
+      validator: (rule: any, value: any) => {
+        if (!value) {
+          return new Error('End date is required')
+        }
+        return true
+      }
+    }
   ],
   registrationDeadline: [
-    { required: true, message: 'Registration deadline is required', trigger: 'blur' }
+    { 
+      required: true, 
+      message: 'Registration deadline is required', 
+      trigger: 'change',
+      validator: (rule: any, value: any) => {
+        if (!value) {
+          return new Error('Registration deadline is required')
+        }
+        return true
+      }
+    }
   ],
   maxParticipants: [
-    { required: true, message: 'Max participants is required', trigger: 'blur' },
-    { type: 'number', min: 2, message: 'Must have at least 2 participants', trigger: 'blur' }
+    { 
+      required: true, 
+      message: 'Max participants is required', 
+      trigger: 'blur',
+      validator: (rule: any, value: any) => {
+        if (!value || value < 2) {
+          return new Error('Max participants must be at least 2')
+        }
+        return true
+      }
+    }
   ],
   'ageRange.min': [
     { required: true, message: 'Minimum age is required', trigger: 'blur' },
@@ -352,7 +369,28 @@ const rules = {
   ]
 }
 
-// Methods
+const sportTypeOptions = [
+  { label: 'Football', value: 'Football' },
+  { label: 'Basketball', value: 'Basketball' },
+  { label: 'Tennis', value: 'Tennis' },
+  { label: 'Running', value: 'Running' },
+  { label: 'Cycling', value: 'Cycling' },
+  { label: 'Volleyball', value: 'Volleyball' },
+  { label: 'Swimming', value: 'Swimming' }
+]
+
+const formatOptions = [
+  { label: 'Single Elimination', value: 'Single Elimination' },
+  { label: 'Double Elimination', value: 'Double Elimination' },
+  { label: 'Round Robin', value: 'Round Robin' },
+  { label: 'Swiss System', value: 'Swiss System' }
+]
+
+const tournamentTypeOptions = [
+  { label: 'Individual', value: 'individual' },
+  { label: 'Team', value: 'team' }
+]
+
 const addRule = () => {
   formData.rules.push('')
 }
@@ -366,7 +404,6 @@ const removeRule = (index: number) => {
 const updateShow = (value: boolean) => {
   emit('update:show', value)
   if (value) {
-    // Clear validation errors when modal opens
     setTimeout(() => {
       formRef.value?.restoreValidation()
     }, 100)
@@ -401,58 +438,12 @@ const handleSubmit = async () => {
     
     console.log('Form data before validation:', formData)
     
-    // Manual validation check
-    const errors = []
-    
-    if (!formData.name || formData.name.trim().length < 3) {
-      errors.push('Tournament name must be at least 3 characters')
-    }
-    
-    if (!formData.description || formData.description.trim().length < 10) {
-      errors.push('Description must be at least 10 characters')
-    }
-    
-    if (!formData.sportType) {
-      errors.push('Sport type is required')
-    }
-    
-    if (!formData.format) {
-      errors.push('Tournament format is required')
-    }
-    
-    if (!formData.tournamentType) {
-      errors.push('Tournament type is required')
-    }
-    
-    if (!formData.location || formData.location.trim().length === 0) {
-      errors.push('Location is required')
-    }
-    
-    if (!formData.startDate) {
-      errors.push('Start date is required')
-    }
-    
-    if (!formData.endDate) {
-      errors.push('End date is required')
-    }
-    
-    if (!formData.registrationDeadline) {
-      errors.push('Registration deadline is required')
-    }
-    
-    if (!formData.maxParticipants || formData.maxParticipants < 2) {
-      errors.push('Max participants must be at least 2')
-    }
-    
-    if (errors.length > 0) {
-      throw new Error(errors.join(', '))
-    }
+    await formRef.value?.validate()
     
     console.log('Form validation passed!')
     
-    // Create tournament object
     const tournament: Tournament = {
-      id: `tournament-${Date.now()}`, // Mock ID generation
+      id: `tournament-${Date.now()}`,
       name: formData.name,
       description: formData.description,
       sportType: formData.sportType!,
@@ -491,7 +482,6 @@ const handleSubmit = async () => {
   } catch (error) {
     console.error('Form validation failed:', error)
     console.log('Form data that failed validation:', formData)
-    message.error(error instanceof Error ? error.message : 'Please check the form and try again.')
   } finally {
     isSubmitting.value = false
   }
