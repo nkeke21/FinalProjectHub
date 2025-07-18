@@ -7,12 +7,14 @@ export class TournamentRegistrationService {
     try {
       await new Promise(resolve => setTimeout(resolve, 500))
 
-      if (isUserRegisteredForTournament('current-user-id', request.tournamentId)) {
-        return {
-          success: false,
-          message: 'Already registered for this tournament'
-        }
+          // Check if user has an active registration (not withdrawn)
+    const existingRegistration = getUserRegistrationForTournament('current-user-id', request.tournamentId)
+    if (existingRegistration && existingRegistration.status === 'REGISTERED') {
+      return {
+        success: false,
+        message: 'Already registered for this tournament'
       }
+    }
 
       const tournament = mockTournaments.find(t => t.id === request.tournamentId)
       if (!tournament) {
@@ -22,15 +24,25 @@ export class TournamentRegistrationService {
         }
       }
 
-      const newRegistration: TournamentRegistration = {
-        id: `reg-${Date.now()}`,
-        tournamentId: request.tournamentId,
-        userId: 'current-user-id',
-        status: RegistrationStatus.REGISTERED,
-        registeredAt: new Date()
-      }
+      let newRegistration: TournamentRegistration
 
-      mockTournamentRegistrations.push(newRegistration)
+      // If user has a withdrawn registration, update it
+      if (existingRegistration && existingRegistration.status === 'WITHDRAWN') {
+        existingRegistration.status = RegistrationStatus.REGISTERED
+        existingRegistration.registeredAt = new Date()
+        newRegistration = existingRegistration
+      } else {
+        // Create new registration
+        newRegistration = {
+          id: `reg-${Date.now()}`,
+          tournamentId: request.tournamentId,
+          userId: 'current-user-id',
+          status: RegistrationStatus.REGISTERED,
+          registeredAt: new Date()
+        }
+        // Add to mock data
+        mockTournamentRegistrations.push(newRegistration)
+      }
 
       return {
         success: true,
@@ -50,7 +62,10 @@ export class TournamentRegistrationService {
   static async canRegisterForTournament(tournamentId: string): Promise<boolean> {
     try {
       await new Promise(resolve => setTimeout(resolve, 200))
-      return !isUserRegisteredForTournament('current-user-id', tournamentId)
+      
+      // Check if user has an active registration (not withdrawn)
+      const registration = getUserRegistrationForTournament('current-user-id', tournamentId)
+      return !registration || registration.status === 'WITHDRAWN'
     } catch (error) {
       console.error('Error checking registration eligibility:', error)
       return false
