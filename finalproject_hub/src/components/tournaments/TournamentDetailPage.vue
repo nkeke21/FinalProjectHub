@@ -57,17 +57,18 @@
         </div>
       </div>
 
+      <!-- Quick Stats -->
       <div class="quick-stats">
         <div class="stat-card">
           <div class="stat-value">{{ tournament.currentParticipants }}/{{ tournament.maxParticipants }}</div>
           <div class="stat-label">Participants</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value">${{ tournament.entryFee }}</div>
+          <div class="stat-value">{{ tournament.entryFee === 0 ? 'Free' : `${tournament.entryFee}₾` }}</div>
           <div class="stat-label">Entry Fee</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value">${{ tournament.prizePool }}</div>
+          <div class="stat-value">{{ tournament.prizePool }}₾</div>
           <div class="stat-label">Prize Pool</div>
         </div>
         <div class="stat-card">
@@ -198,96 +199,6 @@
             </div>
           </div>
         </n-tab-pane>
-
-        <n-tab-pane name="matches" tab="Matches">
-          <div class="matches-content">
-            <div class="matches-header">
-              <h3>Tournament Matches</h3>
-              <div class="matches-filter">
-                <n-select
-                  v-model:value="matchFilter"
-                  :options="matchFilterOptions"
-                  placeholder="Filter by status"
-                  style="width: 200px"
-                />
-              </div>
-            </div>
-
-            <div class="matches-list">
-              <div v-for="match in filteredMatches" :key="match.id" class="match-card">
-                <div class="match-header">
-                  <div class="match-round">Round {{ match.roundNumber }}</div>
-                  <div class="match-status" :class="match.status.toLowerCase().replace(' ', '-')">
-                    {{ match.status }}
-                  </div>
-                </div>
-                
-                <div class="match-content">
-                  <div class="player player1" :class="{ winner: match.winnerId === match.player1Id }">
-                    <span class="player-name">{{ match.player1Name }}</span>
-                  </div>
-                  
-                  <div class="match-vs">
-                    <span class="vs-text">VS</span>
-                    <div v-if="match.score" class="match-score">{{ match.score }}</div>
-                  </div>
-                  
-                  <div class="player player2" :class="{ winner: match.winnerId === match.player2Id }">
-                    <span class="player-name">{{ match.player2Name }}</span>
-                  </div>
-                </div>
-
-                <div class="match-meta">
-                  <span v-if="match.scheduledTime" class="match-time">
-                    {{ formatDateTime(match.scheduledTime) }}
-                  </span>
-                  <span v-if="match.completedAt" class="match-completed">
-                    Completed {{ formatDateTime(match.completedAt) }}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div v-if="filteredMatches.length === 0" class="empty-matches">
-              <n-icon size="48" color="#cbd5e1">
-                <TrophyOutline />
-              </n-icon>
-              <p>No matches scheduled yet</p>
-            </div>
-          </div>
-        </n-tab-pane>
-
-        <n-tab-pane name="bracket" tab="Bracket">
-          <div class="bracket-content">
-            <div class="bracket-header">
-              <h3>Tournament Bracket</h3>
-            </div>
-
-            <div v-if="tournamentBracket" class="bracket-visualization">
-              <div v-for="round in tournamentBracket.rounds" :key="round.roundNumber" class="bracket-round">
-                <h4 class="round-title">{{ round.roundName }}</h4>
-                <div class="round-matches">
-                  <div v-for="match in round.matches" :key="match.id" class="bracket-match">
-                    <div class="bracket-player" :class="{ winner: match.winnerId === match.player1Id }">
-                      {{ match.player1Name }}
-                    </div>
-                    <div class="bracket-player" :class="{ winner: match.winnerId === match.player2Id }">
-                      {{ match.player2Name }}
-                    </div>
-                    <div v-if="match.score" class="bracket-score">{{ match.score }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div v-else class="empty-bracket">
-              <n-icon size="48" color="#cbd5e1">
-                <TrophyOutline />
-              </n-icon>
-              <p>Bracket will be generated once registration closes</p>
-            </div>
-          </div>
-        </n-tab-pane>
       </n-tabs>
     </div>
   </div>
@@ -314,22 +225,16 @@ import {
   PersonOutline,
   LocationOutline,
   AlertCircleOutline,
-  CheckmarkCircleOutline,
-  TrophyOutline
+  CheckmarkCircleOutline
 } from '@vicons/ionicons5'
 import { 
   getTournamentById, 
-  getTournamentParticipants, 
-  getTournamentMatches, 
-  getTournamentBracket 
+  getTournamentParticipants
 } from '@/data/mockTournaments'
 import type { 
   Tournament, 
-  TournamentParticipant, 
-  TournamentMatch, 
-  TournamentBracket,
-  ParticipantStatus,
-  MatchStatus 
+  TournamentParticipant,
+  ParticipantStatus
 } from '@/models/Tournament'
 
 const route = useRoute()
@@ -338,13 +243,9 @@ const router = useRouter()
 const loading = ref(true)
 const tournament = ref<Tournament | null>(null)
 const participants = ref<TournamentParticipant[]>([])
-const matches = ref<TournamentMatch[]>([])
-const tournamentBracket = ref<TournamentBracket | null>(null)
 const registering = ref(false)
 const withdrawing = ref(false)
-
 const participantFilter = ref<string>('all')
-const matchFilter = ref<string>('all')
 
 const canRegister = computed(() => {
   if (!tournament.value) return false
@@ -366,22 +267,9 @@ const participantFilterOptions = [
   { label: 'Withdrawn', value: 'Withdrawn' }
 ]
 
-const matchFilterOptions = [
-  { label: 'All Matches', value: 'all' },
-  { label: 'Scheduled', value: 'Scheduled' },
-  { label: 'In Progress', value: 'In Progress' },
-  { label: 'Completed', value: 'Completed' },
-  { label: 'Cancelled', value: 'Cancelled' }
-]
-
 const filteredParticipants = computed(() => {
   if (participantFilter.value === 'all') return participants.value
   return participants.value.filter(p => p.status === participantFilter.value)
-})
-
-const filteredMatches = computed(() => {
-  if (matchFilter.value === 'all') return matches.value
-  return matches.value.filter(m => m.status === matchFilter.value)
 })
 
 const loadTournamentData = async () => {
@@ -396,10 +284,7 @@ const loadTournamentData = async () => {
     }
     
     tournament.value = tournamentData
-    
     participants.value = getTournamentParticipants(tournamentId)
-    matches.value = getTournamentMatches(tournamentId)
-    tournamentBracket.value = getTournamentBracket(tournamentId) || null
     
   } catch (error) {
     console.error('Error loading tournament data:', error)
@@ -462,16 +347,6 @@ const formatDate = (dateString: string) => {
     year: 'numeric', 
     month: 'long', 
     day: 'numeric' 
-  })
-}
-
-const formatDateTime = (dateString: string) => {
-  return new Date(dateString).toLocaleString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
   })
 }
 
@@ -798,9 +673,8 @@ onMounted(() => {
 }
 
 .participant-status {
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -831,182 +705,18 @@ onMounted(() => {
   font-size: 0.875rem;
 }
 
-.match-card {
-  padding: 1.5rem;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-}
-
-.match-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.match-round {
-  font-weight: 600;
-  color: #1e293b;
-}
-
-.match-status {
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.match-status.scheduled {
-  background: #dbeafe;
-  color: #1e40af;
-}
-
-.match-status.in-progress {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.match-status.completed {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.match-status.cancelled {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.match-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.player {
-  flex: 1;
-  padding: 0.75rem;
-  background: white;
-  border-radius: 6px;
+.empty-participants {
   text-align: center;
-  border: 2px solid transparent;
-}
-
-.player.winner {
-  border-color: #10b981;
-  background: #f0fdf4;
-}
-
-.player-name {
-  font-weight: 600;
-  color: #1e293b;
-}
-
-.match-vs {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0 1rem;
-}
-
-.vs-text {
-  font-weight: 600;
+  padding: 4rem 2rem;
   color: #64748b;
-  font-size: 0.875rem;
 }
 
-.match-score {
-  font-weight: 700;
-  color: #1e293b;
-  font-size: 1.125rem;
-  margin-top: 0.25rem;
-}
-
-.match-meta {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  color: #64748b;
-  font-size: 0.875rem;
-}
-
-.bracket-visualization {
-  display: flex;
-  gap: 2rem;
-  overflow-x: auto;
-  padding: 1rem 0;
-}
-
-.bracket-round {
-  min-width: 250px;
-}
-
-.round-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-.round-matches {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.bracket-match {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.bracket-player {
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid #e2e8f0;
-  font-size: 0.875rem;
-}
-
-.bracket-player:last-child {
-  border-bottom: none;
-}
-
-.bracket-player.winner {
-  background: #f0fdf4;
-  color: #166534;
-  font-weight: 600;
-}
-
-.bracket-score {
-  padding: 0.25rem 0.75rem;
-  background: #f8fafc;
-  text-align: center;
-  font-weight: 600;
-  color: #1e293b;
-  font-size: 0.75rem;
-}
-
-.empty-participants,
-.empty-matches,
-.empty-bracket {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 2rem;
-  color: #64748b;
-  text-align: center;
-}
-
-.empty-participants p,
-.empty-matches p,
-.empty-bracket p {
+.empty-participants p {
   margin-top: 1rem;
+  font-size: 1rem;
 }
 
+/* Responsive design */
 @media (max-width: 768px) {
   .tournament-detail-page {
     padding: 1rem;
