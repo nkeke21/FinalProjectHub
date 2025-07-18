@@ -1,4 +1,6 @@
-package ge.join2play.join2playback.model;
+package ge.join2play.join2playback.model.enums;
+
+import ge.join2play.join2playback.model.Option;
 
 import java.util.List;
 import java.util.stream.Collectors;

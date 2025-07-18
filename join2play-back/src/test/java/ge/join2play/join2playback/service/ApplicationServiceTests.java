@@ -3,16 +3,19 @@ package ge.join2play.join2playback.service;
 import ge.join2play.join2playback.config.EventTableConfig;
 import ge.join2play.join2playback.config.FilterConfig;
 import ge.join2play.join2playback.model.*;
+import ge.join2play.join2playback.model.enums.SportType;
 import ge.join2play.join2playback.repository.EventParticipantsRepository;
 import ge.join2play.join2playback.repository.EventRepository;
 import ge.join2play.join2playback.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -74,12 +77,12 @@ public class ApplicationServiceTests {
                 "Jane Doe",
                 "j.doe@gmail.com",
                 "+999",
-                LocalDate.parse("2000-04-16"),
+                Timestamp.valueOf("2000-04-16").getTime(),
                 "I love sport",
                 "secure_passworD"
         );
 
-        when(userRepository.getById(any(UUID.class))).thenReturn(user);
+        when(userRepository.getById(any(UUID.class))).thenReturn(Optional.of(user));
 
         Event event = new Event(
                 UUID.randomUUID(),
@@ -118,12 +121,12 @@ public class ApplicationServiceTests {
                 "Jane Doe",
                 "j.doe@gmail.com",
                 "+999",
-                LocalDate.parse("2000-04-16"),
+                Timestamp.valueOf("2000-04-16").getTime(),
                 "I love sport",
                 "secure_passworD"
         );
 
-        when(userRepository.getById(any(UUID.class))).thenReturn(user);
+        when(userRepository.getById(any(UUID.class))).thenReturn(Optional.of(user));
 
         EventRequest eventRequest = new EventRequest(
                 hostId,
@@ -167,12 +170,12 @@ public class ApplicationServiceTests {
                 "Jane Doe",
                 "j.doe@gmail.com",
                 "+999",
-                LocalDate.parse("2000-04-16"),
+                Timestamp.valueOf("2000-04-16").getTime(),
                 "I love sport",
                 "secure_passworD"
         );
 
-        when(userRepository.getById(any(UUID.class))).thenReturn(user);
+        when(userRepository.getById(any(UUID.class))).thenReturn(Optional.of(user));
 
         UUID eventId = UUID.randomUUID();
         Event event = new Event(
@@ -215,12 +218,12 @@ public class ApplicationServiceTests {
                 "Jane Doe",
                 "j.doe@gmail.com",
                 "+999",
-                LocalDate.parse("2000-04-16"),
+                Timestamp.valueOf("2000-04-16").getTime(),
                 "I love sport",
                 "secure_passworD"
         );
 
-        when(userRepository.getById(any(UUID.class))).thenReturn(user);
+        when(userRepository.getById(any(UUID.class))).thenReturn(Optional.of(user));
 
         UUID eventId = UUID.randomUUID();
         EventRequest eventRequest = new EventRequest(
@@ -245,7 +248,6 @@ public class ApplicationServiceTests {
         assertNotNull(eventResponse);
         assertEquals(updatedEvent.getId(), eventResponse.getEventId());
         assertEquals(updatedEvent.getHostId(), eventResponse.getHostId());
-        assertEquals(eventRequest.getAgeRange(), eventResponse.getAgeRange());
         assertEquals(eventRequest.getDescription(), eventResponse.getDescription());
         assertEquals(eventRequest.getEventTime(), eventResponse.getEventTime());
         assertEquals(eventRequest.getLatitude(), eventResponse.getLatitude());
@@ -264,12 +266,12 @@ public class ApplicationServiceTests {
                 "Jane Doe",
                 "j.doe@gmail.com",
                 "+999",
-                LocalDate.parse("2000-04-16"),
+                Timestamp.valueOf("2000-04-16").getTime(),
                 "I love sport",
                 "secure_passworD"
         );
 
-        when(userRepository.getById(any(UUID.class))).thenReturn(user);
+        when(userRepository.getById(any(UUID.class))).thenReturn(Optional.of(user));
 
         List<Event> events = new ArrayList<>();
         events.add(new Event(

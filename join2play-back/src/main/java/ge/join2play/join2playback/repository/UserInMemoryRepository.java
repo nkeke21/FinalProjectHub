@@ -1,8 +1,8 @@
 package ge.join2play.join2playback.repository;
 
 import ge.join2play.join2playback.model.User;
-import ge.join2play.join2playback.model.errors.UserAlreadyExistsError;
-import ge.join2play.join2playback.model.errors.UserDoesNotExistError;
+import ge.join2play.join2playback.model.exceptions.UserAlreadyExistsException;
+import ge.join2play.join2playback.model.exceptions.UserDoesNotExistException;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -73,14 +73,14 @@ public class UserInMemoryRepository implements UserRepository {
     }
 
     @Override
-    public User getById(UUID id) {
-        return users.getOrDefault(id, null);
+    public Optional<User> getById(UUID id) {
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override
     public User save(User user) {
-        if (getById(user.getId()) != null) {
-            throw new UserAlreadyExistsError("Cannot save: user with ID " + user.getId() + "already exists.");
+        if (getById(user.getId()).isPresent()) {
+            throw new UserAlreadyExistsException("Cannot save: user with ID " + user.getId() + "already exists.");
         }
         users.put(user.getId(), user);
         return user;
@@ -90,7 +90,7 @@ public class UserInMemoryRepository implements UserRepository {
     public User update(User user) {
         User oldUser = users.replace(user.getId(), user);
         if (oldUser == null) {
-            throw new UserDoesNotExistError("Cannot update: user with ID " + user.getId() + " does not exist.");
+            throw new UserDoesNotExistException("Cannot update: user with ID " + user.getId() + " does not exist.");
         }
         return user;
     }

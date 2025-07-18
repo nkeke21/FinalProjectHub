@@ -4,10 +4,11 @@ import ge.join2play.join2playback.model.Event;
 import ge.join2play.join2playback.model.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository {
-    User getById(UUID id);
+    Optional<User> getById(UUID id);
     User save(User user);
     User update(User user);
     void delete(UUID id);

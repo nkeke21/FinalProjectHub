@@ -3,8 +3,9 @@ package ge.join2play.join2playback.service;
 import ge.join2play.join2playback.config.EventTableConfig;
 import ge.join2play.join2playback.config.FilterConfig;
 import ge.join2play.join2playback.model.*;
-import ge.join2play.join2playback.model.errors.SportTypeDoesNotExist;
-import ge.join2play.join2playback.model.errors.UserDoesNotExistError;
+import ge.join2play.join2playback.model.enums.SportType;
+import ge.join2play.join2playback.model.exceptions.SportTypeDoesNotExistException;
+import ge.join2play.join2playback.model.exceptions.UserDoesNotExistException;
 import ge.join2play.join2playback.repository.EventParticipantsRepository;
 import ge.join2play.join2playback.repository.EventRepository;
 import ge.join2play.join2playback.repository.UserRepository;
@@ -14,10 +15,11 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static ge.join2play.join2playback.model.SportType.getSportTypeOptions;
+import static ge.join2play.join2playback.model.enums.SportType.getSportTypeOptions;
 
 @Service
 public class ApplicationService {
@@ -48,7 +50,7 @@ public class ApplicationService {
         try {
             sportType = SportType.valueOf(eventRequest.getSportType().toUpperCase());
         } catch (IllegalArgumentException | NullPointerException e) {
-            throw new SportTypeDoesNotExist("Invalid sport type " + eventRequest.getSportType() + " provided.");
+            throw new SportTypeDoesNotExistException("Invalid sport type " + eventRequest.getSportType() + " provided.");
         }
         return new Event(
                 UUID.randomUUID(), eventRequest.getHostId(), eventRequest.getMinAge(), eventRequest.getMaxAge(), eventRequest.getDescription(), Instant.ofEpochMilli(eventRequest.getEventTime()),
@@ -59,12 +61,22 @@ public class ApplicationService {
 
     public EventResponse convertEventToEventResponse(Event event) {
         String ageRange = event.getMinAge() + "-" + event.getMaxAge();
-        String hostName = userRepository.getById(event.getHostId()).getName();
+        Optional<User> hostUser = userRepository.getById(event.getHostId());
+        if (hostUser.isEmpty()) {
+            throw new UserDoesNotExistException(
+                    String.format("Host user with id %s does not exist.", event.getHostId()));
+        }
+        String hostName = hostUser.get().getName();
         
         List<EventParticipant> eventParticipants = eventParticipantsRepository.getAllParticipantsOf(event.getId());
         List<ParticipantInfo> participantsList = eventParticipants.stream()
                 .map(ep -> {
-                    User participant = userRepository.getById(ep.getParticipantId());
+                    Optional<User> optionalUser = userRepository.getById(ep.getParticipantId());
+                    if (optionalUser.isEmpty()) {
+                        throw new UserDoesNotExistException(
+                                String.format("Participant with id %s does not exist.", ep.getParticipantId()));
+                    }
+                    User participant = optionalUser.get();
                     int age = calculateAge(participant.getBirthDate());
                     return new ParticipantInfo(participant.getId(), participant.getName(), participant.getEmail(), age);
                 })
@@ -103,16 +115,16 @@ public class ApplicationService {
     }
 
     public List<EventResponse> getUserHostedEvents(UUID id) {
-        if(userRepository.getById(id) == null){
-            throw new UserDoesNotExistError(
+        if(userRepository.getById(id).isEmpty()){
+            throw new UserDoesNotExistException(
                     String.format("User with id %s does not exist.", id));
         }
         return eventRepository.getAllHostedBy(id).stream().map(this::convertEventToEventResponse).collect(Collectors.toList());
     }
 
     public List<EventResponse> getUserRegisteredEvents(UUID id) {
-        if(userRepository.getById(id) == null){
-            throw new UserDoesNotExistError(
+        if(userRepository.getById(id).isEmpty()){
+            throw new UserDoesNotExistException(
                     String.format("User with id %s does not exist.", id));
         }
         List<EventParticipant> eventParticipants = eventParticipantsRepository.getAllEventsParticipating(id);
@@ -120,9 +132,9 @@ public class ApplicationService {
     }
 
     public EventResponse joinEvent(UUID eventId, UUID userId) {
-        User user = userRepository.getById(userId);
-        if(user == null){
-            throw new UserDoesNotExistError(
+        Optional<User> user = userRepository.getById(userId);
+        if(user.isEmpty()){
+            throw new UserDoesNotExistException(
                     String.format("User with id %s does not exist.", userId));
         }
         
@@ -131,7 +143,7 @@ public class ApplicationService {
             throw new RuntimeException("Event with id " + eventId + " does not exist.");
         }
         
-        int userAge = calculateAge(user.getBirthDate());
+        int userAge = calculateAge(user.get().getBirthDate());
         if (userAge < event.getMinAge() || userAge > event.getMaxAge()) {
             throw new RuntimeException(
                 String.format("User age %d is outside the event's age range (%d-%d).", 
@@ -160,8 +172,8 @@ public class ApplicationService {
     }
 
     public boolean isUserParticipating(UUID eventId, UUID userId) {
-        if(userRepository.getById(userId) == null){
-            throw new UserDoesNotExistError(
+        if(userRepository.getById(userId).isEmpty()){
+            throw new UserDoesNotExistException(
                     String.format("User with id %s does not exist.", userId));
         }
         
@@ -176,11 +188,12 @@ public class ApplicationService {
     }
 
     public UserDetailsResponse getUserDetails(UUID id) {
-        if(userRepository.getById(id) == null){
-            throw new UserDoesNotExistError(
+        Optional<User> user = userRepository.getById(id);
+        if(user.isEmpty()){
+            throw new UserDoesNotExistException(
                     String.format("User with id %s does not exist.", id));
         }
-        return convertUserToUserDetailsResponse(userRepository.getById(id));
+        return convertUserToUserDetailsResponse(user.get());
     }
 
     public List<UserResponse> searchUsers(String query) {
@@ -207,11 +220,12 @@ public class ApplicationService {
     }
 
     public UserUpdateDTO updateUserDetails(UUID id, UserUpdateDTO userUpdateDTO) {
-        User user = userRepository.getById(id);
-        if(user == null){
-            throw new UserDoesNotExistError(
+        Optional<User> optionalUser = userRepository.getById(id);
+        if(optionalUser.isEmpty()){
+            throw new UserDoesNotExistException(
                     String.format("User with id %s does not exist.", id));
         }
+        User user = optionalUser.get();
         user.setName(userUpdateDTO.getName());
         user.setDescription(userUpdateDTO.getDescription());
         user.setPhoneNumber(userUpdateDTO.getPhoneNumber());
