@@ -58,6 +58,15 @@ public class FriendRequestService {
         return repository.getPendingRequestsForUser(userId);
     }
 
+    public List<FriendRequest> getAllRequests(UUID userId) {
+        Optional<User> optional = userRepository.getById(userId);
+        if (optional.isEmpty()) {
+            throw new UserDoesNotExistException("User not found with id: " + userId);
+        }
+
+        return repository.getAllRequestsForUser(userId);
+    }
+
     public FriendRequest respondToRequest(UUID requestId, FriendRequestStatus status) {
         Optional<FriendRequest> optional = repository.findById(requestId);
         if (optional.isPresent()) {
@@ -116,4 +125,17 @@ public class FriendRequestService {
         repository.deleteFriend(userId, friendId);
     }
 
+    public Optional<FriendRequest> findRequestBetweenUsers(UUID user1Id, UUID user2Id) {
+        Optional<User> user1 = userRepository.getById(user1Id);
+        if (user1.isEmpty()) {
+            throw new UserDoesNotExistException("User not found with id: " + user1Id);
+        }
+
+        Optional<User> user2 = userRepository.getById(user2Id);
+        if (user2.isEmpty()) {
+            throw new UserDoesNotExistException("User not found with id: " + user2Id);
+        }
+
+        return repository.findRequestBetweenUsers(user1Id, user2Id);
+    }
 }

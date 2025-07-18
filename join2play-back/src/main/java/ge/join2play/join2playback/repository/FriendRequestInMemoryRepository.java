@@ -31,6 +31,12 @@ public class FriendRequestInMemoryRepository implements FriendRequestRepository 
                 .collect(Collectors.toList());
     }
 
+    public List<FriendRequest> getAllRequestsForUser(UUID userId) {
+        return requests.values().stream()
+                .filter(req -> req.getToUserId().equals(userId))
+                .collect(Collectors.toList());
+    }
+
     public Optional<FriendRequest> findById(UUID requestId) {
         return Optional.ofNullable(requests.get(requestId));
     }
@@ -57,5 +63,15 @@ public class FriendRequestInMemoryRepository implements FriendRequestRepository 
             (req.getFromUserId().equals(userId) && req.getToUserId().equals(friendId) && req.getStatus() == FriendRequestStatus.ACCEPTED)
             || (req.getFromUserId().equals(friendId) && req.getToUserId().equals(userId) && req.getStatus() == FriendRequestStatus.ACCEPTED)
         );
+    }
+
+    @Override
+    public Optional<FriendRequest> findRequestBetweenUsers(UUID user1Id, UUID user2Id) {
+        return requests.values().stream()
+                .filter(req -> 
+                    (req.getFromUserId().equals(user1Id) && req.getToUserId().equals(user2Id)) ||
+                    (req.getFromUserId().equals(user2Id) && req.getToUserId().equals(user1Id))
+                )
+                .findFirst();
     }
 }

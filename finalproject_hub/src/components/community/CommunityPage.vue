@@ -20,7 +20,7 @@
           </div>
           <div class="stat-content">
             <div class="stat-number">{{ friends.length }}</div>
-            <div class="stat-label">Total Members</div>
+            <div class="stat-label">Total Friends</div>
           </div>
         </div>
       </div>
@@ -49,7 +49,24 @@
       </div>
     </div>
 
-    <div class="members-grid">
+    <!-- Loading State -->
+    <div v-if="isLoading" class="loading-state">
+      <n-spin size="large" />
+      <p>Loading your friends...</p>
+    </div>
+
+    <div v-else-if="error" class="error-state">
+      <n-icon size="64" color="#ef4444">
+        <PersonOutline />
+      </n-icon>
+      <h3>Error loading friends</h3>
+      <p>{{ error }}</p>
+      <n-button type="primary" @click="loadFriends">
+        Try Again
+      </n-button>
+    </div>
+
+    <div v-else class="members-grid">
       <div 
         v-for="member in filteredMembers" 
         :key="member.id"
@@ -120,14 +137,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { 
   NDataTable, 
   NPagination, 
   NInput, 
   NSelect, 
   NButton, 
-  NIcon 
+  NIcon,
+  NSpin,
+  useMessage
 } from 'naive-ui'
 import { 
   PeopleOutline,
@@ -139,10 +158,16 @@ import {
   CallOutline
 } from '@vicons/ionicons5'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/store/profile/userStore'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
+const userStore = useUserStore()
+const message = useMessage()
 
-const friends = ref([
+const { friends, isLoading, error } = storeToRefs(userStore)
+
+const friendsWithDetails = ref([
   { id: '1', fullName: 'Alice Johnson', email: 'alice@example.com', phone: '+995 123-456-789', age: 25 },
   { id: '2', fullName: 'Bob Smith', email: 'bob@example.com', phone: '+995 234-567-890', age: 28 },
   { id: '3', fullName: 'Charlie Brown', email: 'charlie@example.com', phone: '+995 345-678-901', age: 22 },
@@ -170,7 +195,9 @@ const ageOptions = [
 ]
 
 const filteredMembers = computed(() => {
-  let filtered = friends.value
+  // For now, we'll use mock data since we only have friend IDs from backend
+  // In a real app, you'd fetch user details for each friend ID
+  let filtered = friendsWithDetails.value
 
   if (searchQuery.value) {
     filtered = filtered.filter(member => 
@@ -205,6 +232,18 @@ const handlePageSizeChange = (size: number) => {
   pageSize.value = size
   currentPage.value = 1
 }
+
+const loadFriends = async () => {
+  try {
+    await userStore.fetchCurrentUserFriends()
+  } catch (error) {
+    console.error('Failed to load friends:', error)
+  }
+}
+
+onMounted(() => {
+  loadFriends()
+})
 </script>
 
 <style scoped>
@@ -310,6 +349,35 @@ const handlePageSizeChange = (size: number) => {
 
 .filter-select {
   width: 200px;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #64748b;
+}
+
+.loading-state p {
+  margin-top: 1rem;
+  font-size: 1.125rem;
+}
+
+.error-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #64748b;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.error-state h3 {
+  margin: 1rem 0 0.5rem 0;
+  color: #1e293b;
+}
+
+.error-state p {
+  margin-bottom: 1.5rem;
 }
 
 .members-grid {

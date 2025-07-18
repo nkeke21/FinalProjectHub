@@ -25,7 +25,7 @@
 </template>
   
 <script setup lang="ts">
-import { ref, computed, h } from 'vue'
+import { ref, computed, h, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { NButton, NMenu, NTag } from 'naive-ui'
 import { useUserStore } from '@/store/profile/userStore'
@@ -48,6 +48,39 @@ const profileUserId = computed(() => {
     return route.params.id as string
 })
 
+const showAddFriendButton = ref(true)
+
+const checkExistingFriendRequest = async () => {
+    if (isOwnProfile.value) {
+        showAddFriendButton.value = false
+        return
+    }
+
+    try {
+        const userStr = localStorage.getItem('user')
+        const loggedInUser = userStr ? JSON.parse(userStr) : null
+        const currentUserId = loggedInUser?.id || ''
+        
+        if (!currentUserId || !profileUserId.value) {
+            showAddFriendButton.value = true
+            return
+        }
+
+        const existingRequest = await userStore.checkFriendRequest(currentUserId, profileUserId.value)
+        
+        showAddFriendButton.value = !existingRequest
+        
+        if (showAddFriendButton.value) {
+            await userStore.fetchCurrentUserFriends()
+            const isFriend = userStore.friends.includes(profileUserId.value)
+            showAddFriendButton.value = !isFriend
+        }
+    } catch (error) {
+        console.error('Error checking friend request:', error)
+        showAddFriendButton.value = true
+    }
+}
+
 const handleMenuChange = async (key: string) => {
   if (key === 'add-friend') {
     if (!isOwnProfile.value) {
@@ -61,6 +94,8 @@ const handleMenuChange = async (key: string) => {
           toUserId: profileUserId.value
         })
         message.success('Friend request sent!')
+        
+        showAddFriendButton.value = false
       } catch (err) {
         message.error('Failed to send friend request')
       }
@@ -123,7 +158,7 @@ const menuOptions = computed(() => {
     }
   ]
 
-  if (!isOwnProfile.value) {
+  if (!isOwnProfile.value && showAddFriendButton.value) {
     baseOptions.push({
       key: 'add-friend',
       label: () =>
@@ -150,6 +185,14 @@ const currentComponent = computed(() => {
     default:
       return AccountDetails
   }
+})
+
+onMounted(() => {
+  checkExistingFriendRequest()
+})
+
+watch(() => route.params.id, () => {
+  checkExistingFriendRequest()
 })
 
 </script>
