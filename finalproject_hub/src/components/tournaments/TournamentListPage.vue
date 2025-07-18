@@ -235,7 +235,12 @@
         </div>
 
         <div class="tournament-actions">
-          <n-button type="primary" color="orange" class="view-details-btn">
+          <n-button 
+            type="primary" 
+            color="orange" 
+            class="view-details-btn"
+            @click="router.push(`/tournaments/${tournament.id}`)"
+          >
             View Details
           </n-button>
         </div>
@@ -255,6 +260,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { 
   NButton, 
   NIcon,
@@ -282,6 +288,7 @@ import { mockTournaments } from '@/data/mockTournaments'
 import type { Tournament } from '@/models/Tournament'
 import { SportType, TournamentStatus, TournamentFormat } from '@/models/Tournament'
 
+const router = useRouter()
 const tournaments = ref<Tournament[]>(mockTournaments)
 const searchQuery = ref('')
 const showFilters = ref(false)

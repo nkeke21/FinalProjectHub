@@ -7,6 +7,7 @@ import ProfileComponent from '@/components/profile/ProfileComponent.vue'
 import NotificationsPage from '@/components/notification/NotificationsPage.vue'
 import CommunityPage from '@/components/community/CommunityPage.vue'
 import TournamentListPage from '@/components/tournaments/TournamentListPage.vue'
+import TournamentDetailPage from '@/components/tournaments/TournamentDetailPage.vue'
 import TeamsPage from '@/components/teams/TeamsPage.vue'
 
 const routes = [
@@ -55,6 +56,12 @@ const routes = [
     path: '/tournaments',
     name: 'Tournaments',
     component: TournamentListPage
+  },
+  {
+    path: '/tournaments/:id',
+    name: 'TournamentDetail',
+    component: TournamentDetailPage,
+    props: true
   },
   {
     path: '/teams',

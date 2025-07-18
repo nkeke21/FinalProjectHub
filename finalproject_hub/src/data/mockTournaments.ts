@@ -88,7 +88,7 @@ export const mockTournaments: Tournament[] = [
     endDate: '2025-03-30T22:00:00Z',
     registrationDeadline: '2025-02-25T23:59:59Z',
     maxParticipants: 8,
-    currentParticipants: 8,
+    currentParticipants: 4,
     entryFee: 30,
     prizePool: 1500,
     ageRange: { min: 20, max: 40 },
