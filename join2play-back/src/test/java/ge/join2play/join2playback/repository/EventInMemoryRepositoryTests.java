@@ -105,7 +105,7 @@ public class EventInMemoryRepositoryTests {
         );
 
         assertThrows(EventDoesNotExistException.class, () -> repository.update(nonExistentEvent),
-                "Updating a nonexistent event should throw EventDoesNotExistError.");
+                "Updating a nonexistent event should throw EventDoesNotExistException.");
     }
 
     @Test

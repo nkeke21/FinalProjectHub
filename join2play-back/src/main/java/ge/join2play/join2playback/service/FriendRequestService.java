@@ -37,7 +37,7 @@ public class FriendRequestService {
             throw new UserDoesNotExistException("Receiver not found with id: " + toUserId);
         }
 
-        if( fromUserId.equals(toUserId)) {
+        if(fromUserId.equals(toUserId)) {
             throw new SelfFriendRequestException("Cannot send a friend request to yourself.");
         }
 
@@ -113,7 +113,7 @@ public class FriendRequestService {
             throw new UserIsNotFriendException("Friend not found with id: " + friendId);
         }
 
-         repository.deleteFriend(userId, friendId);
+        repository.deleteFriend(userId, friendId);
     }
 
 }
