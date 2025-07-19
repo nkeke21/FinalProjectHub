@@ -243,6 +243,7 @@ import {
   CloseOutline 
 } from '@vicons/ionicons5'
 import type { Tournament, SportType, TournamentFormat, TournamentType } from '@/models/Tournament'
+import { TournamentService } from '@/services/apis/TournamentService'
 
 interface Props {
   show: boolean
@@ -380,10 +381,10 @@ const sportTypeOptions = [
 ]
 
 const formatOptions = [
-  { label: 'Single Elimination', value: 'Single Elimination' },
-  { label: 'Double Elimination', value: 'Double Elimination' },
-  { label: 'Round Robin', value: 'Round Robin' },
-  { label: 'Swiss System', value: 'Swiss System' }
+  { label: 'Single Elimination', value: 'SINGLE_ELIMINATION' },
+  { label: 'Double Elimination', value: 'DOUBLE_ELIMINATION' },
+  { label: 'Round Robin', value: 'ROUND_ROBIN' },
+  { label: 'Swiss System', value: 'SWISS_SYSTEM' }
 ]
 
 const tournamentTypeOptions = [
@@ -442,32 +443,36 @@ const handleSubmit = async () => {
     
     console.log('Form validation passed!')
     
-    const tournament: Tournament = {
-      id: `tournament-${Date.now()}`,
+    // Create tournament request for backend
+    const tournamentRequest = {
       name: formData.name,
       description: formData.description,
       sportType: formData.sportType!,
       format: formData.format!,
-      status: 'Draft',
-      hostId: 'current-user-id', // Mock host ID
-      hostName: 'Current User', // Mock host name
+      tournamentType: formData.tournamentType!,
       location: formData.location,
-      latitude: 0, // Mock coordinates
+      latitude: 0, // Mock coordinates - could be enhanced with map integration
       longitude: 0,
       startDate: formData.startDate!,
       endDate: formData.endDate!,
       registrationDeadline: formData.registrationDeadline!,
       maxParticipants: formData.maxParticipants!,
-      currentParticipants: 0,
       entryFee: formData.entryFee,
       prizePool: formData.prizePool,
-      ageRange: formData.ageRange,
-      rules: formData.rules.filter(rule => rule.trim() !== ''),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      minAge: formData.ageRange.min,
+      maxAge: formData.ageRange.max,
+      rules: formData.rules.filter(rule => rule.trim() !== '')
     }
     
-    console.log('Created tournament:', tournament)
+    console.log('Sending tournament request to backend:', tournamentRequest)
+    
+    // Call backend service (hostId is now handled by session)
+    const response = await TournamentService.createTournament(tournamentRequest)
+    
+    // Convert response to frontend Tournament model
+    const tournament = TournamentService.convertToTournament(response)
+    
+    console.log('Created tournament from backend:', tournament)
     
     // Emit event with created tournament
     emit('tournament-created', tournament)
@@ -480,8 +485,14 @@ const handleSubmit = async () => {
     resetForm()
     
   } catch (error) {
-    console.error('Form validation failed:', error)
-    console.log('Form data that failed validation:', formData)
+    console.error('Error creating tournament:', error)
+    
+    // Handle specific permission error
+    if (error instanceof Error && error.message.includes('permission')) {
+      message.error('You do not have permission to host tournaments. Please contact support.')
+    } else {
+      message.error('Failed to create tournament. Please try again.')
+    }
   } finally {
     isSubmitting.value = false
   }

@@ -190,7 +190,20 @@
       </div>
     </div>
 
-    <div class="tournament-grid">
+    <div v-if="loading" class="loading-state">
+      <n-spin size="large" />
+      <p>Loading tournaments...</p>
+    </div>
+    
+    <div v-else-if="sortedTournaments.length === 0" class="empty-state">
+      <n-icon size="64" color="#94a3b8">
+        <TrophyOutline />
+      </n-icon>
+      <h3>No tournaments found</h3>
+      <p>Try adjusting your filters or create a new tournament to get started.</p>
+    </div>
+    
+    <div v-else class="tournament-grid">
       <div class="tournament-card" v-for="tournament in sortedTournaments" :key="tournament.id">
         <div class="tournament-header">
           <div class="tournament-badge">
@@ -321,7 +334,8 @@ import {
   NSelect,
   NDatePicker,
   NSlider,
-  NTag
+  NTag,
+  NSpin
 } from 'naive-ui'
 import { 
   FilterOutline,
@@ -339,17 +353,18 @@ import {
   AddOutline,
   CheckmarkCircleOutline
 } from '@vicons/ionicons5'
-import { mockTournaments } from '@/data/mockTournaments'
 import type { Tournament } from '@/models/Tournament'
 import { SportType, TournamentStatus, TournamentFormat } from '@/models/Tournament'
 import CreateTournamentModal from './CreateTournamentModal.vue'
 import TournamentRegistrationForm from './TournamentRegistrationForm.vue'
 import { TournamentRegistrationService } from '@/services/apis/TournamentRegistrationService'
 import type { TournamentRegistration } from '@/models/TournamentRegistration'
+import { TournamentService } from '@/services/apis/TournamentService'
 
 const router = useRouter()
-const tournaments = ref<Tournament[]>(mockTournaments)
+const tournaments = ref<Tournament[]>([])
 const searchQuery = ref('')
+const loading = ref(false)
 const showFilters = ref(false)
 const sortBy = ref('startDate')
 const showCreateModal = ref(false)
@@ -571,9 +586,25 @@ const formatDateRange = (startDate: string, endDate: string) => {
   return `${start} - ${end}`;
 };
 
-const handleTournamentCreated = (newTournament: Tournament) => {
-  tournaments.value.push(newTournament)
+const handleTournamentCreated = async (newTournament: Tournament) => {
+  await loadTournaments() // Reload tournaments from backend
   showCreateModal.value = false
+}
+
+const loadTournaments = async () => {
+  try {
+    loading.value = true
+    const response = await TournamentService.getAllTournaments()
+    tournaments.value = response.map(TournamentService.convertToTournament)
+  } catch (error) {
+    console.error('Error loading tournaments:', error)
+    // Show user-friendly error message
+    if (error instanceof Error) {
+      console.error('Tournament loading error:', error.message)
+    }
+  } finally {
+    loading.value = false
+  }
 }
 
 const loadUserRegistrations = async () => {
@@ -620,8 +651,9 @@ const handleQuickRegistrationError = (message: string) => {
   console.error('Registration failed:', message)
 }
 
-onMounted(() => {
-  loadUserRegistrations()
+onMounted(async () => {
+  await loadTournaments()
+  await loadUserRegistrations()
 })
 </script>
 
@@ -905,6 +937,17 @@ onMounted(() => {
   height: 40px;
   border-radius: 8px;
   flex-shrink: 0;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #64748b;
+}
+
+.loading-state p {
+  margin-top: 1rem;
+  font-size: 1rem;
 }
 
 .empty-state {

@@ -13,7 +13,9 @@ public enum SportType {
     BASKETBALL("Basketball"),
     RUNNING("Running"),
     TENNIS("Tennis"),
-    CYCLING("Cycling");
+    CYCLING("Cycling"),
+    VOLLEYBALL("Volleyball"),
+    SWIMMING("Swimming");
 
     private final String displayName;
 

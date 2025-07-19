@@ -14,9 +14,11 @@ import java.util.UUID;
 @Service
 public class AuthenticationService {
     private final UserRepository userRepository;
+    private final UserPermissionService userPermissionService;
 
-    public AuthenticationService(UserRepository userRepository) {
+    public AuthenticationService(UserRepository userRepository, UserPermissionService userPermissionService) {
         this.userRepository = userRepository;
+        this.userPermissionService = userPermissionService;
     }
 
     public AuthResponse signUp(SignUpRequest signUpRequest) {
@@ -36,6 +38,9 @@ public class AuthenticationService {
         );
 
         User savedUser = userRepository.save(newUser);
+
+        // Create default permission for the new user
+        userPermissionService.createDefaultPermission(savedUser.getId());
 
         return new AuthResponse(
                 savedUser.getId(),
