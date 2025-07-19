@@ -55,9 +55,9 @@ public class TournamentService {
         tournament.setLocation(request.getLocation());
         tournament.setLatitude(request.getLatitude());
         tournament.setLongitude(request.getLongitude());
-        tournament.setStartDate(request.getStartDate());
-        tournament.setEndDate(request.getEndDate());
-        tournament.setRegistrationDeadline(request.getRegistrationDeadline());
+        tournament.setStartDate(Instant.ofEpochMilli(request.getStartDate()));
+        tournament.setEndDate(Instant.ofEpochMilli(request.getEndDate()));
+        tournament.setRegistrationDeadline(Instant.ofEpochMilli(request.getRegistrationDeadline()));
         tournament.setMaxParticipants(request.getMaxParticipants());
         tournament.setCurrentParticipants(0);
         tournament.setEntryFee(request.getEntryFee());
@@ -112,9 +112,9 @@ public class TournamentService {
         existingTournament.setLocation(request.getLocation());
         existingTournament.setLatitude(request.getLatitude());
         existingTournament.setLongitude(request.getLongitude());
-        existingTournament.setStartDate(request.getStartDate());
-        existingTournament.setEndDate(request.getEndDate());
-        existingTournament.setRegistrationDeadline(request.getRegistrationDeadline());
+        existingTournament.setStartDate(Instant.ofEpochMilli(request.getStartDate()));
+        existingTournament.setEndDate(Instant.ofEpochMilli(request.getEndDate()));
+        existingTournament.setRegistrationDeadline(Instant.ofEpochMilli(request.getRegistrationDeadline()));
         existingTournament.setMaxParticipants(request.getMaxParticipants());
         existingTournament.setEntryFee(request.getEntryFee());
         existingTournament.setPrizePool(request.getPrizePool());
@@ -173,9 +173,9 @@ public class TournamentService {
                 tournament.getLocation(),
                 tournament.getLatitude(),
                 tournament.getLongitude(),
-                tournament.getStartDate(),
-                tournament.getEndDate(),
-                tournament.getRegistrationDeadline(),
+                tournament.getStartDate().toEpochMilli(),
+                tournament.getEndDate().toEpochMilli(),
+                tournament.getRegistrationDeadline().toEpochMilli(),
                 tournament.getMaxParticipants(),
                 tournament.getCurrentParticipants(),
                 tournament.getEntryFee(),
@@ -183,8 +183,8 @@ public class TournamentService {
                 tournament.getMinAge(),
                 tournament.getMaxAge(),
                 tournament.getRules(),
-                tournament.getCreatedAt(),
-                tournament.getUpdatedAt()
+                tournament.getCreatedAt().toEpochMilli(),
+                tournament.getUpdatedAt().toEpochMilli()
         );
     }
 } 

@@ -9,9 +9,9 @@ export interface TournamentRequest {
   location: string
   latitude: number
   longitude: number
-  startDate: string
-  endDate: string
-  registrationDeadline: string
+  startDate: number
+  endDate: number
+  registrationDeadline: number
   maxParticipants: number
   entryFee: number
   prizePool: number
@@ -33,9 +33,9 @@ export interface TournamentResponse {
   location: string
   latitude: number
   longitude: number
-  startDate: string
-  endDate: string
-  registrationDeadline: string
+  startDate: number
+  endDate: number
+  registrationDeadline: number
   maxParticipants: number
   currentParticipants: number
   entryFee: number
@@ -43,8 +43,8 @@ export interface TournamentResponse {
   minAge: number
   maxAge: number
   rules: string[]
-  createdAt: string
-  updatedAt: string
+  createdAt: number
+  updatedAt: number
 }
 
 export class TournamentService {
@@ -190,9 +190,9 @@ export class TournamentService {
       location: response.location,
       latitude: response.latitude,
       longitude: response.longitude,
-      startDate: response.startDate,
-      endDate: response.endDate,
-      registrationDeadline: response.registrationDeadline,
+      startDate: new Date(response.startDate).toISOString(),
+      endDate: new Date(response.endDate).toISOString(),
+      registrationDeadline: new Date(response.registrationDeadline).toISOString(),
       maxParticipants: response.maxParticipants,
       currentParticipants: response.currentParticipants,
       entryFee: response.entryFee,
@@ -202,8 +202,8 @@ export class TournamentService {
         max: response.maxAge
       },
       rules: response.rules,
-      createdAt: response.createdAt,
-      updatedAt: response.updatedAt
+      createdAt: new Date(response.createdAt).toISOString(),
+      updatedAt: new Date(response.updatedAt).toISOString()
     }
   }
 } 

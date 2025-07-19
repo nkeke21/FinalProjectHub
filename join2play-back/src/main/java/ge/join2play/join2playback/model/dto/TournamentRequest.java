@@ -3,7 +3,6 @@ package ge.join2play.join2playback.model.dto;
 import ge.join2play.join2playback.model.enums.SportType;
 import ge.join2play.join2playback.model.enums.TournamentFormat;
 
-import java.time.Instant;
 import java.util.List;
 
 public class TournamentRequest {
@@ -15,9 +14,9 @@ public class TournamentRequest {
     private String location;
     private double latitude;
     private double longitude;
-    private Instant startDate;
-    private Instant endDate;
-    private Instant registrationDeadline;
+    private long startDate;
+    private long endDate;
+    private long registrationDeadline;
     private int maxParticipants;
     private double entryFee;
     private double prizePool;
@@ -31,8 +30,8 @@ public class TournamentRequest {
 
     public TournamentRequest(String name, String description, SportType sportType, 
                            TournamentFormat format, String tournamentType, String location,
-                           double latitude, double longitude, Instant startDate, Instant endDate,
-                           Instant registrationDeadline, int maxParticipants, double entryFee,
+                           double latitude, double longitude, long startDate, long endDate,
+                           long registrationDeadline, int maxParticipants, double entryFee,
                            double prizePool, int minAge, int maxAge, List<String> rules) {
         this.name = name;
         this.description = description;
@@ -118,27 +117,27 @@ public class TournamentRequest {
         this.longitude = longitude;
     }
 
-    public Instant getStartDate() {
+    public long getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Instant startDate) {
+    public void setStartDate(long startDate) {
         this.startDate = startDate;
     }
 
-    public Instant getEndDate() {
+    public long getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Instant endDate) {
+    public void setEndDate(long endDate) {
         this.endDate = endDate;
     }
 
-    public Instant getRegistrationDeadline() {
+    public long getRegistrationDeadline() {
         return registrationDeadline;
     }
 
-    public void setRegistrationDeadline(Instant registrationDeadline) {
+    public void setRegistrationDeadline(long registrationDeadline) {
         this.registrationDeadline = registrationDeadline;
     }
 

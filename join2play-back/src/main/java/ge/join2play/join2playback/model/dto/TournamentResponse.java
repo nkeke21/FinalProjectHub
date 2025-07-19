@@ -4,7 +4,6 @@ import ge.join2play.join2playback.model.enums.SportType;
 import ge.join2play.join2playback.model.enums.TournamentFormat;
 import ge.join2play.join2playback.model.enums.TournamentStatus;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,9 +20,9 @@ public class TournamentResponse {
     private String location;
     private double latitude;
     private double longitude;
-    private Instant startDate;
-    private Instant endDate;
-    private Instant registrationDeadline;
+    private long startDate;
+    private long endDate;
+    private long registrationDeadline;
     private int maxParticipants;
     private int currentParticipants;
     private double entryFee;
@@ -31,8 +30,8 @@ public class TournamentResponse {
     private int minAge;
     private int maxAge;
     private List<String> rules;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private long createdAt;
+    private long updatedAt;
 
     public TournamentResponse() {
         // Default constructor for Spring
@@ -41,9 +40,9 @@ public class TournamentResponse {
     public TournamentResponse(UUID id, String name, String description, SportType sportType,
                             TournamentFormat format, String tournamentType, TournamentStatus status,
                             UUID hostId, String hostName, String location, double latitude, double longitude,
-                            Instant startDate, Instant endDate, Instant registrationDeadline,
+                            long startDate, long endDate, long registrationDeadline,
                             int maxParticipants, int currentParticipants, double entryFee, double prizePool,
-                            int minAge, int maxAge, List<String> rules, Instant createdAt, Instant updatedAt) {
+                            int minAge, int maxAge, List<String> rules, long createdAt, long updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -167,27 +166,27 @@ public class TournamentResponse {
         this.longitude = longitude;
     }
 
-    public Instant getStartDate() {
+    public long getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Instant startDate) {
+    public void setStartDate(long startDate) {
         this.startDate = startDate;
     }
 
-    public Instant getEndDate() {
+    public long getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Instant endDate) {
+    public void setEndDate(long endDate) {
         this.endDate = endDate;
     }
 
-    public Instant getRegistrationDeadline() {
+    public long getRegistrationDeadline() {
         return registrationDeadline;
     }
 
-    public void setRegistrationDeadline(Instant registrationDeadline) {
+    public void setRegistrationDeadline(long registrationDeadline) {
         this.registrationDeadline = registrationDeadline;
     }
 
@@ -247,19 +246,19 @@ public class TournamentResponse {
         this.rules = rules;
     }
 
-    public Instant getCreatedAt() {
+    public long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
+    public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Instant getUpdatedAt() {
+    public long getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
+    public void setUpdatedAt(long updatedAt) {
         this.updatedAt = updatedAt;
     }
 } 
