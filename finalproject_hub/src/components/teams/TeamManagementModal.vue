@@ -58,6 +58,24 @@
           </div>
         </n-tab-pane>
         
+        <n-tab-pane v-if="isCaptain" name="requests" tab="Join Requests">
+          <div class="requests-section">
+            <div class="requests-header">
+              <h4>Pending Join Requests</h4>
+              <n-button 
+                size="small" 
+                @click="showJoinRequestsModal = true"
+              >
+                <template #icon>
+                  <n-icon><NotificationsOutline /></n-icon>
+                </template>
+                View Requests
+              </n-button>
+            </div>
+            <p class="requests-info">Manage requests from users who want to join your team.</p>
+          </div>
+        </n-tab-pane>
+        
         <n-tab-pane name="settings" tab="Settings">
           <div class="settings-section">
             <h4>Team Settings</h4>
@@ -115,14 +133,22 @@
         </div>
       </template>
     </n-modal>
+
+    <!-- Team Join Requests Modal -->
+    <TeamJoinRequestsModal
+      v-model:show="showJoinRequestsModal"
+      :team-id="team?.id || ''"
+      @request-processed="handleRequestProcessed"
+    />
   </n-modal>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue'
 import { NModal, NForm, NFormItem, NInput, NInputNumber, NButton, NTabs, NTabPane, NIcon } from 'naive-ui'
-import { PersonAddOutline } from '@vicons/ionicons5'
+import { PersonAddOutline, NotificationsOutline } from '@vicons/ionicons5'
 import type { Team } from '@/models/Tournament'
+import TeamJoinRequestsModal from './TeamJoinRequestsModal.vue'
 
 interface Props {
   show: boolean
@@ -140,6 +166,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const showInviteModal = ref(false)
+const showJoinRequestsModal = ref(false)
 const sendingInvite = ref(false)
 
 const isTeamFull = computed(() => {
@@ -205,6 +232,11 @@ const sendInvite = async () => {
   
   showInviteModal.value = false
   sendingInvite.value = false
+}
+
+const handleRequestProcessed = () => {
+  // Refresh team data when a request is processed
+  emit('team-updated', props.team!)
 }
 
 watch(() => props.team, (newTeam) => {
@@ -342,6 +374,28 @@ watch(() => props.team, (newTeam) => {
 .settings-section h4 {
   margin-bottom: 1rem;
   color: #1e293b;
+}
+
+.requests-section {
+  margin-top: 1rem;
+}
+
+.requests-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.requests-header h4 {
+  margin: 0;
+  color: #1e293b;
+}
+
+.requests-info {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin: 0;
 }
 
 .modal-footer {

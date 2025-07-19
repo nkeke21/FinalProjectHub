@@ -67,15 +67,14 @@ public class TeamController {
     }
 
     @PostMapping("/{id}/join")
-    public ResponseEntity<TeamResponse> joinTeam(@PathVariable UUID id, HttpSession session) {
+    public ResponseEntity<String> joinTeam(@PathVariable UUID id, HttpSession session) {
         User currentUser = (User) session.getAttribute("user");
         if (currentUser == null) {
             return ResponseEntity.status(401).build();
         }
 
         try {
-            TeamResponse response = teamService.joinTeam(id, currentUser.getId());
-            return ResponseEntity.ok(response);
+            return ResponseEntity.badRequest().body("Please use /api/team-requests/send endpoint to request joining a team");
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

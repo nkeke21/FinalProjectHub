@@ -23,7 +23,15 @@ export const ENDPOINTS = {
     MY_TEAMS: '/teams/my',
     AVAILABLE_TEAMS: '/teams/available',
     JOIN_TEAM: (id: string) => `/teams/${id}/join`,
-    LEAVE_TEAM: (id: string) => `/teams/${id}/leave`
+    LEAVE_TEAM: (id: string) => `/teams/${id}/leave`,
+    SEND_TEAM_JOIN_REQUEST: '/team-requests/send',
+    GET_PENDING_TEAM_REQUESTS_FOR_TEAM: (teamId: string) => `/team-requests/team/${teamId}/pending`,
+    GET_PENDING_TEAM_REQUESTS_FOR_USER: '/team-requests/user/pending',
+    GET_PENDING_TEAM_REQUESTS_FOR_CAPTAIN: '/team-requests/captain/pending',
+    GET_ALL_TEAM_REQUESTS_FOR_TEAM: (teamId: string) => `/team-requests/team/${teamId}/all`,
+    GET_ALL_TEAM_REQUESTS_FOR_USER: '/team-requests/user/all',
+    RESPOND_TO_TEAM_JOIN_REQUEST: '/team-requests/respond',
+    CHECK_TEAM_JOIN_REQUEST: (teamId: string, userId: string) => `/team-requests/check-request/${teamId}/${userId}`
 }
 
 export const HEADERS = {

@@ -81,6 +81,7 @@ import { ref, computed, onMounted } from 'vue'
 import { NButton, NIcon, useMessage } from 'naive-ui'
 import { AddOutline, PeopleOutline } from '@vicons/ionicons5'
 import { UserTeamService } from '@/services/apis/UserTeamService'
+import { TeamJoinRequestService } from '@/services/apis/TeamJoinRequestService'
 import type { Team } from '@/models/Tournament'
 import TeamCard from './TeamCard.vue'
 import CreateTeamModal from './CreateTeamModal.vue'
@@ -130,12 +131,12 @@ const openTeamManagement = (team: Team) => {
 const requestToJoinTeam = async (team: Team) => {
   try {
     loading.value = true
-    await UserTeamService.joinTeam(team.id)
-    message.success(`Successfully joined ${team.name}!`)
+    await TeamJoinRequestService.sendJoinRequest(team.id)
+    message.success(`Join request sent to ${team.name}! The team captain will review your request.`)
     await loadTeams()
   } catch (error) {
-    console.error('Failed to join team:', error)
-    message.error('Failed to join team')
+    console.error('Failed to send join request:', error)
+    message.error(error instanceof Error ? error.message : 'Failed to send join request')
   } finally {
     loading.value = false
   }

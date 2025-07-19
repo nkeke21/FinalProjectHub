@@ -87,19 +87,7 @@ export class UserTeamService {
   }
 
   static async joinTeam(teamId: string): Promise<Team> {
-    const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.JOIN_TEAM(teamId)}`, {
-      method: 'POST',
-      headers: HEADERS.JSON,
-      credentials: 'include'
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json()
-      console.error('Failed to join team:', errorData)
-      throw new Error('Failed to join team')
-    }
-
-    return await response.json()
+    throw new Error('Please use TeamJoinRequestService.sendJoinRequest() to request joining a team')
   }
 
   static async leaveTeam(teamId: string): Promise<void> {
