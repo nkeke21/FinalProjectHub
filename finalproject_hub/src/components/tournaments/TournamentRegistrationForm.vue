@@ -78,7 +78,7 @@
             <n-icon size="16" color="#3b82f6">
               <InformationCircleOutline />
             </n-icon>
-            <span>Basic information (name, age, email, phone) is taken from your profile and cannot be changed here. All other fields need to be filled for this specific tournament registration.</span>
+            <span>Basic information (name, age, email, phone) is automatically populated from your profile and cannot be changed here. All other fields need to be filled for this specific tournament registration.</span>
           </div>
           
           <div class="form-row">
@@ -87,6 +87,7 @@
                 v-model:value="formData.fullName" 
                 placeholder="Enter your full name" 
                 :disabled="true"
+                :loading="userStore.isLoading"
                 class="profile-field"
               />
             </n-form-item>
@@ -98,6 +99,7 @@
                 :max="tournament?.ageRange?.max || 65"
                 placeholder="Enter your age"
                 :disabled="true"
+                :loading="userStore.isLoading"
                 class="profile-field"
               />
             </n-form-item>
@@ -109,6 +111,7 @@
                 v-model:value="formData.email" 
                 placeholder="Enter your email address" 
                 :disabled="true"
+                :loading="userStore.isLoading"
                 class="profile-field"
               />
             </n-form-item>
@@ -118,6 +121,7 @@
                 v-model:value="formData.phoneNumber" 
                 placeholder="Enter your phone number" 
                 :disabled="true"
+                :loading="userStore.isLoading"
                 class="profile-field"
               />
             </n-form-item>
@@ -251,7 +255,7 @@ import {
 import type { Tournament } from '@/models/Tournament'
 import { TournamentRegistrationService } from '@/services/apis/TournamentRegistrationService'
 import { UserTeamService } from '@/services/apis/UserTeamService'
-import { UserProfileService, type UserProfile } from '@/services/apis/UserProfileService'
+import { useUserStore } from '@/store/profile/userStore'
 
 interface Props {
   show: boolean
@@ -314,7 +318,9 @@ const skillLevelOptions = [
 const userTeams = ref<{ label: string; value: string }[]>([])
 const loadingTeams = ref(false)
 
-const userProfile = ref<UserProfile | null>(null)
+const userStore = useUserStore()
+
+const userProfile = ref<any | null>(null) // Changed type to any as UserProfile type is removed
 const loadingProfile = ref(false)
 
 const rules = computed(() => {
@@ -397,13 +403,25 @@ const loadUserTeams = async () => {
 const loadUserProfile = async () => {
   try {
     loadingProfile.value = true
-    const profile = await UserProfileService.getUserProfile()
-    userProfile.value = profile
+    await userStore.fetchCurrentUserProfile()
   } catch (error) {
     console.error('Error loading user profile:', error)
   } finally {
     loadingProfile.value = false
   }
+}
+
+const calculateAge = (birthDate: string): number => {
+  const birth = new Date(birthDate)
+  const today = new Date()
+  let age = today.getFullYear() - birth.getFullYear()
+  const monthDiff = today.getMonth() - birth.getMonth()
+  
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--
+  }
+  
+  return age
 }
 
 const handleSubmit = async () => {
@@ -459,20 +477,22 @@ watch(() => props.show, (newValue) => {
   if (newValue) {
     const registrationType = props.tournament?.tournamentType === 'team' ? 'team' : 'individual'
     
-    loadUserProfile()
+    if (!userStore.profile) {
+      loadUserProfile()
+    }
     if (registrationType === 'team') {
       loadUserTeams()
     }
   }
 })
 
-watch(userProfile, (profile) => {
+watch(() => userStore.profile, (profile) => {
   if (profile) {
     Object.assign(formData, {
       registrationType: props.tournament?.tournamentType === 'team' ? 'team' : 'individual',
       teamId: null,
-      fullName: profile.fullName,
-      age: profile.age,
+      fullName: profile.name,
+      age: calculateAge(profile.birthDate),
       email: profile.email,
       phoneNumber: profile.phoneNumber,
       address: '',
