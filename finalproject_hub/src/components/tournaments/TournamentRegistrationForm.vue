@@ -155,17 +155,33 @@
           </div>
 
           <div class="form-row">
-            <n-form-item label="Emergency Contact Phone" path="emergencyContact.phone">
-              <n-input 
-                v-model:value="formData.emergencyContact.phone" 
-                placeholder="Enter emergency contact phone" 
-              />
+            <n-form-item 
+              label="Emergency Contact Phone" 
+              path="emergencyContact.phone"
+              :feedback="emergencyPhoneError" 
+              :validation-status="emergencyPhoneError ? 'error' : undefined"
+            >
+              <div class="phone-input-container">
+                <span class="country-code">+995</span>
+                <n-input 
+                  v-model:value="emergencyPhoneNumber" 
+                  placeholder="5XX XXX XXX" 
+                  class="phone-input-field"
+                  @input="validateEmergencyPhone"
+                />
+              </div>
             </n-form-item>
             
-            <n-form-item label="Emergency Contact Email" path="emergencyContact.email">
+            <n-form-item 
+              label="Emergency Contact Email" 
+              path="emergencyContact.email"
+              :feedback="emergencyEmailError" 
+              :validation-status="emergencyEmailError ? 'error' : undefined"
+            >
               <n-input 
                 v-model:value="formData.emergencyContact.email" 
-                placeholder="Enter emergency contact email" 
+                placeholder="Enter emergency contact email"
+                @input="validateEmergencyEmail"
               />
             </n-form-item>
           </div>
@@ -323,6 +339,11 @@ const userStore = useUserStore()
 const userProfile = ref<any | null>(null) // Changed type to any as UserProfile type is removed
 const loadingProfile = ref(false)
 
+const emergencyPhoneError = ref('')
+const emergencyEmailError = ref('')
+
+const emergencyPhoneNumber = ref('')
+
 const rules = computed(() => {
   const baseRules = {
     address: {
@@ -338,7 +359,32 @@ const rules = computed(() => {
     'emergencyContact.phone': {
       required: true,
       message: 'Emergency contact phone is required',
-      trigger: 'blur'
+      trigger: 'blur',
+      validator: (rule: any, value: string) => {
+        if (!value) {
+          return new Error('Emergency contact phone is required')
+        }
+        if (!value.startsWith('+995') || value.length !== 13) {
+          return new Error('Please enter a valid Georgian mobile number')
+        }
+        const phoneNumber = value.substring(4) // Remove +995
+        if (!phoneNumber.startsWith('5') || phoneNumber.length !== 9) {
+          return new Error('Please enter a valid Georgian mobile number (5XX XXX XXX)')
+        }
+      }
+    },
+    'emergencyContact.email': {
+      validator: (rule: any, value: string) => {
+        if (value && !value.includes('@')) {
+          return new Error('Email must contain "@"')
+        }
+        if (value) {
+          const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+          if (!emailRegex.test(value)) {
+            return new Error('Invalid email format')
+          }
+        }
+      }
     },
     previousExperience: {
       required: true,
@@ -424,9 +470,42 @@ const calculateAge = (birthDate: string): number => {
   return age
 }
 
+const validateEmergencyPhone = () => {
+  emergencyPhoneNumber.value = emergencyPhoneNumber.value.replace(/\D/g, '')
+  
+  if (emergencyPhoneNumber.value.length > 0 && (!emergencyPhoneNumber.value.startsWith('5') || emergencyPhoneNumber.value.length !== 9)) {
+    emergencyPhoneError.value = 'Please enter a valid Georgian mobile number (5XX XXX XXX)'
+  } else {
+    emergencyPhoneError.value = ''
+  }
+  
+  formData.emergencyContact.phone = emergencyPhoneNumber.value ? `+995${emergencyPhoneNumber.value}` : ''
+}
+
+const validateEmergencyEmail = () => {
+  const email = formData.emergencyContact.email
+  
+  if (email && !email.includes('@')) {
+    emergencyEmailError.value = 'Email must contain "@"'
+  } else if (email) {
+    const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+    if (!emailRegex.test(email)) {
+      emergencyEmailError.value = 'Invalid email format'
+    } else {
+      emergencyEmailError.value = ''
+    }
+  } else {
+    emergencyEmailError.value = ''
+  }
+}
+
 const handleSubmit = async () => {
   try {
     submitting.value = true
+    
+    if (emergencyPhoneNumber.value) {
+      formData.emergencyContact.phone = `+995${emergencyPhoneNumber.value}`
+    }
     
     await formRef.value?.validate()
     
@@ -607,6 +686,37 @@ watch(() => userStore.profile, (profile) => {
 .profile-field {
   background-color: #f8fafc !important;
   color: #64748b !important;
+}
+
+.phone-input-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.country-code {
+  background-color: #f8fafc;
+  padding: 0.5rem 0.75rem;
+  border-right: 1px solid #e2e8f0;
+  color: #64748b;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.phone-input-field {
+  flex: 1;
+}
+
+.phone-input-field :deep(.n-input) {
+  border: none;
+  box-shadow: none;
+}
+
+.phone-input-field :deep(.n-input:focus) {
+  border: none;
+  box-shadow: none;
 }
 
 @media (max-width: 768px) {
