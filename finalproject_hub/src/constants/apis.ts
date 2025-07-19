@@ -24,6 +24,7 @@ export const ENDPOINTS = {
     AVAILABLE_TEAMS: '/teams/available',
     JOIN_TEAM: (id: string) => `/teams/${id}/join`,
     LEAVE_TEAM: (id: string) => `/teams/${id}/leave`,
+    REMOVE_TEAM_MEMBER: (teamId: string, memberId: string) => `/teams/${teamId}/members/${memberId}`,
     SEND_TEAM_JOIN_REQUEST: '/team-requests/send',
     GET_PENDING_TEAM_REQUESTS_FOR_TEAM: (teamId: string) => `/team-requests/team/${teamId}/pending`,
     GET_PENDING_TEAM_REQUESTS_FOR_USER: '/team-requests/user/pending',
@@ -31,7 +32,8 @@ export const ENDPOINTS = {
     GET_ALL_TEAM_REQUESTS_FOR_TEAM: (teamId: string) => `/team-requests/team/${teamId}/all`,
     GET_ALL_TEAM_REQUESTS_FOR_USER: '/team-requests/user/all',
     RESPOND_TO_TEAM_JOIN_REQUEST: '/team-requests/respond',
-    CHECK_TEAM_JOIN_REQUEST: (teamId: string, userId: string) => `/team-requests/check-request/${teamId}/${userId}`
+    CHECK_TEAM_JOIN_REQUEST: (teamId: string, userId: string) => `/team-requests/check-request/${teamId}/${userId}`,
+    GET_CURRENT_USER_ID: '/team-requests/current-user'
 }
 
 export const HEADERS = {

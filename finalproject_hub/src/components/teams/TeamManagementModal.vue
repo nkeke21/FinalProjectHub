@@ -46,12 +46,16 @@
                 </div>
                 <div class="member-actions">
                   <n-button
-                    v-if="isCaptain && member.role !== 'CAPTAIN'"
+                    v-if="isCaptain && member.role !== 'CAPTAIN' && team.members.length > 1"
                     size="small"
-                    @click="removeMember(member)"
+                    type="error"
+                    @click="confirmRemoveMember(member)"
                   >
                     Remove
                   </n-button>
+                  <span v-else-if="isCaptain && team.members.length <= 1" class="disabled-text">
+                    Cannot remove last member
+                  </span>
                 </div>
               </div>
             </div>
@@ -140,15 +144,36 @@
       :team-id="team?.id || ''"
       @request-processed="handleRequestProcessed"
     />
+
+    <n-modal v-model:show="showRemoveConfirmation" preset="card" title="Remove Team Member" style="width: 400px">
+      <div class="confirmation-content">
+        <p>Are you sure you want to remove <strong>{{ memberToRemove?.name }}</strong> from the team?</p>
+        <p class="warning-text">This action cannot be undone.</p>
+      </div>
+      
+      <template #footer>
+        <div class="modal-footer">
+          <n-button @click="showRemoveConfirmation = false">Cancel</n-button>
+          <n-button 
+            type="error" 
+            @click="removeMember(memberToRemove)"
+            :loading="false"
+          >
+            Remove Member
+          </n-button>
+        </div>
+      </template>
+    </n-modal>
   </n-modal>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue'
-import { NModal, NForm, NFormItem, NInput, NInputNumber, NButton, NTabs, NTabPane, NIcon } from 'naive-ui'
+import { NModal, NForm, NFormItem, NInput, NInputNumber, NButton, NTabs, NTabPane, NIcon, useMessage } from 'naive-ui'
 import { PersonAddOutline, NotificationsOutline } from '@vicons/ionicons5'
 import type { Team } from '@/models/Tournament'
 import TeamJoinRequestsModal from './TeamJoinRequestsModal.vue'
+import { UserTeamService } from '@/services/apis/UserTeamService'
 
 interface Props {
   show: boolean
@@ -168,6 +193,8 @@ const emit = defineEmits<Emits>()
 const showInviteModal = ref(false)
 const showJoinRequestsModal = ref(false)
 const sendingInvite = ref(false)
+const memberToRemove = ref<any>(null)
+const showRemoveConfirmation = ref(false)
 
 const isTeamFull = computed(() => {
   if (!props.team) return false
@@ -211,12 +238,31 @@ const saveSettings = () => {
   close()
 }
 
-const removeMember = (member: any) => {
+const message = useMessage()
+
+const confirmRemoveMember = (member: any) => {
+  memberToRemove.value = member
+  showRemoveConfirmation.value = true
+}
+
+const removeMember = async (member: any) => {
   if (!props.team) return
   
-  props.team.members = props.team.members.filter(m => m.userId !== member.userId)
-  props.team.updatedAt = new Date().toISOString()
-  emit('member-removed', member.userId)
+  try {
+    await UserTeamService.removeTeamMember(props.team.id, member.userId)
+    
+    props.team.members = props.team.members.filter(m => m.userId !== member.userId)
+    props.team.updatedAt = new Date().toISOString()
+    
+    message.success(`${member.name} has been removed from the team`)
+    emit('member-removed', member.userId)
+    
+    showRemoveConfirmation.value = false
+    memberToRemove.value = null
+  } catch (error) {
+    console.error('Failed to remove team member:', error)
+    message.error('Failed to remove team member. Please try again.')
+  }
 }
 
 const sendInvite = async () => {
@@ -396,6 +442,28 @@ watch(() => props.team, (newTeam) => {
   color: #64748b;
   font-size: 0.875rem;
   margin: 0;
+}
+
+.confirmation-content {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.confirmation-content p {
+  margin-bottom: 0.5rem;
+  color: #1e293b;
+}
+
+.warning-text {
+  color: #dc2626;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.disabled-text {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-style: italic;
 }
 
 .modal-footer {

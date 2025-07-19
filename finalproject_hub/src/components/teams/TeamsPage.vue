@@ -94,17 +94,22 @@ const showCreateTeamModal = ref(false)
 const showTeamManagementModal = ref(false)
 const selectedTeam = ref<Team | null>(null)
 const loading = ref(false)
-const currentUserId = 'user-1' 
+const currentUserId = ref<string>('') 
 
 const isCaptain = computed(() => {
-  if (!selectedTeam.value || !selectedTeam.value.members) return false
-  const user = selectedTeam.value.members.find(member => member && member.role === 'CAPTAIN')
-  return user !== undefined
+  if (!selectedTeam.value || !selectedTeam.value.members || !currentUserId.value) return false
+  const currentUserMember = selectedTeam.value.members.find(member => member && member.userId === currentUserId.value)
+  return currentUserMember?.role === 'CAPTAIN'
 })
 
 const loadTeams = async () => {
   try {
     loading.value = true
+    
+    if (!currentUserId.value) {
+      currentUserId.value = await TeamJoinRequestService.getCurrentUserId()
+    }
+    
     const [myTeamsData, availableTeamsData] = await Promise.all([
       UserTeamService.getMyTeams(),
       UserTeamService.getAvailableTeams()

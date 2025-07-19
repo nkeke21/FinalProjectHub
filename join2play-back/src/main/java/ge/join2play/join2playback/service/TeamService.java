@@ -185,6 +185,28 @@ public class TeamService {
         teamMemberRepository.removeUserFromTeam(teamId, userId);
     }
 
+    public void removeTeamMember(UUID teamId, UUID memberId, UUID captainId) {
+        Team team = teamRepository.getById(teamId);
+        if (team == null) {
+            throw new TeamDoesNotExistException("Team with id " + teamId + " does not exist.");
+        }
+
+        if (!team.getCaptainId().equals(captainId)) {
+            throw new RuntimeException("Only team captain can remove team members.");
+        }
+
+        TeamMember memberToRemove = teamMemberRepository.getMemberByTeamAndUser(teamId, memberId);
+        if (memberToRemove == null) {
+            throw new RuntimeException("User is not a member of this team.");
+        }
+
+        if (memberToRemove.getRole() == TeamRole.CAPTAIN) {
+            throw new RuntimeException("Captain cannot remove themselves from the team.");
+        }
+
+        teamMemberRepository.removeUserFromTeam(teamId, memberId);
+    }
+
     private boolean hasAvailableSlots(UUID teamId, int maxMembers) {
         List<TeamMember> members = teamMemberRepository.getMembersByTeam(teamId);
         return members.size() < maxMembers;

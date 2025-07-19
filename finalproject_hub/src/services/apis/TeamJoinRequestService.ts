@@ -145,4 +145,19 @@ export class TeamJoinRequestService {
 
     return await response.json()
   }
+
+  static async getCurrentUserId(): Promise<string> {
+    const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.GET_CURRENT_USER_ID}`, {
+      method: 'GET',
+      headers: HEADERS.JSON,
+      credentials: 'include'
+    })
+
+    if (!response.ok) {
+      console.error('Failed to get current user ID')
+      throw new Error('Failed to get current user ID')
+    }
+
+    return await response.text()
+  }
 } 

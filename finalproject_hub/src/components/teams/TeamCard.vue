@@ -97,7 +97,7 @@ interface Emits {
 
 const props = withDefaults(defineProps<Props>(), {
   showRole: false,
-  currentUserId: 'user-1'
+  currentUserId: ''
 })
 
 defineEmits<Emits>()

@@ -121,6 +121,20 @@ export class UserTeamService {
     return await response.json()
   }
 
+  static async removeTeamMember(teamId: string, memberId: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.REMOVE_TEAM_MEMBER(teamId, memberId)}`, {
+      method: 'DELETE',
+      headers: HEADERS.JSON,
+      credentials: 'include'
+    })
+
+    if (!response.ok) {
+      const errorData = await response.text()
+      console.error('Failed to remove team member:', errorData)
+      throw new Error(errorData || 'Failed to remove team member')
+    }
+  }
+
   static async getUserTeams(sportType?: string): Promise<Team[]> {
     return this.getMyTeams()
   }

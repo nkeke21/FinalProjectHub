@@ -109,4 +109,19 @@ public class TeamController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @DeleteMapping("/{teamId}/members/{memberId}")
+    public ResponseEntity<Void> removeTeamMember(@PathVariable UUID teamId, @PathVariable UUID memberId, HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        try {
+            teamService.removeTeamMember(teamId, memberId, currentUser.getId());
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
 } 
