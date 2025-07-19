@@ -247,15 +247,12 @@ import {
   AlertCircleOutline,
   CheckmarkCircleOutline
 } from '@vicons/ionicons5'
-import { 
-  getTournamentById, 
-  getTournamentParticipants
-} from '@/data/mockTournaments'
 import type { 
   Tournament, 
   TournamentParticipant,
   ParticipantStatus
 } from '@/models/Tournament'
+import { TournamentService } from '@/services/apis/TournamentService'
 import { TournamentRegistrationService } from '@/services/apis/TournamentRegistrationService'
 import type { TournamentRegistration } from '@/models/TournamentRegistration'
 import RegistrationConfirmationModal from './RegistrationConfirmationModal.vue'
@@ -305,19 +302,17 @@ const loadTournamentData = async () => {
     loading.value = true
     const tournamentId = route.params.id as string
     
-    const tournamentData = getTournamentById(tournamentId)
-    if (!tournamentData) {
-      tournament.value = null
-      return
-    }
+    const tournamentResponse = await TournamentService.getTournamentById(tournamentId)
+    const tournamentData = TournamentService.convertToTournament(tournamentResponse)
     
     tournament.value = tournamentData
-    participants.value = getTournamentParticipants(tournamentId)
+    participants.value = []
     
     await loadRegistrationData(tournamentId)
     
   } catch (error) {
     console.error('Error loading tournament data:', error)
+    tournament.value = null
   } finally {
     loading.value = false
   }
