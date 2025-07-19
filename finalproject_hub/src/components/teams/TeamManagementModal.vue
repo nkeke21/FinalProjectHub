@@ -22,17 +22,6 @@
           <div class="members-section">
             <div class="members-header">
               <h4>Team Members</h4>
-              <n-button 
-                size="small" 
-                @click="showInviteModal = true"
-                :disabled="isTeamFull"
-                :title="isTeamFull ? 'Team is full' : 'Invite a new member'"
-              >
-                <template #icon>
-                  <n-icon><PersonAddOutline /></n-icon>
-                </template>
-                Invite Member
-              </n-button>
             </div>
             
             <div class="members-list">
@@ -46,15 +35,37 @@
                 </div>
                 <div class="member-actions">
                   <n-button
-                    v-if="isCaptain && member.role !== 'CAPTAIN'"
+                    v-if="isCaptain && member.role !== 'CAPTAIN' && team.members.length > 1"
                     size="small"
-                    @click="removeMember(member)"
+                    type="error"
+                    @click="confirmRemoveMember(member)"
                   >
                     Remove
                   </n-button>
+                  <span v-else-if="isCaptain && team.members.length <= 1" class="disabled-text">
+                    Cannot remove last member
+                  </span>
                 </div>
               </div>
             </div>
+          </div>
+        </n-tab-pane>
+        
+        <n-tab-pane v-if="isCaptain" name="requests" tab="Join Requests">
+          <div class="requests-section">
+            <div class="requests-header">
+              <h4>Pending Join Requests</h4>
+              <n-button 
+                size="small" 
+                @click="showJoinRequestsModal = true"
+              >
+                <template #icon>
+                  <n-icon><NotificationsOutline /></n-icon>
+                </template>
+                View Requests
+              </n-button>
+            </div>
+            <p class="requests-info">Manage requests from users who want to join your team.</p>
           </div>
         </n-tab-pane>
         
@@ -73,15 +84,11 @@
               </n-form-item>
               <n-form-item label="Age Range">
                 <div class="age-range-inputs">
-                  <n-input-number v-model:value="settingsForm.ageRange.min" :min="8" :max="80" />
+                  <n-input-number v-model:value="settingsForm.minAge" :min="8" :max="80" />
                   <span class="age-separator">to</span>
-                  <n-input-number v-model:value="settingsForm.ageRange.max" :min="8" :max="80" />
+                  <n-input-number v-model:value="settingsForm.maxAge" :min="8" :max="80" />
                   <span class="age-unit">years</span>
                 </div>
-              </n-form-item>
-              <n-form-item label="Team Privacy">
-                <n-switch v-model:value="settingsForm.isPublic" />
-                <span class="privacy-label">{{ settingsForm.isPublic ? 'Public' : 'Private' }}</span>
               </n-form-item>
             </n-form>
           </div>
@@ -96,26 +103,30 @@
       </div>
     </template>
 
-    <!-- Invite Member Modal -->
-    <n-modal v-model:show="showInviteModal" preset="card" title="Invite Member" style="width: 500px">
-      <n-form :model="inviteForm" label-placement="left" label-width="auto">
-        <n-form-item label="Email Address">
-          <n-input v-model:value="inviteForm.email" placeholder="Enter email address" />
-        </n-form-item>
-        <n-form-item label="Message (Optional)">
-          <n-input
-            v-model:value="inviteForm.message"
-            type="textarea"
-            placeholder="Add a personal message"
-            :rows="3"
-          />
-        </n-form-item>
-      </n-form>
+
+    <!-- Team Join Requests Modal -->
+    <TeamJoinRequestsModal
+      v-model:show="showJoinRequestsModal"
+      :team-id="team?.id || ''"
+      @request-processed="handleRequestProcessed"
+    />
+
+    <n-modal v-model:show="showRemoveConfirmation" preset="card" title="Remove Team Member" style="width: 400px">
+      <div class="confirmation-content">
+        <p>Are you sure you want to remove <strong>{{ memberToRemove?.name }}</strong> from the team?</p>
+        <p class="warning-text">This action cannot be undone.</p>
+      </div>
       
       <template #footer>
         <div class="modal-footer">
-          <n-button @click="showInviteModal = false">Cancel</n-button>
-          <n-button type="primary" @click="sendInvite" :loading="sendingInvite">Send Invite</n-button>
+          <n-button @click="showRemoveConfirmation = false">Cancel</n-button>
+          <n-button 
+            type="error" 
+            @click="removeMember(memberToRemove)"
+            :loading="false"
+          >
+            Remove Member
+          </n-button>
         </div>
       </template>
     </n-modal>
@@ -124,9 +135,11 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue'
-import { NModal, NForm, NFormItem, NInput, NInputNumber, NSwitch, NButton, NTabs, NTabPane, NIcon } from 'naive-ui'
-import { PersonAddOutline } from '@vicons/ionicons5'
+import { NModal, NForm, NFormItem, NInput, NInputNumber, NButton, NTabs, NTabPane, NIcon, useMessage } from 'naive-ui'
+import { NotificationsOutline } from '@vicons/ionicons5'
 import type { Team } from '@/models/Tournament'
+import TeamJoinRequestsModal from './TeamJoinRequestsModal.vue'
+import { UserTeamService } from '@/services/apis/UserTeamService'
 
 interface Props {
   show: boolean
@@ -143,25 +156,16 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const showInviteModal = ref(false)
-const sendingInvite = ref(false)
-
-const isTeamFull = computed(() => {
-  if (!props.team) return false
-  return props.team.members.length >= props.team.maxMembers
-})
+const showJoinRequestsModal = ref(false)
+const memberToRemove = ref<any>(null)
+const showRemoveConfirmation = ref(false)
 
 const settingsForm = reactive({
   name: '',
   description: '',
   maxMembers: 11,
-  ageRange: { min: 18, max: 35 },
-  isPublic: true
-})
-
-const inviteForm = reactive({
-  email: '',
-  message: ''
+  minAge: 18,
+  maxAge: 35
 })
 
 const updateShow = (value: boolean) => {
@@ -179,8 +183,8 @@ const saveSettings = () => {
     name: settingsForm.name,
     description: settingsForm.description,
     maxMembers: settingsForm.maxMembers,
-    ageRange: settingsForm.ageRange,
-    isPublic: settingsForm.isPublic,
+    minAge: settingsForm.minAge,
+    maxAge: settingsForm.maxAge,
     updatedAt: new Date().toISOString()
   })
   
@@ -188,27 +192,37 @@ const saveSettings = () => {
   close()
 }
 
-const removeMember = (member: any) => {
-  if (!props.team) return
-  
-  props.team.members = props.team.members.filter(m => m.userId !== member.userId)
-  props.team.updatedAt = new Date().toISOString()
-  emit('member-removed', member.userId)
+const message = useMessage()
+
+const confirmRemoveMember = (member: any) => {
+  memberToRemove.value = member
+  showRemoveConfirmation.value = true
 }
 
-const sendInvite = async () => {
-  sendingInvite.value = true
+const removeMember = async (member: any) => {
+  if (!props.team) return
   
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  
-  console.log('Sending invite to:', inviteForm.email)
-  console.log('Message:', inviteForm.message)
-  
-  inviteForm.email = ''
-  inviteForm.message = ''
-  
-  showInviteModal.value = false
-  sendingInvite.value = false
+  try {
+    await UserTeamService.removeTeamMember(props.team.id, member.userId)
+    
+    props.team.members = props.team.members.filter(m => m.userId !== member.userId)
+    props.team.updatedAt = new Date().toISOString()
+    
+    message.success(`${member.name} has been removed from the team`)
+    emit('member-removed', member.userId)
+    
+    showRemoveConfirmation.value = false
+    memberToRemove.value = null
+  } catch (error) {
+    console.error('Failed to remove team member:', error)
+    message.error('Failed to remove team member. Please try again.')
+  }
+}
+
+
+const handleRequestProcessed = () => {
+  // Refresh team data when a request is processed
+  emit('team-updated', props.team!)
 }
 
 watch(() => props.team, (newTeam) => {
@@ -217,8 +231,8 @@ watch(() => props.team, (newTeam) => {
       name: newTeam.name,
       description: newTeam.description,
       maxMembers: newTeam.maxMembers,
-      ageRange: newTeam.ageRange,
-      isPublic: newTeam.isPublic
+      minAge: newTeam.minAge,
+      maxAge: newTeam.maxAge
     })
   }
 }, { immediate: true })
@@ -348,6 +362,50 @@ watch(() => props.team, (newTeam) => {
   color: #1e293b;
 }
 
+.requests-section {
+  margin-top: 1rem;
+}
+
+.requests-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.requests-header h4 {
+  margin: 0;
+  color: #1e293b;
+}
+
+.requests-info {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.confirmation-content {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.confirmation-content p {
+  margin-bottom: 0.5rem;
+  color: #1e293b;
+}
+
+.warning-text {
+  color: #dc2626;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.disabled-text {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
 .modal-footer {
   display: flex;
   justify-content: flex-end;
@@ -370,11 +428,7 @@ watch(() => props.team, (newTeam) => {
   font-size: 0.875rem;
 }
 
-.privacy-label {
-  margin-left: 0.5rem;
-  color: #64748b;
-  font-size: 0.875rem;
-}
+
 
 @media (max-width: 768px) {
   .team-stats {

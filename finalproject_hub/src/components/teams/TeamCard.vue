@@ -13,11 +13,6 @@
       <div v-if="showRole" class="team-role" :class="userRole.toLowerCase()">
         {{ userRole }}
       </div>
-      <div v-else class="team-privacy">
-        <n-icon size="16" color="#64748b">
-          <GlobeOutline />
-        </n-icon>
-      </div>
     </div>
     
     <h3 class="team-name">{{ team.name }}</h3>
@@ -41,7 +36,7 @@
         <n-icon size="16" color="#64748b">
           <PeopleOutline />
         </n-icon>
-        <span>{{ team.ageRange.min }}-{{ team.ageRange.max }} years</span>
+                 <span>{{ team.minAge || 0 }}-{{ team.maxAge || 0 }} years</span>
       </div>
     </div>
 
@@ -85,8 +80,7 @@ import {
   FitnessOutline,
   PeopleOutline,
   CalendarOutline,
-  PersonOutline,
-  GlobeOutline
+  PersonOutline
 } from '@vicons/ionicons5'
 import type { Team } from '@/models/Tournament'
 
@@ -103,17 +97,27 @@ interface Emits {
 
 const props = withDefaults(defineProps<Props>(), {
   showRole: false,
-  currentUserId: 'user-1'
+  currentUserId: ''
 })
 
 defineEmits<Emits>()
 
 const userRole = computed(() => {
-  const user = props.team.members.find(member => member.userId === props.currentUserId)
-  if (user) {
-    return user.role === 'CAPTAIN' ? 'Captain' : 'Member'
+  try {
+    if (!props.currentUserId) return 'Member'
+    if (!props.team?.members) {
+      console.log('No members array found in team')
+      return 'Member'
+    }
+    const user = props.team.members.find(member => member?.userId === props.currentUserId)
+    if (user) {
+      return user.role === 'CAPTAIN' ? 'Captain' : 'Member'
+    }
+    return 'Member'
+  } catch (error) {
+    console.error('Error in userRole computed:', error)
+    return 'Member'
   }
-  return 'Member'
 })
 
 const formatDate = (dateString: string) => {
@@ -184,10 +188,7 @@ const formatDate = (dateString: string) => {
   color: #1e40af;
 }
 
-.team-privacy {
-  display: flex;
-  align-items: center;
-}
+
 
 .team-name {
   font-size: 1.25rem;

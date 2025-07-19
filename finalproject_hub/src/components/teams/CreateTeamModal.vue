@@ -57,10 +57,6 @@
         </div>
       </n-form-item>
       
-      <n-form-item label="Team Privacy" path="isPublic">
-        <n-switch v-model:value="form.isPublic" />
-        <span class="privacy-label">{{ form.isPublic ? 'Public' : 'Private' }}</span>
-      </n-form-item>
     </n-form>
     
     <template #footer>
@@ -81,7 +77,8 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
-import { NModal, NForm, NFormItem, NInput, NInputNumber, NSelect, NSwitch, NButton } from 'naive-ui'
+import { NModal, NForm, NFormItem, NInput, NInputNumber, NSelect, NButton, useMessage } from 'naive-ui'
+import { UserTeamService, type TeamRequest } from '@/services/apis/UserTeamService'
 import type { Team } from '@/models/Tournament'
 import { SportType, TeamRole } from '@/models/Tournament'
 
@@ -97,6 +94,7 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
+const message = useMessage()
 const formRef = ref()
 const loading = ref(false)
 
@@ -105,8 +103,7 @@ const form = reactive({
   description: '',
   sportType: '',
   maxMembers: 11,
-  ageRange: { min: 18, max: 35 },
-  isPublic: true
+  ageRange: { min: 18, max: 35 }
 })
 
 const rules = {
@@ -148,30 +145,16 @@ const createTeam = async () => {
     await formRef.value?.validate()
     loading.value = true
     
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    const newTeam: Team = {
-      id: `team-${Date.now()}`,
+    const teamRequest: TeamRequest = {
       name: form.name,
       description: form.description,
-      sportType: form.sportType as SportType,
-      captainId: 'user-1',
-      captainName: 'John Doe',
-      members: [
-        {
-          userId: 'user-1',
-          name: 'John Doe',
-          email: 'john@example.com',
-          role: TeamRole.CAPTAIN,
-          joinedAt: new Date().toISOString()
-        }
-      ],
+      sportType: form.sportType,
       maxMembers: form.maxMembers,
-      isPublic: form.isPublic,
-      ageRange: form.ageRange,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      minAge: form.ageRange.min,
+      maxAge: form.ageRange.max
     }
+    
+    const newTeam = await UserTeamService.createTeam(teamRequest)
     
     emit('team-created', newTeam)
     
@@ -180,13 +163,13 @@ const createTeam = async () => {
       description: '',
       sportType: '',
       maxMembers: 11,
-      ageRange: { min: 18, max: 35 },
-      isPublic: true
+      ageRange: { min: 18, max: 35 }
     })
     
     close()
   } catch (error) {
-    console.error('Validation failed:', error)
+    console.error('Failed to create team:', error)
+    message.error('Failed to create team. Please try again.')
   } finally {
     loading.value = false
   }
@@ -199,8 +182,7 @@ watch(() => props.show, (newVal) => {
       description: '',
       sportType: '',
       maxMembers: 11,
-      ageRange: { min: 18, max: 35 },
-      isPublic: true
+      ageRange: { min: 18, max: 35 }
     })
   }
 })
@@ -231,11 +213,6 @@ watch(() => props.show, (newVal) => {
   white-space: nowrap;
 }
 
-.privacy-label {
-  margin-left: 0.5rem;
-  color: #64748b;
-  font-size: 0.875rem;
-}
 
 .create-team-btn {
   background-color: #3b82f6 !important;
