@@ -73,15 +73,15 @@
               </n-form-item>
               <n-form-item label="Age Range">
                 <div class="age-range-inputs">
-                  <n-input-number v-model:value="settingsForm.ageRange.min" :min="8" :max="80" />
+                  <n-input-number v-model:value="settingsForm.minAge" :min="8" :max="80" />
                   <span class="age-separator">to</span>
-                  <n-input-number v-model:value="settingsForm.ageRange.max" :min="8" :max="80" />
+                  <n-input-number v-model:value="settingsForm.maxAge" :min="8" :max="80" />
                   <span class="age-unit">years</span>
                 </div>
               </n-form-item>
               <n-form-item label="Team Privacy">
-                <n-switch v-model:value="settingsForm.isPublic" />
-                <span class="privacy-label">{{ settingsForm.isPublic ? 'Public' : 'Private' }}</span>
+                <n-switch v-model:value="settingsForm.public" />
+                <span class="privacy-label">{{ settingsForm.public ? 'Public' : 'Private' }}</span>
               </n-form-item>
             </n-form>
           </div>
@@ -155,8 +155,9 @@ const settingsForm = reactive({
   name: '',
   description: '',
   maxMembers: 11,
-  ageRange: { min: 18, max: 35 },
-  isPublic: true
+  minAge: 18,
+  maxAge: 35,
+  public: true
 })
 
 const inviteForm = reactive({
@@ -179,8 +180,9 @@ const saveSettings = () => {
     name: settingsForm.name,
     description: settingsForm.description,
     maxMembers: settingsForm.maxMembers,
-    ageRange: settingsForm.ageRange,
-    isPublic: settingsForm.isPublic,
+    minAge: settingsForm.minAge,
+    maxAge: settingsForm.maxAge,
+    public: settingsForm.public,
     updatedAt: new Date().toISOString()
   })
   
@@ -217,8 +219,9 @@ watch(() => props.team, (newTeam) => {
       name: newTeam.name,
       description: newTeam.description,
       maxMembers: newTeam.maxMembers,
-      ageRange: newTeam.ageRange,
-      isPublic: newTeam.isPublic
+      minAge: newTeam.minAge,
+      maxAge: newTeam.maxAge,
+      public: newTeam.public
     })
   }
 }, { immediate: true })

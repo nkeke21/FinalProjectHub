@@ -6,7 +6,7 @@ export interface TeamRequest {
   description: string
   sportType: string
   maxMembers: number
-  isPublic: boolean
+  public: boolean
   minAge: number
   maxAge: number
 }

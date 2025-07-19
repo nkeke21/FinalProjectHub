@@ -19,13 +19,12 @@
         <h2>My Teams</h2>
         <div class="teams-grid">
           <TeamCard
-            v-for="team in myTeams"
-            :key="team?.id || ''"
+            v-for="(team, index) in myTeams"
+            :key="team?.id || index"
             :team="team"
             :show-role="true"
             :current-user-id="currentUserId"
             @manage-team="openTeamManagement"
-            v-if="team && team.id"
           />
         </div>
         <div v-if="myTeams.length === 0" class="empty-section">
@@ -37,12 +36,11 @@
         <h2>Available Teams to Join</h2>
         <div class="teams-grid">
           <TeamCard
-            v-for="team in availableTeams"
-            :key="team?.id || ''"
+            v-for="(team, index) in availableTeams"
+            :key="team?.id || index"
             :team="team"
             :show-role="false"
             @join-team="requestToJoinTeam"
-            v-if="team && team.id"
           />
         </div>
         <div v-if="availableTeams.length === 0" class="empty-section">
@@ -110,8 +108,10 @@ const loadTeams = async () => {
       UserTeamService.getMyTeams(),
       UserTeamService.getAvailableTeams()
     ])
+    
     myTeams.value = Array.isArray(myTeamsData) ? myTeamsData : []
     availableTeams.value = Array.isArray(availableTeamsData) ? availableTeamsData : []
+    
   } catch (error) {
     console.error('Failed to load teams:', error)
     message.error('Failed to load teams')

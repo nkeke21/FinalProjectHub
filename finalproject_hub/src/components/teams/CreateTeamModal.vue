@@ -57,9 +57,9 @@
         </div>
       </n-form-item>
       
-      <n-form-item label="Team Privacy" path="isPublic">
-        <n-switch v-model:value="form.isPublic" />
-        <span class="privacy-label">{{ form.isPublic ? 'Public' : 'Private' }}</span>
+      <n-form-item label="Team Privacy" path="public">
+        <n-switch v-model:value="form.public" />
+        <span class="privacy-label">{{ form.public ? 'Public' : 'Private' }}</span>
       </n-form-item>
     </n-form>
     
@@ -108,7 +108,7 @@ const form = reactive({
   sportType: '',
   maxMembers: 11,
   ageRange: { min: 18, max: 35 },
-  isPublic: true
+  public: true
 })
 
 const rules = {
@@ -155,7 +155,7 @@ const createTeam = async () => {
       description: form.description,
       sportType: form.sportType,
       maxMembers: form.maxMembers,
-      isPublic: form.isPublic,
+      public: form.public,
       minAge: form.ageRange.min,
       maxAge: form.ageRange.max
     }
@@ -170,7 +170,7 @@ const createTeam = async () => {
       sportType: '',
       maxMembers: 11,
       ageRange: { min: 18, max: 35 },
-      isPublic: true
+      public: true
     })
     
     close()
@@ -190,7 +190,7 @@ watch(() => props.show, (newVal) => {
       sportType: '',
       maxMembers: 11,
       ageRange: { min: 18, max: 35 },
-      isPublic: true
+      public: true
     })
   }
 })

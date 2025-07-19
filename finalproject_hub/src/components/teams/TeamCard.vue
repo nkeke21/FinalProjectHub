@@ -41,7 +41,7 @@
         <n-icon size="16" color="#64748b">
           <PeopleOutline />
         </n-icon>
-        <span>{{ team.ageRange.min }}-{{ team.ageRange.max }} years</span>
+                 <span>{{ team.minAge || 0 }}-{{ team.maxAge || 0 }} years</span>
       </div>
     </div>
 
@@ -109,12 +109,21 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<Emits>()
 
 const userRole = computed(() => {
-  if (!props.currentUserId) return 'Member'
-  const user = props.team.members.find(member => member.userId === props.currentUserId)
-  if (user) {
-    return user.role === 'CAPTAIN' ? 'Captain' : 'Member'
+  try {
+    if (!props.currentUserId) return 'Member'
+    if (!props.team?.members) {
+      console.log('No members array found in team')
+      return 'Member'
+    }
+    const user = props.team.members.find(member => member?.userId === props.currentUserId)
+    if (user) {
+      return user.role === 'CAPTAIN' ? 'Captain' : 'Member'
+    }
+    return 'Member'
+  } catch (error) {
+    console.error('Error in userRole computed:', error)
+    return 'Member'
   }
-  return 'Member'
 })
 
 const formatDate = (dateString: string) => {

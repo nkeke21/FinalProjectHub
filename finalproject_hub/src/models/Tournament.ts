@@ -36,11 +36,9 @@ export interface Team {
   captainName: string
   members: TeamMember[]
   maxMembers: number
-  isPublic: boolean
-  ageRange: {
-    min: number
-    max: number
-  }
+  public: boolean
+  minAge: number
+  maxAge: number
   createdAt: string
   updatedAt: string
 }
@@ -122,9 +120,9 @@ export enum TournamentStatus {
 }
 
 export enum TeamRole {
-  CAPTAIN = 'Captain',
-  MEMBER = 'Member',
-  INVITED = 'Invited'
+  CAPTAIN = 'CAPTAIN',
+  MEMBER = 'MEMBER',
+  INVITED = 'INVITED'
 }
 
 export enum ParticipantStatus {
