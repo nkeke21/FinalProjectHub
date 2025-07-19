@@ -222,6 +222,20 @@
         
         <div class="registration-status-badge" v-if="!registrationLoading">
           <n-tag 
+            v-if="isTournamentHost(tournament)"
+            type="info"
+            size="small"
+            color="#3b82f6"
+          >
+            <template #icon>
+              <n-icon size="12">
+                <PersonOutline />
+              </n-icon>
+            </template>
+            Tournament Host
+          </n-tag>
+          <n-tag 
+            v-else
             :type="isUserRegistered(tournament.id) ? 'success' : 'default'"
             size="small"
             :color="isUserRegistered(tournament.id) ? '#10b981' : '#6b7280'"
@@ -280,7 +294,7 @@
 
         <div class="tournament-actions">
           <n-button 
-            v-if="!isUserRegistered(tournament.id)"
+            v-if="!isUserRegistered(tournament.id) && !isTournamentHost(tournament)"
             type="primary" 
             color="#3b82f6" 
             class="quick-register-btn"
@@ -288,6 +302,15 @@
             :loading="registrationLoading"
           >
             Register Now
+          </n-button>
+          <n-button 
+            v-if="isTournamentHost(tournament)"
+            type="info" 
+            color="#3b82f6" 
+            class="host-badge"
+            disabled
+          >
+            You're the Host
           </n-button>
           <n-button 
             type="primary" 
@@ -360,8 +383,10 @@ import TournamentRegistrationForm from './TournamentRegistrationForm.vue'
 import { TournamentRegistrationService } from '@/services/apis/TournamentRegistrationService'
 import type { TournamentRegistration } from '@/models/TournamentRegistration'
 import { TournamentService } from '@/services/apis/TournamentService'
+import { useUserStore } from '@/store/profile/userStore'
 
 const router = useRouter()
+const userStore = useUserStore()
 const tournaments = ref<Tournament[]>([])
 const searchQuery = ref('')
 const loading = ref(false)
@@ -632,6 +657,11 @@ const isUserRegistered = (tournamentId: string): boolean => {
   return registration?.status === 'REGISTERED'
 }
 
+const isTournamentHost = (tournament: Tournament): boolean => {
+  if (!userStore.profile) return false
+  return String(tournament.hostId) === String(userStore.profile.id)
+}
+
 const getUserRegistrationStatus = (tournamentId: string): string => {
   const registration = userRegistrations.value.get(tournamentId)
   if (!registration) return 'not-registered'
@@ -652,6 +682,9 @@ const handleQuickRegistrationError = (message: string) => {
 }
 
 onMounted(async () => {
+  if (!userStore.profile) {
+    await userStore.fetchCurrentUserProfile()
+  }
   await loadTournaments()
   await loadUserRegistrations()
 })
@@ -937,6 +970,14 @@ onMounted(async () => {
   height: 40px;
   border-radius: 8px;
   flex-shrink: 0;
+}
+
+.host-badge {
+  min-width: 120px;
+  height: 40px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  opacity: 0.8;
 }
 
 .loading-state {

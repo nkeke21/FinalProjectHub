@@ -133,7 +133,13 @@
                       <n-spin size="small" />
                       <span>Loading registration status...</span>
                     </div>
-                                        <n-button
+                    <div v-else-if="isTournamentHost" class="host-message">
+                      <n-icon size="20" color="#3b82f6">
+                        <PersonOutline />
+                      </n-icon>
+                      <span>You are the tournament host</span>
+                    </div>
+                    <n-button
                       v-else-if="canRegister"
                       type="primary"
                       size="large"
@@ -255,11 +261,13 @@ import type {
 import { TournamentService } from '@/services/apis/TournamentService'
 import { TournamentRegistrationService } from '@/services/apis/TournamentRegistrationService'
 import type { TournamentRegistration } from '@/models/TournamentRegistration'
+import { useUserStore } from '@/store/profile/userStore'
 import RegistrationConfirmationModal from './RegistrationConfirmationModal.vue'
 import TournamentRegistrationForm from './TournamentRegistrationForm.vue'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
 
 const loading = ref(true)
 const tournament = ref<Tournament | null>(null)
@@ -282,6 +290,11 @@ const showRegistrationForm = ref(false)
 
 const isRegistered = computed(() => {
   return userRegistration.value?.status === 'REGISTERED'
+})
+
+const isTournamentHost = computed(() => {
+  if (!tournament.value || !userStore.profile) return false
+  return String(tournament.value.hostId) === String(userStore.profile.id)
 })
 
 const participantFilterOptions = [
@@ -410,7 +423,10 @@ const handleRegistrationFormError = (message: string) => {
   showConfirmation('error', 'Registration Failed', message)
 }
 
-onMounted(() => {
+onMounted(async () => {
+  if (!userStore.profile) {
+    await userStore.fetchCurrentUserProfile()
+  }
   loadTournamentData()
 })
 </script>
@@ -680,6 +696,19 @@ onMounted(() => {
   gap: 0.5rem;
   color: #64748b;
   font-size: 0.875rem;
+}
+
+.host-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #3b82f6;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  background: #eff6ff;
+  border-radius: 8px;
+  border: 1px solid #dbeafe;
 }
 
 .participants-content,

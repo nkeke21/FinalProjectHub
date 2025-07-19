@@ -2,6 +2,7 @@ import { API_BASE_URL, HEADERS, ENDPOINTS } from "@/constants/apis"
 import { UserUpdateDTO } from "@/models/UserUpdateDTO"
 
 export interface UserDetailsResponse {
+  id: string
   name: string
   email: string
   phoneNumber: string
