@@ -167,27 +167,6 @@
           </div>
         </div>
 
-        <div class="form-section">
-          <h4>Medical Information</h4>
-          
-          <n-form-item label="Medical Conditions" path="medicalConditions">
-            <n-input 
-              v-model:value="formData.medicalConditions" 
-              type="textarea" 
-              placeholder="List any medical conditions, allergies, or medications (optional)"
-              :rows="3"
-            />
-          </n-form-item>
-
-          <n-form-item label="Blood Type" path="bloodType">
-            <n-select
-              v-model:value="formData.bloodType"
-              :options="bloodTypeOptions"
-              placeholder="Select your blood type"
-              clearable
-            />
-          </n-form-item>
-        </div>
 
         <div class="form-section">
           <h4>Tournament Experience</h4>
@@ -218,36 +197,6 @@
           </n-form-item>
         </div>
 
-        <div class="form-section">
-          <h4>Additional Information</h4>
-          
-          <n-form-item label="T-shirt Size" path="tshirtSize">
-            <n-select
-              v-model:value="formData.tshirtSize"
-              :options="tshirtSizeOptions"
-              placeholder="Select your t-shirt size"
-              clearable
-            />
-          </n-form-item>
-
-          <n-form-item label="Dietary Restrictions" path="dietaryRestrictions">
-            <n-input 
-              v-model:value="formData.dietaryRestrictions" 
-              type="textarea" 
-              placeholder="Any dietary restrictions or food allergies (optional)"
-              :rows="2"
-            />
-          </n-form-item>
-
-          <n-form-item label="Special Requirements" path="specialRequirements">
-            <n-input 
-              v-model:value="formData.specialRequirements" 
-              type="textarea" 
-              placeholder="Any special requirements or accommodations needed (optional)"
-              :rows="2"
-            />
-          </n-form-item>
-        </div>
 
         <div class="form-section">
           <h4>Terms and Conditions</h4>
@@ -337,29 +286,14 @@ const formData = reactive({
     phone: '',
     email: ''
   },
-  medicalConditions: '',
-  bloodType: null as string | null,
   previousExperience: null as string | null,
   skillLevel: null as string | null,
   previousAchievements: '',
-  tshirtSize: null as string | null,
-  dietaryRestrictions: '',
-  specialRequirements: '',
   acceptTerms: false,
   acceptWaiver: false,
   acceptRules: false
 })
 
-const bloodTypeOptions = [
-  { label: 'A+', value: 'A+' },
-  { label: 'A-', value: 'A-' },
-  { label: 'B+', value: 'B+' },
-  { label: 'B-', value: 'B-' },
-  { label: 'AB+', value: 'AB+' },
-  { label: 'AB-', value: 'AB-' },
-  { label: 'O+', value: 'O+' },
-  { label: 'O-', value: 'O-' }
-]
 
 const experienceOptions = [
   { label: 'First Tournament', value: 'first' },
@@ -376,14 +310,6 @@ const skillLevelOptions = [
   { label: 'Expert', value: 'expert' }
 ]
 
-const tshirtSizeOptions = [
-  { label: 'XS', value: 'XS' },
-  { label: 'S', value: 'S' },
-  { label: 'M', value: 'M' },
-  { label: 'L', value: 'L' },
-  { label: 'XL', value: 'XL' },
-  { label: 'XXL', value: 'XXL' }
-]
 
 const userTeams = ref<{ label: string; value: string }[]>([])
 const loadingTeams = ref(false)
@@ -497,14 +423,9 @@ const handleSubmit = async () => {
         phoneNumber: formData.phoneNumber,
         address: formData.address,
         emergencyContact: formData.emergencyContact,
-        medicalConditions: formData.medicalConditions,
-        bloodType: formData.bloodType,
         previousExperience: formData.previousExperience,
         skillLevel: formData.skillLevel,
-        previousAchievements: formData.previousAchievements,
-        tshirtSize: formData.tshirtSize,
-        dietaryRestrictions: formData.dietaryRestrictions,
-        specialRequirements: formData.specialRequirements
+        previousAchievements: formData.previousAchievements
       }
     }
     
@@ -561,14 +482,9 @@ watch(userProfile, (profile) => {
         phone: '',
         email: ''
       },
-      medicalConditions: '',
-      bloodType: null,
       previousExperience: null,
       skillLevel: null,
       previousAchievements: '',
-      tshirtSize: null,
-      dietaryRestrictions: '',
-      specialRequirements: '',
       acceptTerms: false,
       acceptWaiver: false,
       acceptRules: false
