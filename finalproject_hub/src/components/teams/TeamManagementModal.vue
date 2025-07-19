@@ -22,17 +22,6 @@
           <div class="members-section">
             <div class="members-header">
               <h4>Team Members</h4>
-              <n-button 
-                size="small" 
-                @click="showInviteModal = true"
-                :disabled="isTeamFull"
-                :title="isTeamFull ? 'Team is full' : 'Invite a new member'"
-              >
-                <template #icon>
-                  <n-icon><PersonAddOutline /></n-icon>
-                </template>
-                Invite Member
-              </n-button>
             </div>
             
             <div class="members-list">
@@ -114,29 +103,6 @@
       </div>
     </template>
 
-    <!-- Invite Member Modal -->
-    <n-modal v-model:show="showInviteModal" preset="card" title="Invite Member" style="width: 500px">
-      <n-form :model="inviteForm" label-placement="left" label-width="auto">
-        <n-form-item label="Email Address">
-          <n-input v-model:value="inviteForm.email" placeholder="Enter email address" />
-        </n-form-item>
-        <n-form-item label="Message (Optional)">
-          <n-input
-            v-model:value="inviteForm.message"
-            type="textarea"
-            placeholder="Add a personal message"
-            :rows="3"
-          />
-        </n-form-item>
-      </n-form>
-      
-      <template #footer>
-        <div class="modal-footer">
-          <n-button @click="showInviteModal = false">Cancel</n-button>
-          <n-button type="primary" @click="sendInvite" :loading="sendingInvite">Send Invite</n-button>
-        </div>
-      </template>
-    </n-modal>
 
     <!-- Team Join Requests Modal -->
     <TeamJoinRequestsModal
@@ -170,7 +136,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue'
 import { NModal, NForm, NFormItem, NInput, NInputNumber, NButton, NTabs, NTabPane, NIcon, useMessage } from 'naive-ui'
-import { PersonAddOutline, NotificationsOutline } from '@vicons/ionicons5'
+import { NotificationsOutline } from '@vicons/ionicons5'
 import type { Team } from '@/models/Tournament'
 import TeamJoinRequestsModal from './TeamJoinRequestsModal.vue'
 import { UserTeamService } from '@/services/apis/UserTeamService'
@@ -190,16 +156,9 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const showInviteModal = ref(false)
 const showJoinRequestsModal = ref(false)
-const sendingInvite = ref(false)
 const memberToRemove = ref<any>(null)
 const showRemoveConfirmation = ref(false)
-
-const isTeamFull = computed(() => {
-  if (!props.team) return false
-  return props.team.members.length >= props.team.maxMembers
-})
 
 const settingsForm = reactive({
   name: '',
@@ -207,11 +166,6 @@ const settingsForm = reactive({
   maxMembers: 11,
   minAge: 18,
   maxAge: 35
-})
-
-const inviteForm = reactive({
-  email: '',
-  message: ''
 })
 
 const updateShow = (value: boolean) => {
@@ -265,20 +219,6 @@ const removeMember = async (member: any) => {
   }
 }
 
-const sendInvite = async () => {
-  sendingInvite.value = true
-  
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  
-  console.log('Sending invite to:', inviteForm.email)
-  console.log('Message:', inviteForm.message)
-  
-  inviteForm.email = ''
-  inviteForm.message = ''
-  
-  showInviteModal.value = false
-  sendingInvite.value = false
-}
 
 const handleRequestProcessed = () => {
   // Refresh team data when a request is processed
