@@ -81,7 +81,8 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
-import { NModal, NForm, NFormItem, NInput, NInputNumber, NSelect, NSwitch, NButton } from 'naive-ui'
+import { NModal, NForm, NFormItem, NInput, NInputNumber, NSelect, NSwitch, NButton, useMessage } from 'naive-ui'
+import { UserTeamService, type TeamRequest } from '@/services/apis/UserTeamService'
 import type { Team } from '@/models/Tournament'
 import { SportType, TeamRole } from '@/models/Tournament'
 
@@ -97,6 +98,7 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
+const message = useMessage()
 const formRef = ref()
 const loading = ref(false)
 
@@ -148,30 +150,17 @@ const createTeam = async () => {
     await formRef.value?.validate()
     loading.value = true
     
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    const newTeam: Team = {
-      id: `team-${Date.now()}`,
+    const teamRequest: TeamRequest = {
       name: form.name,
       description: form.description,
-      sportType: form.sportType as SportType,
-      captainId: 'user-1',
-      captainName: 'John Doe',
-      members: [
-        {
-          userId: 'user-1',
-          name: 'John Doe',
-          email: 'john@example.com',
-          role: TeamRole.CAPTAIN,
-          joinedAt: new Date().toISOString()
-        }
-      ],
+      sportType: form.sportType,
       maxMembers: form.maxMembers,
       isPublic: form.isPublic,
-      ageRange: form.ageRange,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      minAge: form.ageRange.min,
+      maxAge: form.ageRange.max
     }
+    
+    const newTeam = await UserTeamService.createTeam(teamRequest)
     
     emit('team-created', newTeam)
     
@@ -186,7 +175,8 @@ const createTeam = async () => {
     
     close()
   } catch (error) {
-    console.error('Validation failed:', error)
+    console.error('Failed to create team:', error)
+    message.error('Failed to create team. Please try again.')
   } finally {
     loading.value = false
   }

@@ -109,6 +109,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<Emits>()
 
 const userRole = computed(() => {
+  if (!props.currentUserId) return 'Member'
   const user = props.team.members.find(member => member.userId === props.currentUserId)
   if (user) {
     return user.role === 'CAPTAIN' ? 'Captain' : 'Member'
