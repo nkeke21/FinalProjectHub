@@ -13,11 +13,6 @@
       <div v-if="showRole" class="team-role" :class="userRole.toLowerCase()">
         {{ userRole }}
       </div>
-      <div v-else class="team-privacy">
-        <n-icon size="16" color="#64748b">
-          <GlobeOutline />
-        </n-icon>
-      </div>
     </div>
     
     <h3 class="team-name">{{ team.name }}</h3>
@@ -85,8 +80,7 @@ import {
   FitnessOutline,
   PeopleOutline,
   CalendarOutline,
-  PersonOutline,
-  GlobeOutline
+  PersonOutline
 } from '@vicons/ionicons5'
 import type { Team } from '@/models/Tournament'
 
@@ -194,10 +188,7 @@ const formatDate = (dateString: string) => {
   color: #1e40af;
 }
 
-.team-privacy {
-  display: flex;
-  align-items: center;
-}
+
 
 .team-name {
   font-size: 1.25rem;

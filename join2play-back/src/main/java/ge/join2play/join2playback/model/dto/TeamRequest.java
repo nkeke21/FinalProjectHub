@@ -7,7 +7,6 @@ public class TeamRequest {
     private String description;
     private SportType sportType;
     private int maxMembers;
-    private boolean isPublic;
     private int minAge;
     private int maxAge;
 
@@ -15,12 +14,11 @@ public class TeamRequest {
     }
 
     public TeamRequest(String name, String description, SportType sportType, int maxMembers, 
-                      boolean isPublic, int minAge, int maxAge) {
+                      int minAge, int maxAge) {
         this.name = name;
         this.description = description;
         this.sportType = sportType;
         this.maxMembers = maxMembers;
-        this.isPublic = isPublic;
         this.minAge = minAge;
         this.maxAge = maxAge;
     }
@@ -57,13 +55,7 @@ public class TeamRequest {
         this.maxMembers = maxMembers;
     }
 
-    public boolean isPublic() {
-        return isPublic;
-    }
 
-    public void setPublic(boolean isPublic) {
-        this.isPublic = isPublic;
-    }
 
     public int getMinAge() {
         return minAge;

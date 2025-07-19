@@ -15,7 +15,6 @@ public class TeamResponse {
     private String captainName;
     private List<TeamMemberResponse> members;
     private int maxMembers;
-    private boolean isPublic;
     private int minAge;
     private int maxAge;
     private Instant createdAt;
@@ -26,7 +25,7 @@ public class TeamResponse {
 
     public TeamResponse(UUID id, String name, String description, SportType sportType, UUID captainId, 
                        String captainName, List<TeamMemberResponse> members, int maxMembers, 
-                       boolean isPublic, int minAge, int maxAge, Instant createdAt, Instant updatedAt) {
+                       int minAge, int maxAge, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -35,7 +34,6 @@ public class TeamResponse {
         this.captainName = captainName;
         this.members = members;
         this.maxMembers = maxMembers;
-        this.isPublic = isPublic;
         this.minAge = minAge;
         this.maxAge = maxAge;
         this.createdAt = createdAt;
@@ -106,13 +104,7 @@ public class TeamResponse {
         this.maxMembers = maxMembers;
     }
 
-    public boolean isPublic() {
-        return isPublic;
-    }
 
-    public void setPublic(boolean isPublic) {
-        this.isPublic = isPublic;
-    }
 
     public int getMinAge() {
         return minAge;

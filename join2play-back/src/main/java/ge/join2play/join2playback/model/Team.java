@@ -12,7 +12,6 @@ public class Team {
     private SportType sportType;
     private UUID captainId;
     private int maxMembers;
-    private boolean isPublic;
     private int minAge;
     private int maxAge;
     private Instant createdAt;
@@ -23,14 +22,13 @@ public class Team {
     }
 
     public Team(UUID id, String name, String description, SportType sportType, UUID captainId, 
-                int maxMembers, boolean isPublic, int minAge, int maxAge, Instant createdAt, Instant updatedAt) {
+                int maxMembers, int minAge, int maxAge, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.sportType = sportType;
         this.captainId = captainId;
         this.maxMembers = maxMembers;
-        this.isPublic = isPublic;
         this.minAge = minAge;
         this.maxAge = maxAge;
         this.createdAt = createdAt;
@@ -85,13 +83,7 @@ public class Team {
         this.maxMembers = maxMembers;
     }
 
-    public boolean isPublic() {
-        return isPublic;
-    }
 
-    public void setPublic(boolean isPublic) {
-        this.isPublic = isPublic;
-    }
 
     public int getMinAge() {
         return minAge;

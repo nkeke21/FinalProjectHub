@@ -13,7 +13,7 @@ public interface TeamRepository {
     void delete(UUID id);
     List<Team> getAll();
     List<Team> getTeamsByCaptain(UUID captainId);
-    List<Team> getPublicTeams();
+    List<Team> getAllTeams();
     List<Team> getTeamsBySportType(SportType sportType);
     void clear();
 } 

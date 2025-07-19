@@ -57,10 +57,6 @@
         </div>
       </n-form-item>
       
-      <n-form-item label="Team Privacy" path="public">
-        <n-switch v-model:value="form.public" />
-        <span class="privacy-label">{{ form.public ? 'Public' : 'Private' }}</span>
-      </n-form-item>
     </n-form>
     
     <template #footer>
@@ -81,7 +77,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
-import { NModal, NForm, NFormItem, NInput, NInputNumber, NSelect, NSwitch, NButton, useMessage } from 'naive-ui'
+import { NModal, NForm, NFormItem, NInput, NInputNumber, NSelect, NButton, useMessage } from 'naive-ui'
 import { UserTeamService, type TeamRequest } from '@/services/apis/UserTeamService'
 import type { Team } from '@/models/Tournament'
 import { SportType, TeamRole } from '@/models/Tournament'
@@ -107,8 +103,7 @@ const form = reactive({
   description: '',
   sportType: '',
   maxMembers: 11,
-  ageRange: { min: 18, max: 35 },
-  public: true
+  ageRange: { min: 18, max: 35 }
 })
 
 const rules = {
@@ -155,7 +150,6 @@ const createTeam = async () => {
       description: form.description,
       sportType: form.sportType,
       maxMembers: form.maxMembers,
-      public: form.public,
       minAge: form.ageRange.min,
       maxAge: form.ageRange.max
     }
@@ -169,8 +163,7 @@ const createTeam = async () => {
       description: '',
       sportType: '',
       maxMembers: 11,
-      ageRange: { min: 18, max: 35 },
-      public: true
+      ageRange: { min: 18, max: 35 }
     })
     
     close()
@@ -189,8 +182,7 @@ watch(() => props.show, (newVal) => {
       description: '',
       sportType: '',
       maxMembers: 11,
-      ageRange: { min: 18, max: 35 },
-      public: true
+      ageRange: { min: 18, max: 35 }
     })
   }
 })
@@ -221,11 +213,6 @@ watch(() => props.show, (newVal) => {
   white-space: nowrap;
 }
 
-.privacy-label {
-  margin-left: 0.5rem;
-  color: #64748b;
-  font-size: 0.875rem;
-}
 
 .create-team-btn {
   background-color: #3b82f6 !important;

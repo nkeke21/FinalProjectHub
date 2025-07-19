@@ -49,7 +49,6 @@ public class TeamService {
                 teamRequest.getSportType(),
                 captainId,
                 teamRequest.getMaxMembers(),
-                teamRequest.isPublic(),
                 teamRequest.getMinAge(),
                 teamRequest.getMaxAge(),
                 Instant.now(),
@@ -90,8 +89,8 @@ public class TeamService {
     }
 
     public List<TeamResponse> getAvailableTeams(UUID userId) {
-        // Get all public teams where user is not a member
-        List<Team> publicTeams = teamRepository.getPublicTeams();
+        // Get all teams where user is not a member
+        List<Team> allTeams = teamRepository.getAllTeams();
         List<TeamMember> userMemberships = teamMemberRepository.getTeamsByUser(userId);
         
         // Get team IDs where user is already a member
@@ -99,7 +98,7 @@ public class TeamService {
                 .map(TeamMember::getTeamId)
                 .collect(Collectors.toList());
 
-        return publicTeams.stream()
+        return allTeams.stream()
                 .filter(team -> !userTeamIds.contains(team.getId()))
                 .filter(team -> hasAvailableSlots(team.getId(), team.getMaxMembers()))
                 .map(this::convertTeamToTeamResponse)
@@ -159,7 +158,6 @@ public class TeamService {
         team.setDescription(teamRequest.getDescription());
         team.setSportType(teamRequest.getSportType());
         team.setMaxMembers(teamRequest.getMaxMembers());
-        team.setPublic(teamRequest.isPublic());
         team.setMinAge(teamRequest.getMinAge());
         team.setMaxAge(teamRequest.getMaxAge());
         team.setUpdatedAt(Instant.now());
@@ -211,7 +209,6 @@ public class TeamService {
                 captainName,
                 memberResponses,
                 team.getMaxMembers(),
-                team.isPublic(),
                 team.getMinAge(),
                 team.getMaxAge(),
                 team.getCreatedAt(),

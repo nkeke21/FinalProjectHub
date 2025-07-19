@@ -35,7 +35,6 @@ public class TeamInMemoryRepository implements TeamRepository {
                 SportType.RUNNING,
                 kakhaId, // Kakha is captain
                 15,
-                true,
                 18,
                 45,
                 yesterday,
@@ -49,7 +48,6 @@ public class TeamInMemoryRepository implements TeamRepository {
                 SportType.BASKETBALL,
                 johnId, // John is captain
                 12,
-                true,
                 20,
                 35,
                 yesterday,
@@ -63,7 +61,6 @@ public class TeamInMemoryRepository implements TeamRepository {
                 SportType.FOOTBALL,
                 mikeId, // Mike is captain
                 22,
-                false, // Private team
                 18,
                 30,
                 yesterday,
@@ -116,10 +113,8 @@ public class TeamInMemoryRepository implements TeamRepository {
     }
 
     @Override
-    public List<Team> getPublicTeams() {
-        return teams.values().stream()
-                .filter(Team::isPublic)
-                .collect(Collectors.toList());
+    public List<Team> getAllTeams() {
+        return new ArrayList<>(teams.values());
     }
 
     @Override

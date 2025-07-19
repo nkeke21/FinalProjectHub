@@ -36,7 +36,6 @@ export interface Team {
   captainName: string
   members: TeamMember[]
   maxMembers: number
-  public: boolean
   minAge: number
   maxAge: number
   createdAt: string

@@ -79,10 +79,6 @@
                   <span class="age-unit">years</span>
                 </div>
               </n-form-item>
-              <n-form-item label="Team Privacy">
-                <n-switch v-model:value="settingsForm.public" />
-                <span class="privacy-label">{{ settingsForm.public ? 'Public' : 'Private' }}</span>
-              </n-form-item>
             </n-form>
           </div>
         </n-tab-pane>
@@ -124,7 +120,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue'
-import { NModal, NForm, NFormItem, NInput, NInputNumber, NSwitch, NButton, NTabs, NTabPane, NIcon } from 'naive-ui'
+import { NModal, NForm, NFormItem, NInput, NInputNumber, NButton, NTabs, NTabPane, NIcon } from 'naive-ui'
 import { PersonAddOutline } from '@vicons/ionicons5'
 import type { Team } from '@/models/Tournament'
 
@@ -156,8 +152,7 @@ const settingsForm = reactive({
   description: '',
   maxMembers: 11,
   minAge: 18,
-  maxAge: 35,
-  public: true
+  maxAge: 35
 })
 
 const inviteForm = reactive({
@@ -182,7 +177,6 @@ const saveSettings = () => {
     maxMembers: settingsForm.maxMembers,
     minAge: settingsForm.minAge,
     maxAge: settingsForm.maxAge,
-    public: settingsForm.public,
     updatedAt: new Date().toISOString()
   })
   
@@ -220,8 +214,7 @@ watch(() => props.team, (newTeam) => {
       description: newTeam.description,
       maxMembers: newTeam.maxMembers,
       minAge: newTeam.minAge,
-      maxAge: newTeam.maxAge,
-      public: newTeam.public
+      maxAge: newTeam.maxAge
     })
   }
 }, { immediate: true })
@@ -373,11 +366,7 @@ watch(() => props.team, (newTeam) => {
   font-size: 0.875rem;
 }
 
-.privacy-label {
-  margin-left: 0.5rem;
-  color: #64748b;
-  font-size: 0.875rem;
-}
+
 
 @media (max-width: 768px) {
   .team-stats {
