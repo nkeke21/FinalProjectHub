@@ -200,7 +200,8 @@
         <TrophyOutline />
       </n-icon>
       <h3>No tournaments found</h3>
-      <p>Try adjusting your filters or create a new tournament to get started.</p>
+      <p v-if="hasActiveFilters">Try adjusting your filters or search terms</p>
+      <p v-else>Check back later for upcoming tournaments in your area</p>
     </div>
     
     <div v-else class="tournament-grid">
@@ -342,15 +343,6 @@
           </n-button>
         </div>
       </div>
-    </div>
-
-    <div class="empty-state" v-if="filteredTournaments.length === 0">
-      <n-icon size="64" color="#cbd5e1">
-        <TrophyOutline />
-      </n-icon>
-      <h3>No tournaments found</h3>
-      <p v-if="hasActiveFilters">Try adjusting your filters or search terms</p>
-      <p v-else>Check back later for upcoming tournaments in your area</p>
     </div>
 
     <CreateTournamentModal
