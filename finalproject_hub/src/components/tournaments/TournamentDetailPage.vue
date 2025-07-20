@@ -133,6 +133,10 @@
                       <n-spin size="small" />
                       <span>Loading registration status...</span>
                     </div>
+                    <div v-else-if="isUserProfileLoading" class="host-message">
+                      <n-spin size="small" />
+                      <span>Loading user profile...</span>
+                    </div>
                     <div v-else-if="isTournamentHost" class="host-message">
                       <n-icon size="20" color="#3b82f6">
                         <PersonOutline />
@@ -326,6 +330,10 @@ const isPending = computed(() => {
 const isTournamentHost = computed(() => {
   if (!tournament.value || !userStore.profile) return false
   return String(tournament.value.hostId) === String(userStore.profile.id)
+})
+
+const isUserProfileLoading = computed(() => {
+  return userStore.isLoading
 })
 
 const participantFilterOptions = [

@@ -222,7 +222,20 @@
         
         <div class="registration-status-badge" v-if="!registrationLoading">
           <n-tag 
-            v-if="isTournamentHost(tournament)"
+            v-if="isUserProfileLoading"
+            type="default"
+            size="small"
+            color="#6b7280"
+          >
+            <template #icon>
+              <n-icon size="12">
+                <n-spin size="12" />
+              </n-icon>
+            </template>
+            Loading...
+          </n-tag>
+          <n-tag 
+            v-else-if="isTournamentHost(tournament)"
             type="info"
             size="small"
             color="#3b82f6"
@@ -294,7 +307,7 @@
 
         <div class="tournament-actions">
           <n-button 
-            v-if="!isUserRegistered(tournament.id) && !isTournamentHost(tournament)"
+            v-if="!isUserProfileLoading && !isUserRegistered(tournament.id) && !isTournamentHost(tournament)"
             type="primary" 
             color="#3b82f6" 
             class="quick-register-btn"
@@ -304,13 +317,23 @@
             Register Now
           </n-button>
           <n-button 
-            v-if="isTournamentHost(tournament)"
+            v-if="!isUserProfileLoading && isTournamentHost(tournament)"
             type="info" 
             color="#3b82f6" 
             class="host-badge"
             disabled
           >
             You're the Host
+          </n-button>
+          <n-button 
+            v-if="isUserProfileLoading"
+            type="info" 
+            color="#3b82f6" 
+            class="host-badge"
+            disabled
+          >
+            <n-spin size="small" />
+            Loading...
           </n-button>
           <n-button 
             type="primary" 
@@ -658,9 +681,26 @@ const isUserRegistered = (tournamentId: string): boolean => {
 }
 
 const isTournamentHost = (tournament: Tournament): boolean => {
-  if (!userStore.profile) return false
-  return String(tournament.hostId) === String(userStore.profile.id)
+  if (userStore.isLoading) {
+    console.log('User profile is loading, not showing host status')
+    return false
+  }
+  
+  if (!userStore.profile) {
+    console.log('No user profile available')
+    return false
+  }
+  
+  const isHost = String(tournament.hostId) === String(userStore.profile.id)
+  console.log(`Tournament ${tournament.id}: hostId=${tournament.hostId}, userId=${userStore.profile.id}, isHost=${isHost}`)
+  return isHost
 }
+
+const isUserProfileLoading = computed(() => {
+  const loading = userStore.isLoading
+  console.log('User profile loading state:', loading)
+  return loading
+})
 
 const getUserRegistrationStatus = (tournamentId: string): string => {
   const registration = userRegistrations.value.get(tournamentId)
@@ -681,10 +721,22 @@ const handleQuickRegistrationError = (message: string) => {
   console.error('Registration failed:', message)
 }
 
-onMounted(async () => {
-  if (!userStore.profile) {
-    await userStore.fetchCurrentUserProfile()
+// Watch for user profile changes and reload registrations
+watch(() => userStore.profile, async (newProfile) => {
+  console.log('User profile changed:', newProfile)
+  if (newProfile) {
+    console.log('Loading user registrations for profile:', newProfile.id)
+    await loadUserRegistrations()
   }
+}, { immediate: true })
+
+onMounted(async () => {
+  console.log('TournamentListPage mounted, current profile:', userStore.profile)
+  
+  // Always fetch the current user profile to ensure it's loaded
+  await userStore.fetchCurrentUserProfile()
+  console.log('Profile loaded:', userStore.profile)
+  
   await loadTournaments()
   await loadUserRegistrations()
 })
