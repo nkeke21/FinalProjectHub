@@ -138,6 +138,16 @@
                         <PersonOutline />
                       </n-icon>
                       <span>You are the tournament host</span>
+                      <n-button 
+                        type="primary" 
+                        size="small"
+                        @click="showNotificationModal = true"
+                        color="#3b82f6"
+                        style="margin-left: 1rem;"
+                      >
+                        View Registration Requests
+                        <n-badge v-if="unreadNotificationCount > 0" :value="unreadNotificationCount" />
+                      </n-button>
                     </div>
                     <n-button
                       v-else-if="canRegister"
@@ -157,6 +167,12 @@
                     >
                       Withdraw Registration
                     </n-button>
+                    <div v-else-if="isPending" class="pending-message">
+                      <n-icon size="20" color="#f59e0b">
+                        <TimeOutline />
+                      </n-icon>
+                      <span>Registration request pending approval</span>
+                    </div>
                     <n-button 
                       v-else 
                       type="info" 
@@ -227,6 +243,12 @@
       @registration-success="handleRegistrationFormSuccess"
       @registration-error="handleRegistrationFormError"
     />
+    
+    <!-- Tournament Registration Notification Modal -->
+    <TournamentRegistrationNotificationModal
+      v-model:show="showNotificationModal"
+      @notifications-updated="handleNotificationsUpdated"
+    />
   </div>
 </template>
 
@@ -251,7 +273,8 @@ import {
   PersonOutline,
   LocationOutline,
   AlertCircleOutline,
-  CheckmarkCircleOutline
+  CheckmarkCircleOutline,
+  TimeOutline
 } from '@vicons/ionicons5'
 import type { 
   Tournament, 
@@ -264,6 +287,7 @@ import type { TournamentRegistration } from '@/models/TournamentRegistration'
 import { useUserStore } from '@/store/profile/userStore'
 import RegistrationConfirmationModal from './RegistrationConfirmationModal.vue'
 import TournamentRegistrationForm from './TournamentRegistrationForm.vue'
+import TournamentRegistrationNotificationModal from './TournamentRegistrationNotificationModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -287,9 +311,15 @@ const confirmationMessage = ref('')
 
 // Registration form state
 const showRegistrationForm = ref(false)
+const showNotificationModal = ref(false)
+const unreadNotificationCount = ref(0)
 
 const isRegistered = computed(() => {
   return userRegistration.value?.status === 'REGISTERED'
+})
+
+const isPending = computed(() => {
+  return userRegistration.value?.status === 'PENDING'
 })
 
 const isTournamentHost = computed(() => {
@@ -421,6 +451,12 @@ const handleRegistrationFormSuccess = async () => {
 
 const handleRegistrationFormError = (message: string) => {
   showConfirmation('error', 'Registration Failed', message)
+}
+
+const handleNotificationsUpdated = async () => {
+  if (tournament.value) {
+    await loadTournamentData()
+  }
 }
 
 onMounted(async () => {

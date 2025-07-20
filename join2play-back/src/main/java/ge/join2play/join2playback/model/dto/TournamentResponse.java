@@ -34,7 +34,6 @@ public class TournamentResponse {
     private long updatedAt;
 
     public TournamentResponse() {
-        // Default constructor for Spring
     }
 
     public TournamentResponse(UUID id, String name, String description, SportType sportType,

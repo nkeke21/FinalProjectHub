@@ -222,19 +222,28 @@
           <h4>Terms and Conditions</h4>
           
           <n-form-item path="acceptTerms">
-            <n-checkbox v-model:checked="formData.acceptTerms">
+            <n-checkbox 
+              v-model:checked="formData.acceptTerms"
+              @update:checked="triggerValidation('acceptTerms')"
+            >
               I accept the tournament terms and conditions
             </n-checkbox>
           </n-form-item>
 
           <n-form-item path="acceptWaiver">
-            <n-checkbox v-model:checked="formData.acceptWaiver">
+            <n-checkbox 
+              v-model:checked="formData.acceptWaiver"
+              @update:checked="triggerValidation('acceptWaiver')"
+            >
               I accept the liability waiver and medical release
             </n-checkbox>
           </n-form-item>
 
           <n-form-item path="acceptRules">
-            <n-checkbox v-model:checked="formData.acceptRules">
+            <n-checkbox 
+              v-model:checked="formData.acceptRules"
+              @update:checked="triggerValidation('acceptRules')"
+            >
               I agree to follow all tournament rules and regulations
             </n-checkbox>
           </n-form-item>
@@ -397,18 +406,27 @@ const rules = computed(() => {
       trigger: 'change'
     },
     acceptTerms: {
-      required: true,
-      message: 'You must accept the terms and conditions',
+      validator: (rule: any, value: boolean) => {
+        if (!value) {
+          return new Error('You must accept the terms and conditions')
+        }
+      },
       trigger: 'change'
     },
     acceptWaiver: {
-      required: true,
-      message: 'You must accept the liability waiver',
+      validator: (rule: any, value: boolean) => {
+        if (!value) {
+          return new Error('You must accept the liability waiver')
+        }
+      },
       trigger: 'change'
     },
     acceptRules: {
-      required: true,
-      message: 'You must agree to follow tournament rules',
+      validator: (rule: any, value: boolean) => {
+        if (!value) {
+          return new Error('You must agree to follow tournament rules')
+        }
+      },
       trigger: 'change'
     }
   }
@@ -470,6 +488,45 @@ const calculateAge = (birthDate: string): number => {
   return age
 }
 
+const populateFormFromProfile = (profile: any) => {
+  // Store current checkbox values to preserve them
+  const currentAcceptTerms = formData.acceptTerms
+  const currentAcceptWaiver = formData.acceptWaiver
+  const currentAcceptRules = formData.acceptRules
+  
+  Object.assign(formData, {
+    registrationType: props.tournament?.tournamentType === 'team' ? 'team' : 'individual',
+    teamId: null,
+    fullName: profile.name || '',
+    age: profile.birthDate ? calculateAge(profile.birthDate) : null,
+    email: profile.email || '',
+    phoneNumber: profile.phoneNumber || '',
+    address: formData.address, // Preserve address if already filled
+    emergencyContact: {
+      name: formData.emergencyContact.name, // Preserve emergency contact if already filled
+      relationship: formData.emergencyContact.relationship,
+      phone: formData.emergencyContact.phone,
+      email: formData.emergencyContact.email
+    },
+    previousExperience: formData.previousExperience, // Preserve other fields if already filled
+    skillLevel: formData.skillLevel,
+    previousAchievements: formData.previousAchievements,
+    // Preserve checkbox values
+    acceptTerms: currentAcceptTerms,
+    acceptWaiver: currentAcceptWaiver,
+    acceptRules: currentAcceptRules
+  })
+}
+
+const triggerValidation = (fieldName: string) => {
+  if (formRef.value) {
+    console.log(`Triggering validation for ${fieldName}, current value:`, formData[fieldName as keyof typeof formData])
+    setTimeout(() => {
+      formRef.value?.validate([fieldName])
+    }, 0)
+  }
+}
+
 const validateEmergencyPhone = () => {
   emergencyPhoneNumber.value = emergencyPhoneNumber.value.replace(/\D/g, '')
   
@@ -529,7 +586,7 @@ const handleSubmit = async () => {
     const response = await TournamentRegistrationService.registerForTournament(registrationData)
     
     if (response.success) {
-      message.success('Registration submitted successfully!')
+      message.success('Registration request submitted successfully! Your request is pending approval from the tournament host.')
       emit('registration-success')
       updateShow(false)
     } else {
@@ -552,28 +609,18 @@ const formatDateRange = (startDate?: string, endDate?: string) => {
   return `${start} - ${end}`
 }
 
-watch(() => props.show, (newValue) => {
+watch(() => props.show, async (newValue) => {
   if (newValue) {
     const registrationType = props.tournament?.tournamentType === 'team' ? 'team' : 'individual'
     
-    if (!userStore.profile) {
-      loadUserProfile()
-    }
-    if (registrationType === 'team') {
-      loadUserTeams()
-    }
-  }
-})
-
-watch(() => userStore.profile, (profile) => {
-  if (profile) {
+    // Reset form data when modal opens
     Object.assign(formData, {
-      registrationType: props.tournament?.tournamentType === 'team' ? 'team' : 'individual',
+      registrationType: registrationType,
       teamId: null,
-      fullName: profile.name,
-      age: calculateAge(profile.birthDate),
-      email: profile.email,
-      phoneNumber: profile.phoneNumber,
+      fullName: '',
+      age: null,
+      email: '',
+      phoneNumber: '',
       address: '',
       emergencyContact: {
         name: '',
@@ -588,7 +635,33 @@ watch(() => userStore.profile, (profile) => {
       acceptWaiver: false,
       acceptRules: false
     })
+    
+    // Load profile if not available
+    if (!userStore.profile) {
+      await loadUserProfile()
+    } else {
+      // If profile is already available, populate the form immediately
+      populateFormFromProfile(userStore.profile)
+    }
+    
+    if (registrationType === 'team') {
+      loadUserTeams()
+    }
   }
+})
+
+watch(() => userStore.profile, (profile) => {
+  if (profile) {
+    populateFormFromProfile(profile)
+  }
+})
+
+watch(() => [formData.acceptTerms, formData.acceptWaiver, formData.acceptRules], (newValues) => {
+  console.log('Checkbox values changed:', {
+    acceptTerms: newValues[0],
+    acceptWaiver: newValues[1],
+    acceptRules: newValues[2]
+  })
 })
 </script>
 
