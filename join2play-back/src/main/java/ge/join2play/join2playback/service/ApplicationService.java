@@ -216,7 +216,7 @@ public class ApplicationService {
                     .atZone(ZoneId.systemDefault())
                     .toLocalDate();
         }
-        return new UserDetailsResponse(user.getName(), user.getEmail(), user.getPhoneNumber(), birthDate, user.getDescription());
+        return new UserDetailsResponse(user.getId(), user.getName(), user.getEmail(), user.getPhoneNumber(), birthDate, user.getDescription());
     }
 
     public UserUpdateDTO updateUserDetails(UUID id, UserUpdateDTO userUpdateDTO) {

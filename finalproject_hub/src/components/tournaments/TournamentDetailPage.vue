@@ -129,11 +129,34 @@
                   </div>
                   
                   <div class="registration-actions">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                    </div>
+                    
                     <div v-if="registrationLoading" class="registration-loading">
                       <n-spin size="small" />
                       <span>Loading registration status...</span>
                     </div>
-                                        <n-button
+                    <div v-else-if="isUserProfileLoading" class="host-message">
+                      <n-spin size="small" />
+                      <span>Loading user profile...</span>
+                    </div>
+                    <div v-else-if="isTournamentHost" class="host-message">
+                      <n-icon size="20" color="#3b82f6">
+                        <PersonOutline />
+                      </n-icon>
+                      <span>You are the tournament host</span>
+                      <n-button 
+                        type="primary" 
+                        size="small"
+                        @click="showNotificationModal = true"
+                        color="#3b82f6"
+                        style="margin-left: 1rem;"
+                      >
+                        View Registration Requests
+                        <n-badge v-if="unreadNotificationCount > 0" :value="unreadNotificationCount" />
+                      </n-button>
+                    </div>
+                    <n-button
                       v-else-if="canRegister"
                       type="primary"
                       size="large"
@@ -151,6 +174,12 @@
                     >
                       Withdraw Registration
                     </n-button>
+                    <div v-else-if="isPending" class="pending-message">
+                      <n-icon size="20" color="#f59e0b">
+                        <TimeOutline />
+                      </n-icon>
+                      <span>Registration request pending approval</span>
+                    </div>
                     <n-button 
                       v-else 
                       type="info" 
@@ -184,9 +213,25 @@
               <div v-for="participant in filteredParticipants" :key="participant.id" class="participant-card">
                 <div class="participant-info">
                   <div class="participant-name">{{ participant.participantName }}</div>
-                  <div class="participant-type">{{ participant.participantType }}</div>
+                  <div class="participant-type">
+                    <span v-if="participant.participantType === 'team'" class="team-badge">
+                      <n-icon size="16" style="margin-right: 4px;">
+                        <PeopleOutline />
+                      </n-icon>
+                      Team
+                    </span>
+                    <span v-else class="individual-badge">
+                      <n-icon size="16" style="margin-right: 4px;">
+                        <PersonOutline />
+                      </n-icon>
+                      Individual
+                    </span>
+                  </div>
                   <div class="participant-status" :class="participant.status.toLowerCase()">
                     {{ participant.status }}
+                  </div>
+                  <div v-if="participant.participantType === 'team' && participant.teamId" class="team-details">
+                    <small>Captain: {{ participant.captainName || 'Unknown' }}</small>
                   </div>
                 </div>
                 <div class="participant-meta">
@@ -221,6 +266,12 @@
       @registration-success="handleRegistrationFormSuccess"
       @registration-error="handleRegistrationFormError"
     />
+    
+    <!-- Tournament Registration Notification Modal -->
+    <TournamentRegistrationNotificationModal
+      v-model:show="showNotificationModal"
+      @notifications-updated="handleNotificationsUpdated"
+    />
   </div>
 </template>
 
@@ -245,31 +296,33 @@ import {
   PersonOutline,
   LocationOutline,
   AlertCircleOutline,
-  CheckmarkCircleOutline
+  CheckmarkCircleOutline,
+  TimeOutline
 } from '@vicons/ionicons5'
-import { 
-  getTournamentById, 
-  getTournamentParticipants
-} from '@/data/mockTournaments'
 import type { 
   Tournament, 
   TournamentParticipant,
   ParticipantStatus
 } from '@/models/Tournament'
+import { TournamentService } from '@/services/apis/TournamentService'
 import { TournamentRegistrationService } from '@/services/apis/TournamentRegistrationService'
+import { TournamentParticipantService } from '@/services/apis/TournamentParticipantService'
 import type { TournamentRegistration } from '@/models/TournamentRegistration'
+import { useUserStore } from '@/store/profile/userStore'
 import RegistrationConfirmationModal from './RegistrationConfirmationModal.vue'
 import TournamentRegistrationForm from './TournamentRegistrationForm.vue'
+import TournamentRegistrationNotificationModal from './TournamentRegistrationNotificationModal.vue'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
 
 const loading = ref(true)
 const tournament = ref<Tournament | null>(null)
 const participants = ref<TournamentParticipant[]>([])
 const registering = ref(false)
 const withdrawing = ref(false)
-const participantFilter = ref<string>('all')
+const participantFilter = ref<string>('Confirmed')
 
 const userRegistration = ref<TournamentRegistration | null>(null)
 const canRegister = ref(false)
@@ -282,21 +335,35 @@ const confirmationMessage = ref('')
 
 // Registration form state
 const showRegistrationForm = ref(false)
+const showNotificationModal = ref(false)
+const unreadNotificationCount = ref(0)
 
 const isRegistered = computed(() => {
-  return userRegistration.value?.status === 'REGISTERED'
+  const registered = userRegistration.value?.status === 'REGISTERED'
+  console.log('isRegistered computed:', registered, 'userRegistration status:', userRegistration.value?.status)
+  return registered
+})
+
+const isPending = computed(() => {
+  const pending = userRegistration.value?.status === 'PENDING'
+  console.log('isPending computed:', pending, 'userRegistration status:', userRegistration.value?.status)
+  return pending
+})
+
+const isTournamentHost = computed(() => {
+  if (!tournament.value || !userStore.profile) return false
+  return String(tournament.value.hostId) === String(userStore.profile.id)
+})
+
+const isUserProfileLoading = computed(() => {
+  return userStore.isLoading
 })
 
 const participantFilterOptions = [
-  { label: 'All Participants', value: 'all' },
-  { label: 'Confirmed', value: 'Confirmed' },
-  { label: 'Registered', value: 'Registered' },
-  { label: 'Waitlisted', value: 'Waitlisted' },
-  { label: 'Withdrawn', value: 'Withdrawn' }
+  { label: 'Confirmed', value: 'Confirmed' }
 ]
 
 const filteredParticipants = computed(() => {
-  if (participantFilter.value === 'all') return participants.value
   return participants.value.filter(p => p.status === participantFilter.value)
 })
 
@@ -305,19 +372,19 @@ const loadTournamentData = async () => {
     loading.value = true
     const tournamentId = route.params.id as string
     
-    const tournamentData = getTournamentById(tournamentId)
-    if (!tournamentData) {
-      tournament.value = null
-      return
-    }
+    const tournamentResponse = await TournamentService.getTournamentById(tournamentId)
+    const tournamentData = TournamentService.convertToTournament(tournamentResponse)
     
     tournament.value = tournamentData
-    participants.value = getTournamentParticipants(tournamentId)
     
-    await loadRegistrationData(tournamentId)
+    await Promise.all([
+      loadRegistrationData(tournamentId),
+      loadParticipants(tournamentId)
+    ])
     
   } catch (error) {
     console.error('Error loading tournament data:', error)
+    tournament.value = null
   } finally {
     loading.value = false
   }
@@ -328,13 +395,28 @@ const loadRegistrationData = async (tournamentId: string) => {
     registrationLoading.value = true
     
     userRegistration.value = await TournamentRegistrationService.getUserRegistration(tournamentId)
+    console.log('User registration:', userRegistration.value)
     
     canRegister.value = await TournamentRegistrationService.canRegisterForTournament(tournamentId)
+    console.log('Can register:', canRegister.value)
     
   } catch (error) {
     console.error('Error loading registration data:', error)
   } finally {
     registrationLoading.value = false
+  }
+}
+
+const loadParticipants = async (tournamentId: string) => {
+  try {
+    console.log('Loading participants for tournament:', tournamentId)
+    const registrations = await TournamentRegistrationService.getTournamentRegistrations(tournamentId)
+    console.log('Raw registrations from backend:', registrations)
+    participants.value = await TournamentParticipantService.convertRegistrationsToParticipants(registrations)
+    console.log('Final participants after conversion:', participants.value)
+  } catch (error) {
+    console.error('Error loading participants:', error)
+    participants.value = []
   }
 }
 
@@ -415,7 +497,19 @@ const handleRegistrationFormError = (message: string) => {
   showConfirmation('error', 'Registration Failed', message)
 }
 
-onMounted(() => {
+const handleNotificationsUpdated = async () => {
+  if (tournament.value) {
+    await Promise.all([
+      loadTournamentData(),
+      loadParticipants(tournament.value.id)
+    ])
+  }
+}
+
+onMounted(async () => {
+  if (!userStore.profile) {
+    await userStore.fetchCurrentUserProfile()
+  }
   loadTournamentData()
 })
 </script>
@@ -687,6 +781,19 @@ onMounted(() => {
   font-size: 0.875rem;
 }
 
+.host-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #3b82f6;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  background: #eff6ff;
+  border-radius: 8px;
+  border: 1px solid #dbeafe;
+}
+
 .participants-content,
 .matches-content,
 .bracket-content {
@@ -743,6 +850,39 @@ onMounted(() => {
   color: #64748b;
   font-size: 0.875rem;
   text-transform: capitalize;
+}
+
+.team-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  background: #eff6ff;
+  color: #1e40af;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid #dbeafe;
+}
+
+.individual-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  background: #f1f5f9;
+  color: #475569;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
+}
+
+.team-details {
+  margin-top: 0.25rem;
+}
+
+.team-details small {
+  color: #94a3b8;
+  font-size: 0.75rem;
 }
 
 .participant-status {

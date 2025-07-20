@@ -190,7 +190,20 @@
       </div>
     </div>
 
-    <div class="tournament-grid">
+    <div v-if="loading" class="loading-state">
+      <n-spin size="large" />
+      <p>Loading tournaments...</p>
+    </div>
+    
+    <div v-else-if="sortedTournaments.length === 0" class="empty-state">
+      <n-icon size="64" color="#94a3b8">
+        <TrophyOutline />
+      </n-icon>
+      <h3>No tournaments found</h3>
+      <p>Try adjusting your filters or create a new tournament to get started.</p>
+    </div>
+    
+    <div v-else class="tournament-grid">
       <div class="tournament-card" v-for="tournament in sortedTournaments" :key="tournament.id">
         <div class="tournament-header">
           <div class="tournament-badge">
@@ -209,6 +222,33 @@
         
         <div class="registration-status-badge" v-if="!registrationLoading">
           <n-tag 
+            v-if="isUserProfileLoading"
+            type="default"
+            size="small"
+            color="#6b7280"
+          >
+            <template #icon>
+              <n-icon size="12">
+                <n-spin size="12" />
+              </n-icon>
+            </template>
+            Loading...
+          </n-tag>
+          <n-tag 
+            v-else-if="isTournamentHost(tournament)"
+            type="info"
+            size="small"
+            color="#3b82f6"
+          >
+            <template #icon>
+              <n-icon size="12">
+                <PersonOutline />
+              </n-icon>
+            </template>
+            Tournament Host
+          </n-tag>
+          <n-tag 
+            v-else
             :type="isUserRegistered(tournament.id) ? 'success' : 'default'"
             size="small"
             :color="isUserRegistered(tournament.id) ? '#10b981' : '#6b7280'"
@@ -267,7 +307,7 @@
 
         <div class="tournament-actions">
           <n-button 
-            v-if="!isUserRegistered(tournament.id)"
+            v-if="!isUserProfileLoading && !isUserRegistered(tournament.id) && !isTournamentHost(tournament)"
             type="primary" 
             color="#3b82f6" 
             class="quick-register-btn"
@@ -275,6 +315,25 @@
             :loading="registrationLoading"
           >
             Register Now
+          </n-button>
+          <n-button 
+            v-if="!isUserProfileLoading && isTournamentHost(tournament)"
+            type="info" 
+            color="#3b82f6" 
+            class="host-badge"
+            disabled
+          >
+            You're the Host
+          </n-button>
+          <n-button 
+            v-if="isUserProfileLoading"
+            type="info" 
+            color="#3b82f6" 
+            class="host-badge"
+            disabled
+          >
+            <n-spin size="small" />
+            Loading...
           </n-button>
           <n-button 
             type="primary" 
@@ -321,7 +380,8 @@ import {
   NSelect,
   NDatePicker,
   NSlider,
-  NTag
+  NTag,
+  NSpin
 } from 'naive-ui'
 import { 
   FilterOutline,
@@ -339,17 +399,20 @@ import {
   AddOutline,
   CheckmarkCircleOutline
 } from '@vicons/ionicons5'
-import { mockTournaments } from '@/data/mockTournaments'
 import type { Tournament } from '@/models/Tournament'
 import { SportType, TournamentStatus, TournamentFormat } from '@/models/Tournament'
 import CreateTournamentModal from './CreateTournamentModal.vue'
 import TournamentRegistrationForm from './TournamentRegistrationForm.vue'
 import { TournamentRegistrationService } from '@/services/apis/TournamentRegistrationService'
 import type { TournamentRegistration } from '@/models/TournamentRegistration'
+import { TournamentService } from '@/services/apis/TournamentService'
+import { useUserStore } from '@/store/profile/userStore'
 
 const router = useRouter()
-const tournaments = ref<Tournament[]>(mockTournaments)
+const userStore = useUserStore()
+const tournaments = ref<Tournament[]>([])
 const searchQuery = ref('')
+const loading = ref(false)
 const showFilters = ref(false)
 const sortBy = ref('startDate')
 const showCreateModal = ref(false)
@@ -571,9 +634,25 @@ const formatDateRange = (startDate: string, endDate: string) => {
   return `${start} - ${end}`;
 };
 
-const handleTournamentCreated = (newTournament: Tournament) => {
-  tournaments.value.push(newTournament)
+const handleTournamentCreated = async (newTournament: Tournament) => {
+  await loadTournaments() // Reload tournaments from backend
   showCreateModal.value = false
+}
+
+const loadTournaments = async () => {
+  try {
+    loading.value = true
+    const response = await TournamentService.getAllTournaments()
+    tournaments.value = response.map(TournamentService.convertToTournament)
+  } catch (error) {
+    console.error('Error loading tournaments:', error)
+    // Show user-friendly error message
+    if (error instanceof Error) {
+      console.error('Tournament loading error:', error.message)
+    }
+  } finally {
+    loading.value = false
+  }
 }
 
 const loadUserRegistrations = async () => {
@@ -601,6 +680,28 @@ const isUserRegistered = (tournamentId: string): boolean => {
   return registration?.status === 'REGISTERED'
 }
 
+const isTournamentHost = (tournament: Tournament): boolean => {
+  if (userStore.isLoading) {
+    console.log('User profile is loading, not showing host status')
+    return false
+  }
+  
+  if (!userStore.profile) {
+    console.log('No user profile available')
+    return false
+  }
+  
+  const isHost = String(tournament.hostId) === String(userStore.profile.id)
+  console.log(`Tournament ${tournament.id}: hostId=${tournament.hostId}, userId=${userStore.profile.id}, isHost=${isHost}`)
+  return isHost
+}
+
+const isUserProfileLoading = computed(() => {
+  const loading = userStore.isLoading
+  console.log('User profile loading state:', loading)
+  return loading
+})
+
 const getUserRegistrationStatus = (tournamentId: string): string => {
   const registration = userRegistrations.value.get(tournamentId)
   if (!registration) return 'not-registered'
@@ -620,8 +721,24 @@ const handleQuickRegistrationError = (message: string) => {
   console.error('Registration failed:', message)
 }
 
-onMounted(() => {
-  loadUserRegistrations()
+// Watch for user profile changes and reload registrations
+watch(() => userStore.profile, async (newProfile) => {
+  console.log('User profile changed:', newProfile)
+  if (newProfile) {
+    console.log('Loading user registrations for profile:', newProfile.id)
+    await loadUserRegistrations()
+  }
+}, { immediate: true })
+
+onMounted(async () => {
+  console.log('TournamentListPage mounted, current profile:', userStore.profile)
+  
+  // Always fetch the current user profile to ensure it's loaded
+  await userStore.fetchCurrentUserProfile()
+  console.log('Profile loaded:', userStore.profile)
+  
+  await loadTournaments()
+  await loadUserRegistrations()
 })
 </script>
 
@@ -905,6 +1022,25 @@ onMounted(() => {
   height: 40px;
   border-radius: 8px;
   flex-shrink: 0;
+}
+
+.host-badge {
+  min-width: 120px;
+  height: 40px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #64748b;
+}
+
+.loading-state p {
+  margin-top: 1rem;
+  font-size: 1rem;
 }
 
 .empty-state {

@@ -78,7 +78,7 @@
             <n-icon size="16" color="#3b82f6">
               <InformationCircleOutline />
             </n-icon>
-            <span>Basic information (name, age, email, phone) is taken from your profile and cannot be changed here. All other fields need to be filled for this specific tournament registration.</span>
+            <span>Basic information (name, age, email, phone) is automatically populated from your profile and cannot be changed here. All other fields need to be filled for this specific tournament registration.</span>
           </div>
           
           <div class="form-row">
@@ -87,6 +87,7 @@
                 v-model:value="formData.fullName" 
                 placeholder="Enter your full name" 
                 :disabled="true"
+                :loading="userStore.isLoading"
                 class="profile-field"
               />
             </n-form-item>
@@ -98,6 +99,7 @@
                 :max="tournament?.ageRange?.max || 65"
                 placeholder="Enter your age"
                 :disabled="true"
+                :loading="userStore.isLoading"
                 class="profile-field"
               />
             </n-form-item>
@@ -109,6 +111,7 @@
                 v-model:value="formData.email" 
                 placeholder="Enter your email address" 
                 :disabled="true"
+                :loading="userStore.isLoading"
                 class="profile-field"
               />
             </n-form-item>
@@ -118,6 +121,7 @@
                 v-model:value="formData.phoneNumber" 
                 placeholder="Enter your phone number" 
                 :disabled="true"
+                :loading="userStore.isLoading"
                 class="profile-field"
               />
             </n-form-item>
@@ -151,43 +155,38 @@
           </div>
 
           <div class="form-row">
-            <n-form-item label="Emergency Contact Phone" path="emergencyContact.phone">
-              <n-input 
-                v-model:value="formData.emergencyContact.phone" 
-                placeholder="Enter emergency contact phone" 
-              />
+            <n-form-item 
+              label="Emergency Contact Phone" 
+              path="emergencyContact.phone"
+              :feedback="emergencyPhoneError" 
+              :validation-status="emergencyPhoneError ? 'error' : undefined"
+            >
+              <div class="phone-input-container">
+                <span class="country-code">+995</span>
+                <n-input 
+                  v-model:value="emergencyPhoneNumber" 
+                  placeholder="5XX XXX XXX" 
+                  class="phone-input-field"
+                  @input="validateEmergencyPhone"
+                />
+              </div>
             </n-form-item>
             
-            <n-form-item label="Emergency Contact Email" path="emergencyContact.email">
+            <n-form-item 
+              label="Emergency Contact Email" 
+              path="emergencyContact.email"
+              :feedback="emergencyEmailError" 
+              :validation-status="emergencyEmailError ? 'error' : undefined"
+            >
               <n-input 
                 v-model:value="formData.emergencyContact.email" 
-                placeholder="Enter emergency contact email" 
+                placeholder="Enter emergency contact email"
+                @input="validateEmergencyEmail"
               />
             </n-form-item>
           </div>
         </div>
 
-        <div class="form-section">
-          <h4>Medical Information</h4>
-          
-          <n-form-item label="Medical Conditions" path="medicalConditions">
-            <n-input 
-              v-model:value="formData.medicalConditions" 
-              type="textarea" 
-              placeholder="List any medical conditions, allergies, or medications (optional)"
-              :rows="3"
-            />
-          </n-form-item>
-
-          <n-form-item label="Blood Type" path="bloodType">
-            <n-select
-              v-model:value="formData.bloodType"
-              :options="bloodTypeOptions"
-              placeholder="Select your blood type"
-              clearable
-            />
-          </n-form-item>
-        </div>
 
         <div class="form-section">
           <h4>Tournament Experience</h4>
@@ -218,54 +217,33 @@
           </n-form-item>
         </div>
 
-        <div class="form-section">
-          <h4>Additional Information</h4>
-          
-          <n-form-item label="T-shirt Size" path="tshirtSize">
-            <n-select
-              v-model:value="formData.tshirtSize"
-              :options="tshirtSizeOptions"
-              placeholder="Select your t-shirt size"
-              clearable
-            />
-          </n-form-item>
-
-          <n-form-item label="Dietary Restrictions" path="dietaryRestrictions">
-            <n-input 
-              v-model:value="formData.dietaryRestrictions" 
-              type="textarea" 
-              placeholder="Any dietary restrictions or food allergies (optional)"
-              :rows="2"
-            />
-          </n-form-item>
-
-          <n-form-item label="Special Requirements" path="specialRequirements">
-            <n-input 
-              v-model:value="formData.specialRequirements" 
-              type="textarea" 
-              placeholder="Any special requirements or accommodations needed (optional)"
-              :rows="2"
-            />
-          </n-form-item>
-        </div>
 
         <div class="form-section">
           <h4>Terms and Conditions</h4>
           
           <n-form-item path="acceptTerms">
-            <n-checkbox v-model:checked="formData.acceptTerms">
+            <n-checkbox 
+              v-model:checked="formData.acceptTerms"
+              @update:checked="triggerValidation('acceptTerms')"
+            >
               I accept the tournament terms and conditions
             </n-checkbox>
           </n-form-item>
 
           <n-form-item path="acceptWaiver">
-            <n-checkbox v-model:checked="formData.acceptWaiver">
+            <n-checkbox 
+              v-model:checked="formData.acceptWaiver"
+              @update:checked="triggerValidation('acceptWaiver')"
+            >
               I accept the liability waiver and medical release
             </n-checkbox>
           </n-form-item>
 
           <n-form-item path="acceptRules">
-            <n-checkbox v-model:checked="formData.acceptRules">
+            <n-checkbox 
+              v-model:checked="formData.acceptRules"
+              @update:checked="triggerValidation('acceptRules')"
+            >
               I agree to follow all tournament rules and regulations
             </n-checkbox>
           </n-form-item>
@@ -302,7 +280,7 @@ import {
 import type { Tournament } from '@/models/Tournament'
 import { TournamentRegistrationService } from '@/services/apis/TournamentRegistrationService'
 import { UserTeamService } from '@/services/apis/UserTeamService'
-import { UserProfileService, type UserProfile } from '@/services/apis/UserProfileService'
+import { useUserStore } from '@/store/profile/userStore'
 
 interface Props {
   show: boolean
@@ -337,29 +315,14 @@ const formData = reactive({
     phone: '',
     email: ''
   },
-  medicalConditions: '',
-  bloodType: null as string | null,
   previousExperience: null as string | null,
   skillLevel: null as string | null,
   previousAchievements: '',
-  tshirtSize: null as string | null,
-  dietaryRestrictions: '',
-  specialRequirements: '',
   acceptTerms: false,
   acceptWaiver: false,
   acceptRules: false
 })
 
-const bloodTypeOptions = [
-  { label: 'A+', value: 'A+' },
-  { label: 'A-', value: 'A-' },
-  { label: 'B+', value: 'B+' },
-  { label: 'B-', value: 'B-' },
-  { label: 'AB+', value: 'AB+' },
-  { label: 'AB-', value: 'AB-' },
-  { label: 'O+', value: 'O+' },
-  { label: 'O-', value: 'O-' }
-]
 
 const experienceOptions = [
   { label: 'First Tournament', value: 'first' },
@@ -376,20 +339,19 @@ const skillLevelOptions = [
   { label: 'Expert', value: 'expert' }
 ]
 
-const tshirtSizeOptions = [
-  { label: 'XS', value: 'XS' },
-  { label: 'S', value: 'S' },
-  { label: 'M', value: 'M' },
-  { label: 'L', value: 'L' },
-  { label: 'XL', value: 'XL' },
-  { label: 'XXL', value: 'XXL' }
-]
 
 const userTeams = ref<{ label: string; value: string }[]>([])
 const loadingTeams = ref(false)
 
-const userProfile = ref<UserProfile | null>(null)
+const userStore = useUserStore()
+
+const userProfile = ref<any | null>(null) // Changed type to any as UserProfile type is removed
 const loadingProfile = ref(false)
+
+const emergencyPhoneError = ref('')
+const emergencyEmailError = ref('')
+
+const emergencyPhoneNumber = ref('')
 
 const rules = computed(() => {
   const baseRules = {
@@ -406,7 +368,32 @@ const rules = computed(() => {
     'emergencyContact.phone': {
       required: true,
       message: 'Emergency contact phone is required',
-      trigger: 'blur'
+      trigger: 'blur',
+      validator: (rule: any, value: string) => {
+        if (!value) {
+          return new Error('Emergency contact phone is required')
+        }
+        if (!value.startsWith('+995') || value.length !== 13) {
+          return new Error('Please enter a valid Georgian mobile number')
+        }
+        const phoneNumber = value.substring(4) // Remove +995
+        if (!phoneNumber.startsWith('5') || phoneNumber.length !== 9) {
+          return new Error('Please enter a valid Georgian mobile number (5XX XXX XXX)')
+        }
+      }
+    },
+    'emergencyContact.email': {
+      validator: (rule: any, value: string) => {
+        if (value && !value.includes('@')) {
+          return new Error('Email must contain "@"')
+        }
+        if (value) {
+          const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+          if (!emailRegex.test(value)) {
+            return new Error('Invalid email format')
+          }
+        }
+      }
     },
     previousExperience: {
       required: true,
@@ -419,18 +406,27 @@ const rules = computed(() => {
       trigger: 'change'
     },
     acceptTerms: {
-      required: true,
-      message: 'You must accept the terms and conditions',
+      validator: (rule: any, value: boolean) => {
+        if (!value) {
+          return new Error('You must accept the terms and conditions')
+        }
+      },
       trigger: 'change'
     },
     acceptWaiver: {
-      required: true,
-      message: 'You must accept the liability waiver',
+      validator: (rule: any, value: boolean) => {
+        if (!value) {
+          return new Error('You must accept the liability waiver')
+        }
+      },
       trigger: 'change'
     },
     acceptRules: {
-      required: true,
-      message: 'You must agree to follow tournament rules',
+      validator: (rule: any, value: boolean) => {
+        if (!value) {
+          return new Error('You must agree to follow tournament rules')
+        }
+      },
       trigger: 'change'
     }
   }
@@ -455,10 +451,11 @@ const loadUserTeams = async () => {
   
   try {
     loadingTeams.value = true
-    const teams = await UserTeamService.getUserTeams(props.tournament.sportType)
+    const allTeams = await UserTeamService.getTeamsByCaptain()
+    const matchingTeams = allTeams.filter(team => team.sportType === props.tournament!.sportType)
     
-    userTeams.value = teams.map(team => ({
-      label: team.name,
+    userTeams.value = matchingTeams.map(team => ({
+      label: `${team.name} (${team.members.length}/${team.maxMembers} members)`,
       value: team.id
     }))
   } catch (error) {
@@ -471,8 +468,7 @@ const loadUserTeams = async () => {
 const loadUserProfile = async () => {
   try {
     loadingProfile.value = true
-    const profile = await UserProfileService.getUserProfile()
-    userProfile.value = profile
+    await userStore.fetchCurrentUserProfile()
   } catch (error) {
     console.error('Error loading user profile:', error)
   } finally {
@@ -480,9 +476,94 @@ const loadUserProfile = async () => {
   }
 }
 
+const calculateAge = (birthDate: string): number => {
+  const birth = new Date(birthDate)
+  const today = new Date()
+  let age = today.getFullYear() - birth.getFullYear()
+  const monthDiff = today.getMonth() - birth.getMonth()
+  
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--
+  }
+  
+  return age
+}
+
+const populateFormFromProfile = (profile: any) => {
+  // Store current checkbox values to preserve them
+  const currentAcceptTerms = formData.acceptTerms
+  const currentAcceptWaiver = formData.acceptWaiver
+  const currentAcceptRules = formData.acceptRules
+  
+  Object.assign(formData, {
+    registrationType: props.tournament?.tournamentType === 'team' ? 'team' : 'individual',
+    teamId: null,
+    fullName: profile.name || '',
+    age: profile.birthDate ? calculateAge(profile.birthDate) : null,
+    email: profile.email || '',
+    phoneNumber: profile.phoneNumber || '',
+    address: formData.address, // Preserve address if already filled
+    emergencyContact: {
+      name: formData.emergencyContact.name, // Preserve emergency contact if already filled
+      relationship: formData.emergencyContact.relationship,
+      phone: formData.emergencyContact.phone,
+      email: formData.emergencyContact.email
+    },
+    previousExperience: formData.previousExperience, // Preserve other fields if already filled
+    skillLevel: formData.skillLevel,
+    previousAchievements: formData.previousAchievements,
+    // Preserve checkbox values
+    acceptTerms: currentAcceptTerms,
+    acceptWaiver: currentAcceptWaiver,
+    acceptRules: currentAcceptRules
+  })
+}
+
+const triggerValidation = (fieldName: string) => {
+  if (formRef.value) {
+    console.log(`Triggering validation for ${fieldName}, current value:`, formData[fieldName as keyof typeof formData])
+    setTimeout(() => {
+      formRef.value?.validate([fieldName])
+    }, 0)
+  }
+}
+
+const validateEmergencyPhone = () => {
+  emergencyPhoneNumber.value = emergencyPhoneNumber.value.replace(/\D/g, '')
+  
+  if (emergencyPhoneNumber.value.length > 0 && (!emergencyPhoneNumber.value.startsWith('5') || emergencyPhoneNumber.value.length !== 9)) {
+    emergencyPhoneError.value = 'Please enter a valid Georgian mobile number (5XX XXX XXX)'
+  } else {
+    emergencyPhoneError.value = ''
+  }
+  
+  formData.emergencyContact.phone = emergencyPhoneNumber.value ? `+995${emergencyPhoneNumber.value}` : ''
+}
+
+const validateEmergencyEmail = () => {
+  const email = formData.emergencyContact.email
+  
+  if (email && !email.includes('@')) {
+    emergencyEmailError.value = 'Email must contain "@"'
+  } else if (email) {
+    const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+    if (!emailRegex.test(email)) {
+      emergencyEmailError.value = 'Invalid email format'
+    } else {
+      emergencyEmailError.value = ''
+    }
+  } else {
+    emergencyEmailError.value = ''
+  }
+}
+
 const handleSubmit = async () => {
   try {
     submitting.value = true
+    
+    if (emergencyPhoneNumber.value) {
+      formData.emergencyContact.phone = `+995${emergencyPhoneNumber.value}`
+    }
     
     await formRef.value?.validate()
     
@@ -497,21 +578,16 @@ const handleSubmit = async () => {
         phoneNumber: formData.phoneNumber,
         address: formData.address,
         emergencyContact: formData.emergencyContact,
-        medicalConditions: formData.medicalConditions,
-        bloodType: formData.bloodType,
         previousExperience: formData.previousExperience,
         skillLevel: formData.skillLevel,
-        previousAchievements: formData.previousAchievements,
-        tshirtSize: formData.tshirtSize,
-        dietaryRestrictions: formData.dietaryRestrictions,
-        specialRequirements: formData.specialRequirements
+        previousAchievements: formData.previousAchievements
       }
     }
     
     const response = await TournamentRegistrationService.registerForTournament(registrationData)
     
     if (response.success) {
-      message.success('Registration submitted successfully!')
+      message.success('Registration request submitted successfully! Your request is pending approval from the tournament host.')
       emit('registration-success')
       updateShow(false)
     } else {
@@ -534,26 +610,18 @@ const formatDateRange = (startDate?: string, endDate?: string) => {
   return `${start} - ${end}`
 }
 
-watch(() => props.show, (newValue) => {
+watch(() => props.show, async (newValue) => {
   if (newValue) {
     const registrationType = props.tournament?.tournamentType === 'team' ? 'team' : 'individual'
     
-    loadUserProfile()
-    if (registrationType === 'team') {
-      loadUserTeams()
-    }
-  }
-})
-
-watch(userProfile, (profile) => {
-  if (profile) {
+    // Reset form data when modal opens
     Object.assign(formData, {
-      registrationType: props.tournament?.tournamentType === 'team' ? 'team' : 'individual',
+      registrationType: registrationType,
       teamId: null,
-      fullName: profile.fullName,
-      age: profile.age,
-      email: profile.email,
-      phoneNumber: profile.phoneNumber,
+      fullName: '',
+      age: null,
+      email: '',
+      phoneNumber: '',
       address: '',
       emergencyContact: {
         name: '',
@@ -561,19 +629,40 @@ watch(userProfile, (profile) => {
         phone: '',
         email: ''
       },
-      medicalConditions: '',
-      bloodType: null,
       previousExperience: null,
       skillLevel: null,
       previousAchievements: '',
-      tshirtSize: null,
-      dietaryRestrictions: '',
-      specialRequirements: '',
       acceptTerms: false,
       acceptWaiver: false,
       acceptRules: false
     })
+    
+    // Load profile if not available
+    if (!userStore.profile) {
+      await loadUserProfile()
+    } else {
+      // If profile is already available, populate the form immediately
+      populateFormFromProfile(userStore.profile)
+    }
+    
+    if (registrationType === 'team') {
+      loadUserTeams()
+    }
   }
+})
+
+watch(() => userStore.profile, (profile) => {
+  if (profile) {
+    populateFormFromProfile(profile)
+  }
+})
+
+watch(() => [formData.acceptTerms, formData.acceptWaiver, formData.acceptRules], (newValues) => {
+  console.log('Checkbox values changed:', {
+    acceptTerms: newValues[0],
+    acceptWaiver: newValues[1],
+    acceptRules: newValues[2]
+  })
 })
 </script>
 
@@ -671,6 +760,37 @@ watch(userProfile, (profile) => {
 .profile-field {
   background-color: #f8fafc !important;
   color: #64748b !important;
+}
+
+.phone-input-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.country-code {
+  background-color: #f8fafc;
+  padding: 0.5rem 0.75rem;
+  border-right: 1px solid #e2e8f0;
+  color: #64748b;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.phone-input-field {
+  flex: 1;
+}
+
+.phone-input-field :deep(.n-input) {
+  border: none;
+  box-shadow: none;
+}
+
+.phone-input-field :deep(.n-input:focus) {
+  border: none;
+  box-shadow: none;
 }
 
 @media (max-width: 768px) {

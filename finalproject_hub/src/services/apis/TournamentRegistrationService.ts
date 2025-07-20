@@ -15,60 +15,74 @@ interface ExtendedRegistrationRequest extends RegistrationRequest {
       phone: string
       email: string
     }
-    medicalConditions?: string
-    bloodType?: string
     previousExperience?: string
     skillLevel?: string
     previousAchievements?: string
-    tshirtSize?: string
-    dietaryRestrictions?: string
-    specialRequirements?: string
   }
 }
-import { mockTournamentRegistrations, isUserRegisteredForTournament, getUserRegistrationForTournament } from '../../data/mockTournamentRegistrations'
-import { mockTournaments } from '../../data/mockTournaments'
+
+interface BackendRegistrationResponse {
+  id: string
+  tournamentId: string
+  userId: string
+  registrationType: 'individual' | 'team'
+  teamId: string | null
+  status: string
+  registeredAt: number
+  updatedAt: number
+  fullName: string
+  age: number
+  email: string
+  phoneNumber: string
+  address: string
+  emergencyContactName: string
+  emergencyContactRelationship: string
+  emergencyContactPhone: string
+  emergencyContactEmail: string
+  previousExperience: string
+  skillLevel: string
+  previousAchievements: string
+}
 
 export class TournamentRegistrationService {
+  private static readonly BASE_URL = '/api/tournament-registrations'
+
   static async registerForTournament(request: ExtendedRegistrationRequest): Promise<RegistrationResponse> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 500))
-
-    const existingRegistration = getUserRegistrationForTournament('current-user-id', request.tournamentId)
-    if (existingRegistration && existingRegistration.status === 'REGISTERED') {
-      return {
-        success: false,
-        message: 'Already registered for this tournament'
-      }
-    }
-
-      const tournament = mockTournaments.find(t => t.id === request.tournamentId)
-      if (!tournament) {
-        return {
-          success: false,
-          message: 'Tournament not found'
-        }
-      }
-
-      let newRegistration: TournamentRegistration
-
-      if (existingRegistration && existingRegistration.status === 'WITHDRAWN') {
-        existingRegistration.status = RegistrationStatus.REGISTERED
-        existingRegistration.registeredAt = new Date()
-        newRegistration = existingRegistration
-      } else {
-        newRegistration = {
-          id: `reg-${Date.now()}`,
+      const response = await fetch(this.BASE_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           tournamentId: request.tournamentId,
-          userId: 'current-user-id',
-          status: RegistrationStatus.REGISTERED,
-          registeredAt: new Date()
-        }
-        mockTournamentRegistrations.push(newRegistration)
+          registrationType: request.registrationType || 'individual',
+          teamId: request.teamId,
+          participantInfo: request.participantInfo
+        }),
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`Failed to register for tournament: ${errorText}`)
+      }
+
+      const backendResponse: BackendRegistrationResponse = await response.json()
+      
+      const registration: TournamentRegistration = {
+        id: backendResponse.id,
+        tournamentId: backendResponse.tournamentId,
+        userId: backendResponse.userId,
+        registrationType: backendResponse.registrationType,
+        teamId: backendResponse.teamId,
+        status: backendResponse.status as RegistrationStatus,
+        registeredAt: new Date(backendResponse.registeredAt)
       }
 
       return {
         success: true,
-        registration: newRegistration,
+        registration,
         message: 'Successfully registered for tournament'
       }
 
@@ -76,17 +90,23 @@ export class TournamentRegistrationService {
       console.error('Error registering for tournament:', error)
       return {
         success: false,
-        message: 'Failed to register for tournament'
+        message: error instanceof Error ? error.message : 'Failed to register for tournament'
       }
     }
   }
 
   static async canRegisterForTournament(tournamentId: string): Promise<boolean> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 200))
-      
-      const registration = getUserRegistrationForTournament('current-user-id', tournamentId)
-      return !registration || registration.status === 'WITHDRAWN'
+      const response = await fetch(`${this.BASE_URL}/tournament/${tournamentId}/can-register`, {
+        method: 'GET',
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        return false
+      }
+
+      return await response.json()
     } catch (error) {
       console.error('Error checking registration eligibility:', error)
       return false
@@ -95,17 +115,27 @@ export class TournamentRegistrationService {
 
   static async withdrawFromTournament(tournamentId: string): Promise<RegistrationResponse> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 300))
+      const response = await fetch(`${this.BASE_URL}/${tournamentId}/withdraw`, {
+        method: 'POST',
+        credentials: 'include',
+      })
 
-      const registration = getUserRegistrationForTournament('current-user-id', tournamentId)
-      if (!registration) {
-        return {
-          success: false,
-          message: 'Not registered for this tournament'
-        }
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`Failed to withdraw from tournament: ${errorText}`)
       }
 
-      registration.status = RegistrationStatus.WITHDRAWN
+      const backendResponse: BackendRegistrationResponse = await response.json()
+      
+      const registration: TournamentRegistration = {
+        id: backendResponse.id,
+        tournamentId: backendResponse.tournamentId,
+        userId: backendResponse.userId,
+        registrationType: backendResponse.registrationType,
+        teamId: backendResponse.teamId,
+        status: backendResponse.status as RegistrationStatus,
+        registeredAt: new Date(backendResponse.registeredAt)
+      }
 
       return {
         success: true,
@@ -117,17 +147,212 @@ export class TournamentRegistrationService {
       console.error('Error withdrawing from tournament:', error)
       return {
         success: false,
-        message: 'Failed to withdraw from tournament'
+        message: error instanceof Error ? error.message : 'Failed to withdraw from tournament'
       }
     }
   }
 
   static async getUserRegistration(tournamentId: string): Promise<TournamentRegistration | null> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 200))
-      return getUserRegistrationForTournament('current-user-id', tournamentId)
+      const response = await fetch(`${this.BASE_URL}/tournament/${tournamentId}`, {
+        method: 'GET',
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null
+        }
+        throw new Error(`Failed to get user registration: ${response.statusText}`)
+      }
+
+      const backendResponse: BackendRegistrationResponse = await response.json()
+      
+      return {
+        id: backendResponse.id,
+        tournamentId: backendResponse.tournamentId,
+        userId: backendResponse.userId,
+        registrationType: backendResponse.registrationType,
+        teamId: backendResponse.teamId,
+        status: backendResponse.status as RegistrationStatus,
+        registeredAt: new Date(backendResponse.registeredAt),
+        fullName: backendResponse.fullName,
+        age: backendResponse.age,
+        email: backendResponse.email,
+        phoneNumber: backendResponse.phoneNumber,
+        address: backendResponse.address,
+        emergencyContactName: backendResponse.emergencyContactName,
+        emergencyContactRelationship: backendResponse.emergencyContactRelationship,
+        emergencyContactPhone: backendResponse.emergencyContactPhone,
+        emergencyContactEmail: backendResponse.emergencyContactEmail,
+        previousExperience: backendResponse.previousExperience,
+        skillLevel: backendResponse.skillLevel,
+        previousAchievements: backendResponse.previousAchievements
+      }
     } catch (error) {
       console.error('Error getting user registration:', error)
+      return null
+    }
+  }
+
+  static async approveRegistration(registrationId: string): Promise<RegistrationResponse> {
+    try {
+      const response = await fetch(`${this.BASE_URL}/${registrationId}/approve`, {
+        method: 'PUT',
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`Failed to approve registration: ${errorText}`)
+      }
+
+      const backendResponse: BackendRegistrationResponse = await response.json()
+      
+      const registration: TournamentRegistration = {
+        id: backendResponse.id,
+        tournamentId: backendResponse.tournamentId,
+        userId: backendResponse.userId,
+        registrationType: backendResponse.registrationType,
+        teamId: backendResponse.teamId,
+        status: backendResponse.status as RegistrationStatus,
+        registeredAt: new Date(backendResponse.registeredAt)
+      }
+
+      return {
+        success: true,
+        registration,
+        message: 'Registration approved successfully'
+      }
+
+    } catch (error) {
+      console.error('Error approving registration:', error)
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to approve registration'
+      }
+    }
+  }
+
+  static async rejectRegistration(registrationId: string): Promise<RegistrationResponse> {
+    try {
+      const response = await fetch(`${this.BASE_URL}/${registrationId}/reject`, {
+        method: 'PUT',
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`Failed to reject registration: ${errorText}`)
+      }
+
+      const backendResponse: BackendRegistrationResponse = await response.json()
+      
+      const registration: TournamentRegistration = {
+        id: backendResponse.id,
+        tournamentId: backendResponse.tournamentId,
+        userId: backendResponse.userId,
+        registrationType: backendResponse.registrationType,
+        teamId: backendResponse.teamId,
+        status: backendResponse.status as RegistrationStatus,
+        registeredAt: new Date(backendResponse.registeredAt)
+      }
+
+      return {
+        success: true,
+        registration,
+        message: 'Registration rejected successfully'
+      }
+
+    } catch (error) {
+      console.error('Error rejecting registration:', error)
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to reject registration'
+      }
+    }
+  }
+
+  static async getTournamentRegistrations(tournamentId: string): Promise<TournamentRegistration[]> {
+    try {
+      const response = await fetch(`${this.BASE_URL}/tournament/${tournamentId}/all`, {
+        method: 'GET',
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to get tournament registrations: ${response.statusText}`)
+      }
+
+      const backendResponses: BackendRegistrationResponse[] = await response.json()
+      
+      return backendResponses.map(response => ({
+        id: response.id,
+        tournamentId: response.tournamentId,
+        userId: response.userId,
+        registrationType: response.registrationType,
+        teamId: response.teamId,
+        status: response.status as RegistrationStatus,
+        registeredAt: new Date(response.registeredAt),
+        fullName: response.fullName,
+        age: response.age,
+        email: response.email,
+        phoneNumber: response.phoneNumber,
+        address: response.address,
+        emergencyContactName: response.emergencyContactName,
+        emergencyContactRelationship: response.emergencyContactRelationship,
+        emergencyContactPhone: response.emergencyContactPhone,
+        emergencyContactEmail: response.emergencyContactEmail,
+        previousExperience: response.previousExperience,
+        skillLevel: response.skillLevel,
+        previousAchievements: response.previousAchievements
+      }))
+    } catch (error) {
+      console.error('Error getting tournament registrations:', error)
+      return []
+    }
+  }
+
+  static async getRegistrationById(registrationId: string): Promise<TournamentRegistration | null> {
+    try {
+      const response = await fetch(`${this.BASE_URL}/${registrationId}`, {
+        method: 'GET',
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null
+        }
+        throw new Error(`Failed to get registration: ${response.statusText}`)
+      }
+
+      const backendResponse: BackendRegistrationResponse = await response.json()
+      
+      const registration = {
+        id: backendResponse.id,
+        tournamentId: backendResponse.tournamentId,
+        userId: backendResponse.userId,
+        registrationType: backendResponse.registrationType,
+        teamId: backendResponse.teamId,
+        status: backendResponse.status as RegistrationStatus,
+        registeredAt: new Date(backendResponse.registeredAt),
+        fullName: backendResponse.fullName,
+        age: backendResponse.age,
+        email: backendResponse.email,
+        phoneNumber: backendResponse.phoneNumber,
+        address: backendResponse.address,
+        emergencyContactName: backendResponse.emergencyContactName,
+        emergencyContactRelationship: backendResponse.emergencyContactRelationship,
+        emergencyContactPhone: backendResponse.emergencyContactPhone,
+        emergencyContactEmail: backendResponse.emergencyContactEmail,
+        previousExperience: backendResponse.previousExperience,
+        skillLevel: backendResponse.skillLevel,
+        previousAchievements: backendResponse.previousAchievements
+      }
+      return registration
+    } catch (error) {
+      console.error('Error getting registration:', error)
       return null
     }
   }

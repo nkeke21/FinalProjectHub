@@ -1,6 +1,7 @@
 import { API_BASE_URL, ENDPOINTS, HEADERS } from '../../constants/apis'
 
 export interface UserDetails {
+  id: string
   name: string
   email: string
   phoneNumber: string

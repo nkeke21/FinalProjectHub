@@ -1,4 +1,5 @@
 export enum RegistrationStatus {
+  PENDING = 'PENDING',
   REGISTERED = 'REGISTERED',
   WITHDRAWN = 'WITHDRAWN'
 }
@@ -7,8 +8,22 @@ export interface TournamentRegistration {
   id: string
   tournamentId: string
   userId: string
+  registrationType?: 'individual' | 'team'
+  teamId?: string | null
   status: RegistrationStatus
   registeredAt: Date
+  fullName?: string
+  age?: number
+  email?: string
+  phoneNumber?: string
+  address?: string
+  emergencyContactName?: string
+  emergencyContactRelationship?: string
+  emergencyContactPhone?: string
+  emergencyContactEmail?: string
+  previousExperience?: string
+  skillLevel?: string
+  previousAchievements?: string
 }
 
 export interface RegistrationRequest {

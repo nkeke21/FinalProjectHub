@@ -66,6 +66,17 @@ public class TeamController {
         return ResponseEntity.ok(teams);
     }
 
+    @GetMapping("/captain")
+    public ResponseEntity<List<TeamResponse>> getTeamsByCaptain(HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        List<TeamResponse> teams = teamService.getTeamsByCaptain(currentUser.getId());
+        return ResponseEntity.ok(teams);
+    }
+
     @PostMapping("/{id}/join")
     public ResponseEntity<String> joinTeam(@PathVariable UUID id, HttpSession session) {
         User currentUser = (User) session.getAttribute("user");

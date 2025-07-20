@@ -17,6 +17,8 @@ import ge.join2play.join2playback.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -101,6 +103,13 @@ public class TeamService {
         return allTeams.stream()
                 .filter(team -> !userTeamIds.contains(team.getId()))
                 .filter(team -> hasAvailableSlots(team.getId(), team.getMaxMembers()))
+                .map(this::convertTeamToTeamResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<TeamResponse> getTeamsByCaptain(UUID captainId) {
+        List<Team> teams = teamRepository.getTeamsByCaptain(captainId);
+        return teams.stream()
                 .map(this::convertTeamToTeamResponse)
                 .collect(Collectors.toList());
     }
@@ -242,11 +251,26 @@ public class TeamService {
         Optional<User> user = userRepository.getById(member.getUserId());
         String name = user.map(User::getName).orElse("Unknown");
         String email = user.map(User::getEmail).orElse("Unknown");
+        
+        Integer age = null;
+        if (user.isPresent() && user.get().getBirthDate() != null) {
+            try {
+                LocalDate birthDate = Instant.ofEpochMilli(user.get().getBirthDate()).atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate today = LocalDate.now();
+                age = today.getYear() - birthDate.getYear();
+                if (birthDate.plusYears(age).isAfter(today)) {
+                    age--;
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to calculate age for user " + user.get().getId() + ": " + e.getMessage());
+            }
+        }
 
         return new TeamMemberResponse(
                 member.getUserId(),
                 name,
                 email,
+                age,
                 member.getRole(),
                 member.getJoinedAt()
         );
