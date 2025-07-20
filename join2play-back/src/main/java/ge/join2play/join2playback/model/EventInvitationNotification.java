@@ -7,7 +7,7 @@ public class EventInvitationNotification {
     private String eventId;
     private String fromUserId;
     private String fromUserName;
-    private String eventDesctiption;
+    private String eventDescription;
     private String eventDate;
     private String eventLocation;
     private String message;
