@@ -18,6 +18,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/friends")
+@CrossOrigin(origins = "*")
 public class FriendRequestController {
 
     private final FriendRequestService service;

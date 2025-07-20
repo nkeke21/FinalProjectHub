@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/invite")
+@CrossOrigin(origins = "*")
 public class NotificationController {
 
     private final SimpMessagingTemplate messagingTemplate;
