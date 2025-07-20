@@ -1,4 +1,4 @@
-import { Tournament } from '../../models/Tournament'
+import { Tournament, TournamentFormat, TournamentStatus } from '../../models/Tournament'
 
 export interface TournamentRequest {
   name: string
@@ -175,16 +175,15 @@ export class TournamentService {
     }
   }
 
-  // Helper method to convert backend response to frontend Tournament model
   static convertToTournament(response: TournamentResponse): Tournament {
     return {
       id: response.id,
       name: response.name,
       description: response.description,
       sportType: response.sportType as any,
-      format: response.format as any,
+      format: TournamentService.mapBackendFormatToFrontend(response.format) as TournamentFormat,
       tournamentType: response.tournamentType as 'individual' | 'team',
-      status: response.status as any,
+      status: TournamentService.mapBackendStatusToFrontend(response.status) as TournamentStatus,
       hostId: response.hostId,
       hostName: response.hostName,
       location: response.location,
@@ -205,5 +204,27 @@ export class TournamentService {
       createdAt: new Date(response.createdAt).toISOString(),
       updatedAt: new Date(response.updatedAt).toISOString()
     }
+  }
+
+  static mapBackendFormatToFrontend(backendFormat: string): string {
+    const formatMap: { [key: string]: string } = {
+      'SINGLE_ELIMINATION': 'Single Elimination',
+      'DOUBLE_ELIMINATION': 'Double Elimination',
+      'ROUND_ROBIN': 'Round Robin',
+      'SWISS_SYSTEM': 'Swiss System'
+    }
+    return formatMap[backendFormat] || backendFormat
+  }
+
+  static mapBackendStatusToFrontend(backendStatus: string): string {
+    const statusMap: { [key: string]: string } = {
+      'DRAFT': 'Draft',
+      'REGISTRATION_OPEN': 'Registration Open',
+      'REGISTRATION_CLOSED': 'Registration Closed',
+      'IN_PROGRESS': 'In Progress',
+      'COMPLETED': 'Completed',
+      'CANCELLED': 'Cancelled'
+    }
+    return statusMap[backendStatus] || backendStatus
   }
 } 
