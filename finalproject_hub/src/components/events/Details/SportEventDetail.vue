@@ -110,19 +110,46 @@
             </div>
 
             <div class="action-section">
-              <n-button 
-                v-if="isHost" 
-                type="primary" 
-                color="#f97316" 
-                size="large" 
-                @click="onEditClick"
-                class="action-button"
-              >
-                <template #icon>
-                  <n-icon><PencilOutline /></n-icon>
-                </template>
-                Edit Event
-              </n-button>
+              <div v-if="isHost" class="host-actions">
+                <n-button 
+                  type="primary" 
+                  color="#f97316" 
+                  size="large" 
+                  @click="onEditClick"
+                  class="action-button"
+                >
+                  <template #icon>
+                    <n-icon><PencilOutline /></n-icon>
+                  </template>
+                  Edit Event
+                </n-button>
+                
+                <n-button 
+                  type="primary" 
+                  color="#3b82f6" 
+                  size="large" 
+                  @click="showInviteModal = true"
+                  class="action-button"
+                >
+                  <template #icon>
+                    <n-icon><PersonAddOutline /></n-icon>
+                  </template>
+                  Invite Friends
+                </n-button>
+                
+                <n-button 
+                  type="default" 
+                  size="large" 
+                  @click="refreshEventData"
+                  class="action-button"
+                  :loading="isUpdating"
+                >
+                  <template #icon>
+                    <n-icon><RefreshOutline /></n-icon>
+                  </template>
+                  Refresh
+                </n-button>
+              </div>
               
               <n-button 
                 v-else-if="isParticipating" 
@@ -166,6 +193,20 @@
                 </template>
                 Join Event
               </n-button>
+              
+              <n-button 
+                v-if="!isHost" 
+                type="default" 
+                size="large" 
+                @click="refreshEventData"
+                class="action-button"
+                :loading="isUpdating"
+              >
+                <template #icon>
+                  <n-icon><RefreshOutline /></n-icon>
+                </template>
+                Refresh
+              </n-button>
             </div>
           </n-card>
         </div>
@@ -180,6 +221,15 @@
         @submit="handleEditSubmit"
       />
     </CustomModal>
+
+    <!-- Invite Friends Modal -->
+    <InviteFriendsModal
+      v-model:show="showInviteModal"
+      :event-id="route.params.id as string"
+      :event-age-range="event?.minAge && event?.maxAge ? { min: event.minAge, max: event.maxAge } : undefined"
+      :current-participants="event?.participantsList || []"
+      @invitations-sent="handleInvitationsSent"
+    />
   </div>
 </template>
 
@@ -203,19 +253,23 @@ import {
   CheckmarkCircleOutline,
   CloseCircleOutline,
   AddCircleOutline,
-  FitnessOutline
+  FitnessOutline,
+  PersonAddOutline,
+  RefreshOutline
 } from '@vicons/ionicons5'
 import { SportEvent } from '../../../models/SportEvent'
 import { useSportEventStore } from '../../../store/events/useSportEventStore'
 import { useRoute } from 'vue-router'
 import CustomModal from '../Dialog/CustomModal.vue'
 import AddSportEventModalContent from '../Dialog/AddSportEventModalContent.vue'
+import InviteFriendsModal from '../Dialog/InviteFriendsModal.vue'
 import { config } from '../../../utils/config'
 
 const route = useRoute();
 const store = useSportEventStore()
 const message = useMessage()
 const isUpdating = ref(false)
+const showInviteModal = ref(false)
 
 const event = computed(() => store.selectedEvent)
 
@@ -268,6 +322,21 @@ onMounted(async () => {
     initMap()
   }, 100)
 })
+
+// Function to refresh event data
+const refreshEventData = async () => {
+  isUpdating.value = true
+  try {
+    await store.fetchEventById(route.params.id as string)
+    if (loggedInUserId.value && !isHost.value) {
+      isParticipating.value = await store.checkParticipation(route.params.id as string)
+    }
+  } catch (error) {
+    console.error('Failed to refresh event data:', error)
+  } finally {
+    isUpdating.value = false
+  }
+}
 
 const loadGoogleMapsScript = () => {
   return new Promise((resolve, reject) => {
@@ -340,6 +409,24 @@ const handleEditSubmit = async (eventDetails: SportEvent) => {
     message.error('Failed to update the event. Please try again.')
   } finally {
     isUpdating.value = false
+  }
+}
+
+const handleInvitationsSent = () => {
+  message.success('Invitations sent successfully!')
+  // Optionally refresh event data or update UI
+}
+
+// Debug function to test event invitations
+const debugEventInvitations = async () => {
+  try {
+    const { EventInvitationService } = await import('../../../services/apis/EventInvitationService')
+    const invitations = await EventInvitationService.getPendingInvitations()
+    console.log('Debug - Pending invitations:', invitations)
+    message.info(`Found ${invitations.length} pending invitations`)
+  } catch (error) {
+    console.error('Debug - Error loading invitations:', error)
+    message.error('Failed to load invitations')
   }
 }
 
@@ -603,6 +690,13 @@ const onJoinClick = async () => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.host-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .action-button {

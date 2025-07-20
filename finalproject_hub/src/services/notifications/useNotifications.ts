@@ -4,6 +4,7 @@ import type { FriendRequest } from '@/services/apis/FriendRequestService'
 import { TeamJoinRequestService, type TeamJoinRequest } from '@/services/apis/TeamJoinRequestService'
 import { UserService, type UserDetails } from '@/services/apis/UserService'
 import { UserTeamService, type Team } from '@/services/apis/UserTeamService'
+import { EventInvitationService, type EventInvitation } from '@/services/apis/EventInvitationService'
 
 export interface Notification {
   id: string
@@ -104,7 +105,75 @@ export function useNotifications() {
           message: `User ${request.fromUserId.slice(0, 8)} wants to join your team`,
           status: request.status,
           requestId: request.requestId,
-          teamId: request.teamId
+          teamId: request.teamId,
+          teamName: `Team ${request.teamId.slice(0, 8)}`
+        })
+      }
+    }
+    
+    return notifications
+  }
+
+  const convertEventInvitationsToNotifications = async (eventInvitations: EventInvitation[]): Promise<Notification[]> => {
+    const notifications: Notification[] = []
+    
+    for (const invitation of eventInvitations) {
+      try {
+        const userDetails = await UserService.getUserById(invitation.fromUserId)
+        const senderName = userDetails.name || `User ${invitation.fromUserId.slice(0, 8)}`
+        
+        // Try to fetch event details to make notification more informative
+        let eventTitle = 'Sports Event'
+        let eventDate: Date | undefined
+        let eventLocation = ''
+        let eventSport = ''
+        
+        try {
+          // Import SportEventService dynamically to avoid circular dependencies
+          const { getSportEventById } = await import('../apis/SportEventService')
+          const eventResponse = await getSportEventById(invitation.eventId)
+          if (eventResponse.ok) {
+            const eventData = await eventResponse.json()
+            eventTitle = eventData.description || 'Sports Event'
+            eventDate = eventData.eventTime ? new Date(eventData.eventTime) : undefined
+            eventLocation = eventData.location || ''
+            eventSport = eventData.sportType || ''
+          }
+        } catch (eventError) {
+          console.warn(`Failed to fetch event details for ${invitation.eventId}:`, eventError)
+        }
+        
+        notifications.push({
+          id: invitation.invitationId,
+          type: 'event-invitation',
+          senderName: senderName,
+          senderId: invitation.fromUserId,
+          timestamp: new Date(invitation.sentAt),
+          read: false,
+          message: `${senderName} invited you to join "${eventTitle}"`,
+          status: invitation.status,
+          eventId: invitation.eventId,
+          eventTitle: eventTitle,
+          eventDate: eventDate,
+          eventLocation: eventLocation,
+          eventSport: eventSport
+        })
+      } catch (error) {
+        console.error(`Failed to fetch user details for ${invitation.fromUserId}:`, error)
+        notifications.push({
+          id: invitation.invitationId,
+          type: 'event-invitation',
+          senderName: `User ${invitation.fromUserId.slice(0, 8)}`,
+          senderId: invitation.fromUserId,
+          timestamp: new Date(invitation.sentAt),
+          read: false,
+          message: `User ${invitation.fromUserId.slice(0, 8)} invited you to join an event`,
+          status: invitation.status,
+          eventId: invitation.eventId,
+          eventTitle: 'Sports Event',
+          eventDate: undefined,
+          eventLocation: '',
+          eventSport: ''
         })
       }
     }
@@ -143,6 +212,28 @@ export function useNotifications() {
       console.log('Updated notifications array with team requests:', notifications.value)
     } catch (error) {
       console.error('Failed to load team join requests:', error)
+    }
+  }
+
+  const loadEventInvitations = async () => {
+    try {
+      console.log('Loading event invitations...')
+      const eventInvitations = await EventInvitationService.getPendingInvitations()
+      console.log('Pending event invitations:', eventInvitations)
+      
+      if (eventInvitations.length === 0) {
+        console.log('No pending event invitations found')
+        return
+      }
+      
+      const eventInvitationNotifications = await convertEventInvitationsToNotifications(eventInvitations)
+      console.log('Converted event invitations to notifications:', eventInvitationNotifications)
+      
+      const existingNotifications = notifications.value.filter(n => n.type !== 'event-invitation')
+      notifications.value = [...existingNotifications, ...eventInvitationNotifications]
+      console.log('Updated notifications array with event invitations:', notifications.value)
+    } catch (error) {
+      console.error('Failed to load event invitations:', error)
     }
   }
 
@@ -237,14 +328,75 @@ export function useNotifications() {
     }
   }
 
-  const acceptEventInvitation = (notificationId: string) => {
-    markAsRead(notificationId)
-    console.log('Event invitation accepted:', notificationId)
+  const acceptEventInvitation = async (notificationId: string) => {
+    try {
+      // First, respond to the invitation
+      await EventInvitationService.respondToInvitation({
+        invitationId: notificationId,
+        status: 'ACCEPTED'
+      })
+      
+      // Get the notification to find the event ID
+      const notification = notifications.value.find(n => n.id === notificationId)
+      if (notification && notification.eventId) {
+        // Join the event
+        try {
+          const { joinEvent } = await import('../apis/SportEventService')
+          await joinEvent(notification.eventId)
+          console.log('Successfully joined event:', notification.eventId)
+        } catch (joinError) {
+          console.error('Failed to join event:', joinError)
+          // Don't throw here - the invitation was still accepted
+        }
+      }
+      
+      markAsRead(notificationId)
+      
+      if (notification) {
+        notification.status = 'ACCEPTED'
+        notification.message = `Event invitation accepted - you've joined the event!`
+        
+        setTimeout(() => {
+          const index = notifications.value.findIndex(n => n.id === notificationId)
+          if (index !== -1) {
+            notifications.value.splice(index, 1)
+          }
+        }, 5000)
+      }
+      
+      console.log('Event invitation accepted:', notificationId)
+    } catch (error) {
+      console.error('Failed to accept event invitation:', error)
+      throw error
+    }
   }
 
-  const declineEventInvitation = (notificationId: string) => {
-    markAsRead(notificationId)
-    console.log('Event invitation declined:', notificationId)
+  const declineEventInvitation = async (notificationId: string) => {
+    try {
+      await EventInvitationService.respondToInvitation({
+        invitationId: notificationId,
+        status: 'REJECTED'
+      })
+      markAsRead(notificationId)
+      
+      const notification = notifications.value.find(n => n.id === notificationId)
+      if (notification) {
+        notification.status = 'REJECTED'
+        notification.message = `Event invitation declined`
+        
+        setTimeout(() => {
+          const index = notifications.value.findIndex(n => n.id === notificationId)
+          if (index !== -1) {
+            notifications.value.splice(index, 1)
+          }
+        }, 5000)
+      }
+      
+      console.log('Event invitation declined:', notificationId)
+    } catch (error) {
+      console.error('Failed to decline event invitation:', error)
+      throw error
+    }
   }
 
   const approveTeamJoinRequest = async (notificationId: string) => {
@@ -321,7 +473,8 @@ export function useNotifications() {
   const refreshNotifications = async () => {
     await Promise.all([
       loadFriendRequests(),
-      loadTeamJoinRequests()
+      loadTeamJoinRequests(),
+      loadEventInvitations()
     ])
   }
 

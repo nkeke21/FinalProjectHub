@@ -33,7 +33,13 @@ export const ENDPOINTS = {
     GET_ALL_TEAM_REQUESTS_FOR_USER: '/team-requests/user/all',
     RESPOND_TO_TEAM_JOIN_REQUEST: '/team-requests/respond',
     CHECK_TEAM_JOIN_REQUEST: (teamId: string, userId: string) => `/team-requests/check-request/${teamId}/${userId}`,
-    GET_CURRENT_USER_ID: '/team-requests/current-user'
+    GET_CURRENT_USER_ID: '/team-requests/current-user',
+    SEND_EVENT_INVITATION: '/event-invitations/send',
+    GET_PENDING_EVENT_INVITATIONS: '/event-invitations/user/pending',
+    GET_SENT_EVENT_INVITATIONS: '/event-invitations/user/sent',
+    RESPOND_TO_EVENT_INVITATION: '/event-invitations/respond',
+    DELETE_EVENT_INVITATION: (invitationId: string) => `/event-invitations/${invitationId}`,
+    CHECK_EVENT_INVITATION: (eventId: string, userId: string) => `/event-invitations/check-invitation/${eventId}/${userId}`
 }
 
 export const HEADERS = {
