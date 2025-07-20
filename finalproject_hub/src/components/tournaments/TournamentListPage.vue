@@ -68,16 +68,6 @@
             />
           </div>
 
-          <div class="filter-group">
-            <label>Status</label>
-            <n-select
-              v-model:value="filters.status"
-              :options="statusOptions"
-              placeholder="All Statuses"
-              clearable
-              size="medium"
-            />
-          </div>
 
           <div class="filter-group">
             <label>Format</label>
@@ -414,7 +404,6 @@ const selectedTournament = ref<Tournament | null>(null)
 
 const filters = ref({
   sportType: null as string | null,
-  status: null as string | null,
   format: null as string | null,
   dateRange: null as [number, number] | null,
   location: '',
@@ -431,13 +420,6 @@ const sportTypeOptions = [
   { label: 'Volleyball', value: 'Volleyball' }
 ]
 
-const statusOptions = [
-  { label: 'Registration Open', value: 'REGISTRATION_OPEN' },
-  { label: 'In Progress', value: 'IN_PROGRESS' },
-  { label: 'Completed', value: 'COMPLETED' },
-  { label: 'Registration Closed', value: 'REGISTRATION_CLOSED' },
-  { label: 'Draft', value: 'DRAFT' }
-]
 
 const formatOptions = [
   { label: 'Single Elimination', value: 'SINGLE_ELIMINATION' },
@@ -519,7 +501,6 @@ const sortedTournaments = computed(() => {
 const hasActiveFilters = computed(() => {
   return searchQuery.value || 
          filters.value.sportType || 
-         filters.value.status || 
          filters.value.format || 
          filters.value.dateRange || 
          filters.value.location || 
@@ -539,9 +520,6 @@ const activeFilterTags = computed(() => {
   }
   if (filters.value.sportType) {
     tags.push({ key: 'sportType', label: `Sport: ${filters.value.sportType}`, type: 'success' })
-  }
-  if (filters.value.status) {
-    tags.push({ key: 'status', label: `Status: ${filters.value.status.replace('_', ' ')}`, type: 'warning' })
   }
   if (filters.value.format) {
     tags.push({ key: 'format', label: `Format: ${filters.value.format.replace('_', ' ')}`, type: 'info' })
@@ -571,7 +549,6 @@ const clearFilters = () => {
   searchQuery.value = ''
   filters.value = {
     sportType: null,
-    status: null,
     format: null,
     dateRange: null,
     location: '',
@@ -588,9 +565,6 @@ const removeFilter = (key: string) => {
       break
     case 'sportType':
       filters.value.sportType = null
-      break
-    case 'status':
-      filters.value.status = null
       break
     case 'format':
       filters.value.format = null
