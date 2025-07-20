@@ -90,7 +90,25 @@ export const useUserStore = defineStore('user', {
             this.error = null
 
             try {
-                this.searchResults = await searchUsers(query)
+                const allResults = await searchUsers(query)
+                console.log('🔍 All search results:', allResults)
+                
+                const userStr = localStorage.getItem('user')
+                let currentUserId: string | null = null
+                
+                if (userStr) {
+                    try {
+                        const user = JSON.parse(userStr)
+                        currentUserId = user.id
+                    } catch (error) {
+                        console.error('Failed to parse user from localStorage:', error)
+                    }
+                }
+                
+                this.searchResults = currentUserId 
+                    ? allResults.filter(user => user.id !== currentUserId)
+                    : allResults
+                                    
             } catch (err: any) {
                 this.error = err.message
                 this.searchResults = []
