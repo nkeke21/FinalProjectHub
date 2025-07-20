@@ -39,7 +39,7 @@ public class Tournament {
     }
 
     public Tournament(UUID id, String name, String description, SportType sportType, 
-                     TournamentFormat format, String tournamentType, TournamentStatus status,
+                     TournamentFormat format, String tournamentType,
                      UUID hostId, String hostName, String location, double latitude, double longitude,
                      Instant startDate, Instant endDate, Instant registrationDeadline,
                      int maxParticipants, int currentParticipants, double entryFee, double prizePool,

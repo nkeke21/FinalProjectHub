@@ -106,6 +106,20 @@
           Team Requests ({{ teamJoinRequestCount }})
         </button>
       </div>
+      
+      <n-button 
+        type="default" 
+        size="small"
+        @click="refreshNotifications"
+        class="refresh-button"
+      >
+        <template #icon>
+          <n-icon size="16">
+            <RefreshOutline />
+          </n-icon>
+        </template>
+        Refresh
+      </n-button>
     </div>
 
     <div class="notifications-list" v-if="filteredNotifications.length > 0">
@@ -345,7 +359,8 @@ import {
   InformationCircleOutline,
   LocationOutline,
   FootballOutline,
-  PeopleOutline
+  PeopleOutline,
+  RefreshOutline
 } from '@vicons/ionicons5'
 
 const router = useRouter()
@@ -363,8 +378,13 @@ const {
   acceptEventInvitation,
   declineEventInvitation,
   approveTeamJoinRequest,
-  declineTeamJoinRequest
+  declineTeamJoinRequest,
+  refreshNotifications
 } = useNotifications()
+
+onMounted(() => {
+  refreshNotifications()
+})
 
 const formatTime = (timestamp: Date) => {
   const now = new Date()
@@ -551,6 +571,10 @@ onMounted(() => {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
   border: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
 }
 
 .filter-tabs {
@@ -582,6 +606,25 @@ onMounted(() => {
   background: #22c55e;
   color: white;
   box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+}
+
+.refresh-button {
+  background: #f1f5f9;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.refresh-button:hover {
+  background: #e2e8f0;
+  color: #475569;
 }
 
 .notifications-list {

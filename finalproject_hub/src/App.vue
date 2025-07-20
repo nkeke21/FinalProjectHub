@@ -3,6 +3,7 @@
 		<n-notification-provider>
 			<div class="app">
 				<FriendRequestNotification />
+				<EventInvitationNotification />
 				<Sidebar v-if="showSidebar" />
 				<router-view />
 			</div>
@@ -17,6 +18,7 @@ import { useRoute } from 'vue-router'
 import Sidebar from './components/Sidebar/Sidebar.vue'
 import ProfileComponent from './components/profile/ProfileComponent.vue';
 import FriendRequestNotification from '@/components/common/requests/FriendRequestNotification.vue'
+import EventInvitationNotification from '@/components/common/requests/EventInvitationNotification.vue'
 
 const route = useRoute()
 const showSidebar = computed(() => route.path !== '/')
