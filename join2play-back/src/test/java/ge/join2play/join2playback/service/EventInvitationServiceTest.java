@@ -278,6 +278,6 @@ class EventInvitationServiceTest {
 
         assertFalse(result.isEmpty());
         assertEquals(1, result.size());
-        assertEquals(invitation.getInvitationId(), result.get(0).getInvitationId());
+        assertEquals(invitation.getInvitationId(), result.getFirst().getInvitationId());
     }
 }
