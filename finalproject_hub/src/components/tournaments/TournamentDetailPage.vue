@@ -303,7 +303,7 @@ const tournament = ref<Tournament | null>(null)
 const participants = ref<TournamentParticipant[]>([])
 const registering = ref(false)
 const withdrawing = ref(false)
-const participantFilter = ref<string>('all')
+const participantFilter = ref<string>('Confirmed')
 
 const userRegistration = ref<TournamentRegistration | null>(null)
 const canRegister = ref(false)
@@ -337,15 +337,10 @@ const isUserProfileLoading = computed(() => {
 })
 
 const participantFilterOptions = [
-  { label: 'All Participants', value: 'all' },
-  { label: 'Confirmed', value: 'Confirmed' },
-  { label: 'Registered', value: 'Registered' },
-  { label: 'Waitlisted', value: 'Waitlisted' },
-  { label: 'Withdrawn', value: 'Withdrawn' }
+  { label: 'Confirmed', value: 'Confirmed' }
 ]
 
 const filteredParticipants = computed(() => {
-  if (participantFilter.value === 'all') return participants.value
   return participants.value.filter(p => p.status === participantFilter.value)
 })
 
