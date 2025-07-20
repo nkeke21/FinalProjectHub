@@ -15,10 +15,12 @@ import java.util.UUID;
 public class AuthenticationService {
     private final UserRepository userRepository;
     private final UserPermissionService userPermissionService;
+    private final PasswordService passwordService;
 
-    public AuthenticationService(UserRepository userRepository, UserPermissionService userPermissionService) {
+    public AuthenticationService(UserRepository userRepository, UserPermissionService userPermissionService, PasswordService passwordService) {
         this.userRepository = userRepository;
         this.userPermissionService = userPermissionService;
+        this.passwordService = passwordService;
     }
 
     public AuthResponse signUp(SignUpRequest signUpRequest) {
@@ -27,6 +29,8 @@ public class AuthenticationService {
             throw new EmailAlreadyExistsException("Email " + signUpRequest.getEmail() + " is already registered.");
         }
 
+        String hashedPassword = passwordService.hashPassword(signUpRequest.getPassword());
+        
         User newUser = new User(
                 UUID.randomUUID(),
                 signUpRequest.getName(),
@@ -34,12 +38,11 @@ public class AuthenticationService {
                 signUpRequest.getPhoneNumber(),
                 signUpRequest.getBirthDate(),
                 signUpRequest.getDescription(),
-                signUpRequest.getPassword()
+                hashedPassword
         );
 
         User savedUser = userRepository.save(newUser);
 
-        // Create default permission for the new user
         userPermissionService.createDefaultPermission(savedUser.getId());
 
         return new AuthResponse(
@@ -57,7 +60,7 @@ public class AuthenticationService {
             throw new InvalidCredentialsException("Invalid username or password.");
         }
 
-        if (!user.getPassword().equals(signInRequest.getPassword())) {
+        if (!passwordService.verifyPassword(signInRequest.getPassword(), user.getPassword())) {
             throw new InvalidCredentialsException("Invalid username or password.");
         }
 

@@ -139,7 +139,10 @@ const validateForm = () => {
         valid = false
     }
     
-    if (passwordMismatch.value) {
+    if (!repeatPassword.value) {
+        repeatPasswordError.value = 'Please confirm your password'
+        valid = false
+    } else if (passwordMismatch.value) {
         repeatPasswordError.value = 'Passwords do not match'
         valid = false
     }
