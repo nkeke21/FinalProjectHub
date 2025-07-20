@@ -8,6 +8,8 @@ export interface TournamentRegistration {
   id: string
   tournamentId: string
   userId: string
+  registrationType?: 'individual' | 'team'
+  teamId?: string | null
   status: RegistrationStatus
   registeredAt: Date
   fullName?: string

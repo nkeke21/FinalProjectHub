@@ -109,7 +109,7 @@ const loadTeams = async () => {
     if (!currentUserId.value) {
       currentUserId.value = await TeamJoinRequestService.getCurrentUserId()
     }
-    
+        
     const [myTeamsData, availableTeamsData] = await Promise.all([
       UserTeamService.getMyTeams(),
       UserTeamService.getAvailableTeams()
@@ -117,7 +117,7 @@ const loadTeams = async () => {
     
     myTeams.value = Array.isArray(myTeamsData) ? myTeamsData : []
     availableTeams.value = Array.isArray(availableTeamsData) ? availableTeamsData : []
-    
+        
   } catch (error) {
     console.error('Failed to load teams:', error)
     message.error('Failed to load teams')

@@ -129,6 +129,15 @@
                   </div>
                   
                   <div class="registration-actions">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                      Debug: registrationLoading={{ registrationLoading }}, 
+                      isUserProfileLoading={{ isUserProfileLoading }}, 
+                      isTournamentHost={{ isTournamentHost }}, 
+                      canRegister={{ canRegister }}, 
+                      isRegistered={{ isRegistered }}, 
+                      isPending={{ isPending }}
+                    </div>
+                    
                     <div v-if="registrationLoading" class="registration-loading">
                       <n-spin size="small" />
                       <span>Loading registration status...</span>
@@ -210,9 +219,25 @@
               <div v-for="participant in filteredParticipants" :key="participant.id" class="participant-card">
                 <div class="participant-info">
                   <div class="participant-name">{{ participant.participantName }}</div>
-                  <div class="participant-type">{{ participant.participantType }}</div>
+                  <div class="participant-type">
+                    <span v-if="participant.participantType === 'team'" class="team-badge">
+                      <n-icon size="16" style="margin-right: 4px;">
+                        <PeopleOutline />
+                      </n-icon>
+                      Team
+                    </span>
+                    <span v-else class="individual-badge">
+                      <n-icon size="16" style="margin-right: 4px;">
+                        <PersonOutline />
+                      </n-icon>
+                      Individual
+                    </span>
+                  </div>
                   <div class="participant-status" :class="participant.status.toLowerCase()">
                     {{ participant.status }}
+                  </div>
+                  <div v-if="participant.participantType === 'team' && participant.teamId" class="team-details">
+                    <small>Captain: {{ participant.captainName || 'Unknown' }}</small>
                   </div>
                 </div>
                 <div class="participant-meta">
@@ -320,11 +345,15 @@ const showNotificationModal = ref(false)
 const unreadNotificationCount = ref(0)
 
 const isRegistered = computed(() => {
-  return userRegistration.value?.status === 'REGISTERED'
+  const registered = userRegistration.value?.status === 'REGISTERED'
+  console.log('isRegistered computed:', registered, 'userRegistration status:', userRegistration.value?.status)
+  return registered
 })
 
 const isPending = computed(() => {
-  return userRegistration.value?.status === 'PENDING'
+  const pending = userRegistration.value?.status === 'PENDING'
+  console.log('isPending computed:', pending, 'userRegistration status:', userRegistration.value?.status)
+  return pending
 })
 
 const isTournamentHost = computed(() => {
@@ -372,8 +401,10 @@ const loadRegistrationData = async (tournamentId: string) => {
     registrationLoading.value = true
     
     userRegistration.value = await TournamentRegistrationService.getUserRegistration(tournamentId)
+    console.log('User registration:', userRegistration.value)
     
     canRegister.value = await TournamentRegistrationService.canRegisterForTournament(tournamentId)
+    console.log('Can register:', canRegister.value)
     
   } catch (error) {
     console.error('Error loading registration data:', error)
@@ -384,8 +415,11 @@ const loadRegistrationData = async (tournamentId: string) => {
 
 const loadParticipants = async (tournamentId: string) => {
   try {
+    console.log('Loading participants for tournament:', tournamentId)
     const registrations = await TournamentRegistrationService.getTournamentRegistrations(tournamentId)
-    participants.value = TournamentParticipantService.convertRegistrationsToParticipants(registrations)
+    console.log('Raw registrations from backend:', registrations)
+    participants.value = await TournamentParticipantService.convertRegistrationsToParticipants(registrations)
+    console.log('Final participants after conversion:', participants.value)
   } catch (error) {
     console.error('Error loading participants:', error)
     participants.value = []
@@ -822,6 +856,39 @@ onMounted(async () => {
   color: #64748b;
   font-size: 0.875rem;
   text-transform: capitalize;
+}
+
+.team-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  background: #eff6ff;
+  color: #1e40af;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid #dbeafe;
+}
+
+.individual-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  background: #f1f5f9;
+  color: #475569;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
+}
+
+.team-details {
+  margin-top: 0.25rem;
+}
+
+.team-details small {
+  color: #94a3b8;
+  font-size: 0.75rem;
 }
 
 .participant-status {

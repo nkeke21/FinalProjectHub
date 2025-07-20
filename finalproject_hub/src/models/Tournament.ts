@@ -46,6 +46,7 @@ export interface TeamMember {
   userId: string
   name: string
   email: string
+  age?: number
   role: TeamRole
   joinedAt: string
 }
@@ -58,6 +59,7 @@ export interface TournamentParticipant {
   participantType: 'individual' | 'team'
   teamId?: string
   teamName?: string
+  captainName?: string
   registrationDate: string
   status: ParticipantStatus
 }

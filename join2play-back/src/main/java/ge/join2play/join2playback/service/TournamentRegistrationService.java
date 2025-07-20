@@ -80,7 +80,7 @@ public class TournamentRegistrationService {
             registration.setRegisteredAt(Instant.now());
         }
 
-        if ("individual".equals(request.getRegistrationType()) && request.getParticipantInfo() != null) {
+        if (request.getParticipantInfo() != null) {
             var participantInfo = request.getParticipantInfo();
             registration.setFullName(participantInfo.getFullName());
             registration.setAge(participantInfo.getAge());

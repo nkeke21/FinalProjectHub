@@ -84,27 +84,67 @@
           <!-- Registration Details Section -->
           <div v-if="expandedNotifications.has(notification.id)" class="registration-details">
             <div v-if="registrationDetails[notification.id]" class="details-content">
+              <!-- Team Information (if team registration) -->
+              <div v-if="registrationDetails[notification.id].teamId" class="team-info-section">
+                <h5>Team Information</h5>
+                <div class="team-details">
+                  <div class="detail-item">
+                    <span class="detail-label">Team Name:</span>
+                    <span class="detail-value">{{ teamDetails[notification.id]?.name || 'Loading...' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Team Captain:</span>
+                    <span class="detail-value">{{ teamDetails[notification.id]?.captainName || 'Loading...' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Team Members:</span>
+                    <span class="detail-value">{{ teamDetails[notification.id]?.members?.length || 0 }}/{{ teamDetails[notification.id]?.maxMembers || 0 }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Team Description:</span>
+                    <span class="detail-value">{{ teamDetails[notification.id]?.description || 'No description' }}</span>
+                  </div>
+                </div>
+                
+                <div v-if="teamDetails[notification.id]?.members" class="team-members">
+                  <h6>Team Members</h6>
+                  <div class="members-list">
+                    <div 
+                      v-for="member in teamDetails[notification.id].members" 
+                      :key="member.userId"
+                      class="member-item"
+                    >
+                      <div class="member-info">
+                        <span class="member-name">{{ member.name }}</span>
+                        <span v-if="member.age" class="member-age">{{ member.age }} years</span>
+                      </div>
+                      <span class="member-role">{{ member.role }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <h5>Participant Information</h5>
               <div class="details-grid">
                 <div class="detail-item">
                   <span class="detail-label">Full Name:</span>
-                  <span class="detail-value">{{ registrationDetails[notification.id].fullName }}</span>
+                  <span class="detail-value">{{ registrationDetails[notification.id].fullName || 'Not specified' }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Age:</span>
-                  <span class="detail-value">{{ registrationDetails[notification.id].age }} years</span>
+                  <span class="detail-value">{{ registrationDetails[notification.id].age ? `${registrationDetails[notification.id].age} years` : 'Not specified' }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Email:</span>
-                  <span class="detail-value">{{ registrationDetails[notification.id].email }}</span>
+                  <span class="detail-value">{{ registrationDetails[notification.id].email || 'Not specified' }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Phone:</span>
-                  <span class="detail-value">{{ registrationDetails[notification.id].phoneNumber }}</span>
+                  <span class="detail-value">{{ registrationDetails[notification.id].phoneNumber || 'Not specified' }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Address:</span>
-                  <span class="detail-value">{{ registrationDetails[notification.id].address }}</span>
+                  <span class="detail-value">{{ registrationDetails[notification.id].address || 'Not specified' }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Skill Level:</span>
@@ -124,19 +164,19 @@
               <div class="details-grid">
                 <div class="detail-item">
                   <span class="detail-label">Name:</span>
-                  <span class="detail-value">{{ registrationDetails[notification.id].emergencyContactName }}</span>
+                  <span class="detail-value">{{ registrationDetails[notification.id].emergencyContactName || 'Not specified' }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Relationship:</span>
-                  <span class="detail-value">{{ registrationDetails[notification.id].emergencyContactRelationship }}</span>
+                  <span class="detail-value">{{ registrationDetails[notification.id].emergencyContactRelationship || 'Not specified' }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Phone:</span>
-                  <span class="detail-value">{{ registrationDetails[notification.id].emergencyContactPhone }}</span>
+                  <span class="detail-value">{{ registrationDetails[notification.id].emergencyContactPhone || 'Not specified' }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Email:</span>
-                  <span class="detail-value">{{ registrationDetails[notification.id].emergencyContactEmail }}</span>
+                  <span class="detail-value">{{ registrationDetails[notification.id].emergencyContactEmail || 'Not specified' }}</span>
                 </div>
               </div>
             </div>
@@ -169,6 +209,7 @@ import {
 } from '@vicons/ionicons5'
 import { TournamentRegistrationNotificationService, type TournamentRegistrationNotification } from '@/services/apis/TournamentRegistrationNotificationService'
 import { TournamentRegistrationService } from '@/services/apis/TournamentRegistrationService'
+import { UserTeamService } from '@/services/apis/UserTeamService'
 
 interface Props {
   show: boolean
@@ -188,6 +229,7 @@ const notifications = ref<TournamentRegistrationNotification[]>([])
 const processingRegistration = ref<string | null>(null)
 const expandedNotifications = ref<Set<string>>(new Set())
 const registrationDetails = ref<Record<string, any>>({})
+const teamDetails = ref<Record<string, any>>({})
 const loadingDetails = ref<string | null>(null)
 
 const updateShow = (value: boolean) => {
@@ -224,15 +266,36 @@ const loadRegistrationDetails = async (notificationId: string) => {
   
   try {
     loadingDetails.value = notificationId
+    console.log('Loading details for registration ID:', notification.registrationId)
     const details = await TournamentRegistrationService.getRegistrationById(notification.registrationId)
+    console.log('Registration details received:', details)
+    
     if (details) {
       registrationDetails.value[notificationId] = details
+      console.log('Stored registration details:', registrationDetails.value[notificationId])
+      
+      // If this is a team registration, load team details
+      if (details.teamId) {
+        console.log('Loading team details for team ID:', details.teamId)
+        await loadTeamDetails(notificationId, details.teamId)
+      }
     }
   } catch (error) {
     console.error('Error loading registration details:', error)
     message.error('Failed to load registration details')
   } finally {
     loadingDetails.value = null
+  }
+}
+
+const loadTeamDetails = async (notificationId: string, teamId: string) => {
+  try {
+    const team = await UserTeamService.getTeamById(teamId)
+    if (team) {
+      teamDetails.value[notificationId] = team
+    }
+  } catch (error) {
+    console.error('Error loading team details:', error)
   }
 }
 
@@ -442,5 +505,69 @@ watch(() => props.show, (newValue) => {
 
 .error-details {
   color: #ef4444;
+}
+
+.team-info-section {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f0f9ff;
+  border-radius: 8px;
+  border: 1px solid #bae6fd;
+}
+
+.team-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.team-members h6 {
+  margin: 0 0 0.5rem 0;
+  color: #1e293b;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.member-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: #ffffff;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+.member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.member-name {
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.member-age {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.member-role {
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  background: #f1f5f9;
+  border-radius: 4px;
 }
 </style> 

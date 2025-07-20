@@ -25,7 +25,7 @@ interface BackendRegistrationResponse {
   id: string
   tournamentId: string
   userId: string
-  registrationType: string
+  registrationType: 'individual' | 'team'
   teamId: string | null
   status: string
   registeredAt: number
@@ -74,6 +74,8 @@ export class TournamentRegistrationService {
         id: backendResponse.id,
         tournamentId: backendResponse.tournamentId,
         userId: backendResponse.userId,
+        registrationType: backendResponse.registrationType,
+        teamId: backendResponse.teamId,
         status: backendResponse.status as RegistrationStatus,
         registeredAt: new Date(backendResponse.registeredAt)
       }
@@ -129,6 +131,8 @@ export class TournamentRegistrationService {
         id: backendResponse.id,
         tournamentId: backendResponse.tournamentId,
         userId: backendResponse.userId,
+        registrationType: backendResponse.registrationType,
+        teamId: backendResponse.teamId,
         status: backendResponse.status as RegistrationStatus,
         registeredAt: new Date(backendResponse.registeredAt)
       }
@@ -168,6 +172,8 @@ export class TournamentRegistrationService {
         id: backendResponse.id,
         tournamentId: backendResponse.tournamentId,
         userId: backendResponse.userId,
+        registrationType: backendResponse.registrationType,
+        teamId: backendResponse.teamId,
         status: backendResponse.status as RegistrationStatus,
         registeredAt: new Date(backendResponse.registeredAt),
         fullName: backendResponse.fullName,
@@ -207,6 +213,8 @@ export class TournamentRegistrationService {
         id: backendResponse.id,
         tournamentId: backendResponse.tournamentId,
         userId: backendResponse.userId,
+        registrationType: backendResponse.registrationType,
+        teamId: backendResponse.teamId,
         status: backendResponse.status as RegistrationStatus,
         registeredAt: new Date(backendResponse.registeredAt)
       }
@@ -244,6 +252,8 @@ export class TournamentRegistrationService {
         id: backendResponse.id,
         tournamentId: backendResponse.tournamentId,
         userId: backendResponse.userId,
+        registrationType: backendResponse.registrationType,
+        teamId: backendResponse.teamId,
         status: backendResponse.status as RegistrationStatus,
         registeredAt: new Date(backendResponse.registeredAt)
       }
@@ -280,6 +290,8 @@ export class TournamentRegistrationService {
         id: response.id,
         tournamentId: response.tournamentId,
         userId: response.userId,
+        registrationType: response.registrationType,
+        teamId: response.teamId,
         status: response.status as RegistrationStatus,
         registeredAt: new Date(response.registeredAt),
         fullName: response.fullName,
@@ -317,10 +329,12 @@ export class TournamentRegistrationService {
 
       const backendResponse: BackendRegistrationResponse = await response.json()
       
-      return {
+      const registration = {
         id: backendResponse.id,
         tournamentId: backendResponse.tournamentId,
         userId: backendResponse.userId,
+        registrationType: backendResponse.registrationType,
+        teamId: backendResponse.teamId,
         status: backendResponse.status as RegistrationStatus,
         registeredAt: new Date(backendResponse.registeredAt),
         fullName: backendResponse.fullName,
@@ -336,6 +350,7 @@ export class TournamentRegistrationService {
         skillLevel: backendResponse.skillLevel,
         previousAchievements: backendResponse.previousAchievements
       }
+      return registration
     } catch (error) {
       console.error('Error getting registration:', error)
       return null

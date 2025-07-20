@@ -9,16 +9,18 @@ public class TeamMemberResponse {
     private UUID userId;
     private String name;
     private String email;
+    private Integer age;
     private TeamRole role;
     private Instant joinedAt;
 
     public TeamMemberResponse() {
     }
 
-    public TeamMemberResponse(UUID userId, String name, String email, TeamRole role, Instant joinedAt) {
+    public TeamMemberResponse(UUID userId, String name, String email, Integer age, TeamRole role, Instant joinedAt) {
         this.userId = userId;
         this.name = name;
         this.email = email;
+        this.age = age;
         this.role = role;
         this.joinedAt = joinedAt;
     }
@@ -45,6 +47,14 @@ public class TeamMemberResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
     }
 
     public TeamRole getRole() {

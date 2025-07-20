@@ -451,10 +451,11 @@ const loadUserTeams = async () => {
   
   try {
     loadingTeams.value = true
-    const teams = await UserTeamService.getUserTeams(props.tournament.sportType)
+    const allTeams = await UserTeamService.getTeamsByCaptain()
+    const matchingTeams = allTeams.filter(team => team.sportType === props.tournament!.sportType)
     
-    userTeams.value = teams.map(team => ({
-      label: team.name,
+    userTeams.value = matchingTeams.map(team => ({
+      label: `${team.name} (${team.members.length}/${team.maxMembers} members)`,
       value: team.id
     }))
   } catch (error) {
