@@ -146,7 +146,7 @@ public class EventInvitationService {
                 invitation.getEventId().toString(),
                 invitation.getFromUserId().toString(),
                 sender.get().getName(),
-                eventDescription,
+                eventDesctiption,
                 DATE_FORMATTER.format(event.getEventTime()),
                 event.getLocation(),
                 formattedMessage
