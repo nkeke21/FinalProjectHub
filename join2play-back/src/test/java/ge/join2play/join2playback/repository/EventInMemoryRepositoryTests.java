@@ -24,6 +24,7 @@ public class EventInMemoryRepositoryTests {
     @BeforeEach
     void setUp() {
         repository = new EventInMemoryRepository();
+        repository.clear();
         sampleEvent = new Event(
                 eventId,
                 hostId,

@@ -1,16 +1,17 @@
 package ge.join2play.join2playback.repository;
 
-import ge.join2play.join2playback.model.enums.TeamJoinRequestStatus;
 import ge.join2play.join2playback.model.TeamJoinRequest;
+import ge.join2play.join2playback.model.enums.TeamJoinRequestStatus;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
 public class TeamJoinRequestInMemoryRepository implements TeamJoinRequestRepository {
-    private final Map<UUID, TeamJoinRequest> requests = new HashMap<>();
+    private final Map<UUID, TeamJoinRequest> requests = new ConcurrentHashMap<>();
 
     public TeamJoinRequest saveRequest(UUID teamId, UUID fromUserId) {
         TeamJoinRequest request = new TeamJoinRequest(

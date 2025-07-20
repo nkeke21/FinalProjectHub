@@ -7,12 +7,16 @@ import ge.join2play.join2playback.model.exceptions.TeamDoesNotExistException;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
 public class TeamInMemoryRepository implements TeamRepository {
-    private final Map<UUID, Team> teams = new HashMap<>();
+    private final Map<UUID, Team> teams = new ConcurrentHashMap<>();
 
     public TeamInMemoryRepository() {
         // Mock teams data
