@@ -172,7 +172,7 @@ public class ApplicationServiceTests {
                 "Jane Doe",
                 "j.doe@gmail.com",
                 "+999",
-                Timestamp.valueOf("2000-04-16").getTime(),
+                Timestamp.valueOf("2000-04-16 00:00:00").getTime(),
                 "I love sport",
                 "secure_passworD"
         );
@@ -220,7 +220,7 @@ public class ApplicationServiceTests {
                 "Jane Doe",
                 "j.doe@gmail.com",
                 "+999",
-                Timestamp.valueOf("2000-04-16").getTime(),
+                Timestamp.valueOf("2000-04-16 00:10:00").getTime(),
                 "I love sport",
                 "secure_passworD"
         );
@@ -268,7 +268,7 @@ public class ApplicationServiceTests {
                 "Jane Doe",
                 "j.doe@gmail.com",
                 "+999",
-                Timestamp.valueOf("2000-04-16").getTime(),
+                Timestamp.valueOf("2000-04-16 02:00:00").getTime(),
                 "I love sport",
                 "secure_passworD"
         );
