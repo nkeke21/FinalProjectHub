@@ -18,12 +18,12 @@ public class EventInvitationNotification {
     }
 
     public EventInvitationNotification(String invitationId, String eventId, String fromUserId, String fromUserName,
-                                       String eventDesctiption, String eventDate, String eventLocation, String message) {
+                                       String eventDescription, String eventDate, String eventLocation, String message) {
         this.invitationId = invitationId;
         this.eventId = eventId;
         this.fromUserId = fromUserId;
         this.fromUserName = fromUserName;
-        this.eventDesctiption = eventDesctiption;
+        this.eventDescription = eventDescription;
         this.eventDate = eventDate;
         this.eventLocation = eventLocation;
         this.message = message;
