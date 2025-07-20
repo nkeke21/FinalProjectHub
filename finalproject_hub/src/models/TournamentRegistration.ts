@@ -10,6 +10,18 @@ export interface TournamentRegistration {
   userId: string
   status: RegistrationStatus
   registeredAt: Date
+  fullName?: string
+  age?: number
+  email?: string
+  phoneNumber?: string
+  address?: string
+  emergencyContactName?: string
+  emergencyContactRelationship?: string
+  emergencyContactPhone?: string
+  emergencyContactEmail?: string
+  previousExperience?: string
+  skillLevel?: string
+  previousAchievements?: string
 }
 
 export interface RegistrationRequest {

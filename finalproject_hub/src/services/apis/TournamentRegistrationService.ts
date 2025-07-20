@@ -169,7 +169,19 @@ export class TournamentRegistrationService {
         tournamentId: backendResponse.tournamentId,
         userId: backendResponse.userId,
         status: backendResponse.status as RegistrationStatus,
-        registeredAt: new Date(backendResponse.registeredAt)
+        registeredAt: new Date(backendResponse.registeredAt),
+        fullName: backendResponse.fullName,
+        age: backendResponse.age,
+        email: backendResponse.email,
+        phoneNumber: backendResponse.phoneNumber,
+        address: backendResponse.address,
+        emergencyContactName: backendResponse.emergencyContactName,
+        emergencyContactRelationship: backendResponse.emergencyContactRelationship,
+        emergencyContactPhone: backendResponse.emergencyContactPhone,
+        emergencyContactEmail: backendResponse.emergencyContactEmail,
+        previousExperience: backendResponse.previousExperience,
+        skillLevel: backendResponse.skillLevel,
+        previousAchievements: backendResponse.previousAchievements
       }
     } catch (error) {
       console.error('Error getting user registration:', error)
@@ -248,6 +260,44 @@ export class TournamentRegistrationService {
         success: false,
         message: error instanceof Error ? error.message : 'Failed to reject registration'
       }
+    }
+  }
+
+  static async getTournamentRegistrations(tournamentId: string): Promise<TournamentRegistration[]> {
+    try {
+      const response = await fetch(`${this.BASE_URL}/tournament/${tournamentId}/all`, {
+        method: 'GET',
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to get tournament registrations: ${response.statusText}`)
+      }
+
+      const backendResponses: BackendRegistrationResponse[] = await response.json()
+      
+      return backendResponses.map(response => ({
+        id: response.id,
+        tournamentId: response.tournamentId,
+        userId: response.userId,
+        status: response.status as RegistrationStatus,
+        registeredAt: new Date(response.registeredAt),
+        fullName: response.fullName,
+        age: response.age,
+        email: response.email,
+        phoneNumber: response.phoneNumber,
+        address: response.address,
+        emergencyContactName: response.emergencyContactName,
+        emergencyContactRelationship: response.emergencyContactRelationship,
+        emergencyContactPhone: response.emergencyContactPhone,
+        emergencyContactEmail: response.emergencyContactEmail,
+        previousExperience: response.previousExperience,
+        skillLevel: response.skillLevel,
+        previousAchievements: response.previousAchievements
+      }))
+    } catch (error) {
+      console.error('Error getting tournament registrations:', error)
+      return []
     }
   }
 } 

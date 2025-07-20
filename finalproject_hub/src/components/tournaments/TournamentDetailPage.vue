@@ -283,6 +283,7 @@ import type {
 } from '@/models/Tournament'
 import { TournamentService } from '@/services/apis/TournamentService'
 import { TournamentRegistrationService } from '@/services/apis/TournamentRegistrationService'
+import { TournamentParticipantService } from '@/services/apis/TournamentParticipantService'
 import type { TournamentRegistration } from '@/models/TournamentRegistration'
 import { useUserStore } from '@/store/profile/userStore'
 import RegistrationConfirmationModal from './RegistrationConfirmationModal.vue'
@@ -349,9 +350,11 @@ const loadTournamentData = async () => {
     const tournamentData = TournamentService.convertToTournament(tournamentResponse)
     
     tournament.value = tournamentData
-    participants.value = []
     
-    await loadRegistrationData(tournamentId)
+    await Promise.all([
+      loadRegistrationData(tournamentId),
+      loadParticipants(tournamentId)
+    ])
     
   } catch (error) {
     console.error('Error loading tournament data:', error)
@@ -373,6 +376,16 @@ const loadRegistrationData = async (tournamentId: string) => {
     console.error('Error loading registration data:', error)
   } finally {
     registrationLoading.value = false
+  }
+}
+
+const loadParticipants = async (tournamentId: string) => {
+  try {
+    const registrations = await TournamentRegistrationService.getTournamentRegistrations(tournamentId)
+    participants.value = TournamentParticipantService.convertRegistrationsToParticipants(registrations)
+  } catch (error) {
+    console.error('Error loading participants:', error)
+    participants.value = []
   }
 }
 
@@ -455,7 +468,10 @@ const handleRegistrationFormError = (message: string) => {
 
 const handleNotificationsUpdated = async () => {
   if (tournament.value) {
-    await loadTournamentData()
+    await Promise.all([
+      loadTournamentData(),
+      loadParticipants(tournament.value.id)
+    ])
   }
 }
 
