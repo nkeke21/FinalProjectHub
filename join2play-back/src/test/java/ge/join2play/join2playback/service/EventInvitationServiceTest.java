@@ -246,7 +246,7 @@ class EventInvitationServiceTest {
         assertNotNull(notification);
         assertEquals(invitation.getInvitationId().toString(), notification.getInvitationId());
         assertEquals(host.getName(), notification.getFromUserName());
-        assertEquals(event.getDescription(), notification.getEventDesctiption());
+        assertEquals(event.getDescription(), notification.getEventDescription());
         assertTrue(notification.getMessage().contains(host.getName()));
         assertTrue(notification.getMessage().contains(event.getDescription() != null ? event.getDescription() : "Sports Event"));
     }
