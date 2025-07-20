@@ -130,12 +130,6 @@
                   
                   <div class="registration-actions">
                     <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
-                      Debug: registrationLoading={{ registrationLoading }}, 
-                      isUserProfileLoading={{ isUserProfileLoading }}, 
-                      isTournamentHost={{ isTournamentHost }}, 
-                      canRegister={{ canRegister }}, 
-                      isRegistered={{ isRegistered }}, 
-                      isPending={{ isPending }}
                     </div>
                     
                     <div v-if="registrationLoading" class="registration-loading">
