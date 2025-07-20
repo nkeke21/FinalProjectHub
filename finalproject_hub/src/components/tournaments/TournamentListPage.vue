@@ -874,8 +874,8 @@ onMounted(async () => {
 
 .tournament-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 2rem;
   margin-bottom: 2rem;
 }
 
@@ -1047,6 +1047,30 @@ onMounted(async () => {
   text-align: center;
   padding: 4rem 2rem;
   color: #64748b;
+}
+
+@media (max-width: 768px) {
+  .tournament-list-page {
+    padding: 1rem;
+  }
+  
+  .tournament-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .page-header h1 {
+    font-size: 2rem;
+  }
+  
+  .filters-section {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .filter-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .empty-state h3 {
