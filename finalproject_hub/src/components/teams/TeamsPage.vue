@@ -43,7 +43,7 @@
             @join-team="requestToJoinTeam"
           />
         </div>
-        <div v-if="availableTeams.length === 0" class="empty-section">
+        <div v-if="availableTeams.length === 0 && myTeams.length > 0" class="empty-section">
           <p>No teams available to join at the moment.</p>
         </div>
       </div>
