@@ -3,7 +3,6 @@ package ge.join2play.join2playback.repository;
 import ge.join2play.join2playback.model.Tournament;
 import ge.join2play.join2playback.model.enums.SportType;
 import ge.join2play.join2playback.model.enums.TournamentFormat;
-import ge.join2play.join2playback.model.enums.TournamentStatus;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -32,7 +31,6 @@ public class TournamentInMemoryRepository implements TournamentRepository {
             SportType.FOOTBALL,
             TournamentFormat.SINGLE_ELIMINATION,
             "team",
-            TournamentStatus.REGISTRATION_OPEN,
             hostId,
             "John Doe",
             "Tbilisi, Georgia",
@@ -59,7 +57,6 @@ public class TournamentInMemoryRepository implements TournamentRepository {
             SportType.BASKETBALL,
             TournamentFormat.DOUBLE_ELIMINATION,
             "team",
-            TournamentStatus.REGISTRATION_OPEN,
             hostId,
             "John Doe",
             "Tbilisi Sports Complex",
