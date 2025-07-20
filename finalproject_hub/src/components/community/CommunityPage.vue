@@ -8,7 +8,7 @@
           </n-icon>
           <h1>Community</h1>
         </div>
-        <p class="header-subtitle">Connect with fellow sports enthusiasts</p>
+        <p class="header-subtitle">Your friends and connections</p>
       </div>
       
       <div class="stats-grid">
@@ -19,7 +19,7 @@
             </n-icon>
           </div>
           <div class="stat-content">
-            <div class="stat-number">{{ friends.length }}</div>
+            <div class="stat-number">{{ stats?.totalFriends || 0 }}</div>
             <div class="stat-label">Total Friends</div>
           </div>
         </div>
@@ -30,8 +30,9 @@
       <div class="search-container">
         <n-input
           v-model:value="searchQuery"
-          placeholder="Search community members..."
+          placeholder="Search your friends..."
           class="search-input"
+          @update:value="communityStore.setSearchQuery"
         >
           <template #prefix>
             <n-icon size="18" color="#64748b">
@@ -45,6 +46,7 @@
           :options="ageOptions"
           placeholder="Filter by age"
           class="filter-select"
+          @update:value="communityStore.setAgeFilter"
         />
       </div>
     </div>
@@ -61,14 +63,14 @@
       </n-icon>
       <h3>Error loading friends</h3>
       <p>{{ error }}</p>
-      <n-button type="primary" @click="loadFriends">
+      <n-button type="primary" @click="loadCommunityData">
         Try Again
       </n-button>
     </div>
 
     <div v-else class="members-grid">
       <div 
-        v-for="member in filteredMembers" 
+        v-for="member in paginatedMembers" 
         :key="member.id"
         class="member-card"
         @click="router.push(`/profile/${member.id}`)"
@@ -114,19 +116,19 @@
       </div>
     </div>
 
-    <div v-if="filteredMembers.length === 0" class="empty-state">
+    <div v-if="communityStore.filteredMembers.length === 0" class="empty-state">
       <n-icon size="64" color="#cbd5e1">
         <PeopleOutline />
       </n-icon>
       <h3>No members found</h3>
-      <p>{{ searchQuery ? `No members match "${searchQuery}"` : 'No community members available' }}</p>
+      <p>{{ searchQuery ? `No friends match "${searchQuery}"` : 'No friends available yet' }}</p>
     </div>
 
     <div class="pagination-wrapper">
       <n-pagination
         v-model:page="currentPage"
         v-model:page-size="pageSize"
-        :item-count="filteredMembers.length"
+        :item-count="communityStore.filteredMembers.length"
         show-size-picker
         :page-sizes="[6, 12, 24]"
         @update:page="handlePageChange"
@@ -158,34 +160,17 @@ import {
   CallOutline
 } from '@vicons/ionicons5'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/store/profile/userStore'
+import { useCommunityStore } from '@/store/community/communityStore'
 import { storeToRefs } from 'pinia'
 
 const router = useRouter()
-const userStore = useUserStore()
+const communityStore = useCommunityStore()
 const message = useMessage()
 
-const { friends, isLoading, error } = storeToRefs(userStore)
-
-const friendsWithDetails = ref([
-  { id: '1', fullName: 'Alice Johnson', email: 'alice@example.com', phone: '+995 123-456-789', age: 25 },
-  { id: '2', fullName: 'Bob Smith', email: 'bob@example.com', phone: '+995 234-567-890', age: 28 },
-  { id: '3', fullName: 'Charlie Brown', email: 'charlie@example.com', phone: '+995 345-678-901', age: 22 },
-  { id: '4', fullName: 'Diana Prince', email: 'diana@example.com', phone: '+995 456-789-012', age: 30 },
-  { id: '5', fullName: 'Eve Adams', email: 'eve@example.com', phone: '+995 567-890-123', age: 27 },
-  { id: '6', fullName: 'Frank Miller', email: 'frank@example.com', phone: '+995 678-901-234', age: 31 },
-  { id: '7', fullName: 'Grace Lee', email: 'grace@example.com', phone: '+995 789-012-345', age: 24 },
-  { id: '8', fullName: 'Henry Ford', email: 'henry@example.com', phone: '+995 890-123-456', age: 29 },
-  { id: '9', fullName: 'Iris Wilson', email: 'iris@example.com', phone: '+995 901-234-567', age: 26 },
-  { id: '10', fullName: 'Jack Davis', email: 'jack@example.com', phone: '+995 012-345-678', age: 33 },
-  { id: '11', fullName: 'Kate Martinez', email: 'kate@example.com', phone: '+995 123-456-789', age: 23 },
-  { id: '12', fullName: 'Liam Thompson', email: 'liam@example.com', phone: '+995 234-567-890', age: 35 }
-])
+const { members, stats, isLoading, error, searchQuery, ageFilter } = storeToRefs(communityStore)
 
 const currentPage = ref(1)
 const pageSize = ref(6)
-const searchQuery = ref('')
-const ageFilter = ref(null)
 
 const ageOptions = [
   { label: 'All Ages', value: null },
@@ -194,34 +179,10 @@ const ageOptions = [
   { label: '36+', value: '36+' }
 ]
 
-const filteredMembers = computed(() => {
-  // For now, we'll use mock data since we only have friend IDs from backend
-  // In a real app, you'd fetch user details for each friend ID
-  let filtered = friendsWithDetails.value
-
-  if (searchQuery.value) {
-    filtered = filtered.filter(member => 
-      member.fullName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      member.email.toLowerCase().includes(searchQuery.value.toLowerCase())
-    )
-  }
-
-  if (ageFilter.value) {
-    const [minAge, maxAge] = ageFilter.value.split('-').map(Number)
-    if (maxAge) {
-      filtered = filtered.filter(member => member.age >= minAge && member.age <= maxAge)
-    } else {
-      filtered = filtered.filter(member => member.age >= minAge)
-    }
-  }
-
-  return filtered
-})
-
 const paginatedMembers = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value
   const end = start + pageSize.value
-  return filteredMembers.value.slice(start, end)
+  return communityStore.filteredMembers.slice(start, end)
 })
 
 const handlePageChange = (page: number) => {
@@ -233,16 +194,19 @@ const handlePageSizeChange = (size: number) => {
   currentPage.value = 1
 }
 
-const loadFriends = async () => {
+const loadCommunityData = async () => {
   try {
-    await userStore.fetchCurrentUserFriends()
+    await Promise.all([
+      communityStore.fetchCommunityMembers(),
+      communityStore.fetchCommunityStats()
+    ])
   } catch (error) {
-    console.error('Failed to load friends:', error)
+    console.error('Failed to load community data:', error)
   }
 }
 
 onMounted(() => {
-  loadFriends()
+  loadCommunityData()
 })
 </script>
 
@@ -292,8 +256,10 @@ onMounted(() => {
 .stats-grid {
   display: flex;
   justify-content: center;
-  max-width: 400px;
+  gap: 1rem;
+  max-width: 800px;
   margin: 0 auto;
+  flex-wrap: wrap;
 }
 
 .stat-card {
@@ -496,7 +462,8 @@ onMounted(() => {
   }
   
   .stats-grid {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: center;
   }
   
   .search-container {
