@@ -153,4 +153,24 @@ public class TournamentRegistrationController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @GetMapping("/{registrationId}")
+    public ResponseEntity<TournamentRegistrationResponse> getRegistrationById(
+            @PathVariable UUID registrationId,
+            HttpSession session) {
+        try {
+            User currentUser = (User) session.getAttribute("user");
+            if (currentUser == null) {
+                return ResponseEntity.status(401).build();
+            }
+            
+            TournamentRegistrationResponse response = registrationService.getRegistrationById(registrationId);
+            if (response == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 } 

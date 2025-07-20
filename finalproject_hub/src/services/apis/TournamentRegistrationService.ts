@@ -300,4 +300,45 @@ export class TournamentRegistrationService {
       return []
     }
   }
+
+  static async getRegistrationById(registrationId: string): Promise<TournamentRegistration | null> {
+    try {
+      const response = await fetch(`${this.BASE_URL}/${registrationId}`, {
+        method: 'GET',
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null
+        }
+        throw new Error(`Failed to get registration: ${response.statusText}`)
+      }
+
+      const backendResponse: BackendRegistrationResponse = await response.json()
+      
+      return {
+        id: backendResponse.id,
+        tournamentId: backendResponse.tournamentId,
+        userId: backendResponse.userId,
+        status: backendResponse.status as RegistrationStatus,
+        registeredAt: new Date(backendResponse.registeredAt),
+        fullName: backendResponse.fullName,
+        age: backendResponse.age,
+        email: backendResponse.email,
+        phoneNumber: backendResponse.phoneNumber,
+        address: backendResponse.address,
+        emergencyContactName: backendResponse.emergencyContactName,
+        emergencyContactRelationship: backendResponse.emergencyContactRelationship,
+        emergencyContactPhone: backendResponse.emergencyContactPhone,
+        emergencyContactEmail: backendResponse.emergencyContactEmail,
+        previousExperience: backendResponse.previousExperience,
+        skillLevel: backendResponse.skillLevel,
+        previousAchievements: backendResponse.previousAchievements
+      }
+    } catch (error) {
+      console.error('Error getting registration:', error)
+      return null
+    }
+  }
 } 

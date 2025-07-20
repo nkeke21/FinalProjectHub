@@ -155,6 +155,14 @@ public class TournamentRegistrationService {
                 .collect(Collectors.toList());
     }
 
+    public TournamentRegistrationResponse getRegistrationById(UUID registrationId) {
+        TournamentRegistration registration = registrationRepository.getById(registrationId);
+        if (registration == null) {
+            return null;
+        }
+        return convertToResponse(registration);
+    }
+
     public boolean canRegisterForTournament(UUID tournamentId, UUID userId) {
         Tournament tournament = tournamentRepository.getById(tournamentId);
         if (tournament == null) {
