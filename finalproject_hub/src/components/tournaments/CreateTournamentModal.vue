@@ -225,7 +225,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { 
   NModal, 
   NForm, 
@@ -317,6 +317,14 @@ const rules = {
         if (!value) {
           return new Error('Start date is required')
         }
+        
+        const startDate = new Date(value)
+        const now = new Date()
+        
+        if (startDate <= now) {
+          return new Error('Start date must be in the future')
+        }
+        
         return true
       }
     }
@@ -330,6 +338,14 @@ const rules = {
         if (!value) {
           return new Error('End date is required')
         }
+        
+        const endDate = new Date(value)
+        const startDate = formData.startDate ? new Date(formData.startDate) : null
+        
+        if (startDate && endDate <= startDate) {
+          return new Error('End date must be after start date')
+        }
+        
         return true
       }
     }
@@ -343,6 +359,19 @@ const rules = {
         if (!value) {
           return new Error('Registration deadline is required')
         }
+        
+        const registrationDeadline = new Date(value)
+        const startDate = formData.startDate ? new Date(formData.startDate) : null
+        const now = new Date()
+        
+        if (registrationDeadline <= now) {
+          return new Error('Registration deadline must be in the future')
+        }
+        
+        if (startDate && registrationDeadline >= startDate) {
+          return new Error('Registration deadline must be before tournament start date')
+        }
+        
         return true
       }
     }
@@ -401,6 +430,24 @@ const removeRule = (index: number) => {
     formData.rules.splice(index, 1)
   }
 }
+
+watch(() => formData.startDate, () => {
+  if (formRef.value) {
+    setTimeout(() => {
+      formRef.value?.validate(['endDate', 'registrationDeadline'])
+    }, 100)
+  }
+})
+
+watch(() => formData.endDate, () => {
+  if (formRef.value) {
+    setTimeout(() => {
+      formRef.value?.validate(['registrationDeadline'])
+    }, 100)
+  }
+})
+
+
 
 const updateShow = (value: boolean) => {
   emit('update:show', value)
