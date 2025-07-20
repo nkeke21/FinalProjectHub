@@ -7,17 +7,21 @@ import ge.join2play.join2playback.model.exceptions.EventDoesNotExistException;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class EventInMemoryRepository implements EventRepository {
-    private final Map<UUID, Event> events = new HashMap<>();
+    private final Map<UUID, Event> events = new ConcurrentHashMap<>();
 
     public EventInMemoryRepository() {
         UUID mockEventId = UUID.fromString("e5d1d580-a4cf-4677-8220-a50c5decccfa");
         UUID mockHostId = UUID.fromString("13fa5e4e-1d9e-4a2a-9a20-7385f24e9097"); // Kakha Salukvadze
         Instant mockEventTime = Instant.parse("2025-04-16T10:15:30.00Z");
-        
+
         Event mockEvent = new Event(
                 mockEventId,
                 mockHostId,
@@ -32,9 +36,10 @@ public class EventInMemoryRepository implements EventRepository {
                 3,
                 SportType.FOOTBALL
         );
-        
+
         events.put(mockEventId, mockEvent);
     }
+
     @Override
     public Event getById(UUID id) {
         return events.getOrDefault(id, null);

@@ -1,16 +1,20 @@
 package ge.join2play.join2playback.repository;
 
-import ge.join2play.join2playback.model.enums.FriendRequestStatus;
 import ge.join2play.join2playback.model.FriendRequest;
+import ge.join2play.join2playback.model.enums.FriendRequestStatus;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
 public class FriendRequestInMemoryRepository implements FriendRequestRepository {
-    private final Map<UUID, FriendRequest> requests = new HashMap<>();
+    private final Map<UUID, FriendRequest> requests = new ConcurrentHashMap<>();
 
     public FriendRequest saveRequest(UUID fromUserId, UUID toUserId) {
         FriendRequest request = new FriendRequest(
@@ -60,17 +64,17 @@ public class FriendRequestInMemoryRepository implements FriendRequestRepository 
     @Override
     public void deleteFriend(UUID userId, UUID friendId) {
         requests.values().removeIf(req ->
-            (req.getFromUserId().equals(userId) && req.getToUserId().equals(friendId) && req.getStatus() == FriendRequestStatus.ACCEPTED)
-            || (req.getFromUserId().equals(friendId) && req.getToUserId().equals(userId) && req.getStatus() == FriendRequestStatus.ACCEPTED)
+                (req.getFromUserId().equals(userId) && req.getToUserId().equals(friendId) && req.getStatus() == FriendRequestStatus.ACCEPTED)
+                        || (req.getFromUserId().equals(friendId) && req.getToUserId().equals(userId) && req.getStatus() == FriendRequestStatus.ACCEPTED)
         );
     }
 
     @Override
     public Optional<FriendRequest> findRequestBetweenUsers(UUID user1Id, UUID user2Id) {
         return requests.values().stream()
-                .filter(req -> 
-                    (req.getFromUserId().equals(user1Id) && req.getToUserId().equals(user2Id)) ||
-                    (req.getFromUserId().equals(user2Id) && req.getToUserId().equals(user1Id))
+                .filter(req ->
+                        (req.getFromUserId().equals(user1Id) && req.getToUserId().equals(user2Id)) ||
+                                (req.getFromUserId().equals(user2Id) && req.getToUserId().equals(user1Id))
                 )
                 .findFirst();
     }

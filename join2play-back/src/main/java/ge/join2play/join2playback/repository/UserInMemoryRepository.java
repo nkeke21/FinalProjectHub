@@ -8,11 +8,12 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
 public class UserInMemoryRepository implements UserRepository {
-    private final Map<UUID, User> users = new HashMap<>();
+    private final Map<UUID, User> users = new ConcurrentHashMap<>();
 
     public UserInMemoryRepository() {
         User user1 = new User(
@@ -131,8 +132,8 @@ public class UserInMemoryRepository implements UserRepository {
     @Override
     public User findByEmailOrName(String emailOrName) {
         return users.values().stream()
-                .filter(user -> user.getEmail().equalsIgnoreCase(emailOrName) || 
-                               user.getName().equalsIgnoreCase(emailOrName))
+                .filter(user -> user.getEmail().equalsIgnoreCase(emailOrName) ||
+                        user.getName().equalsIgnoreCase(emailOrName))
                 .findFirst()
                 .orElse(null);
     }
