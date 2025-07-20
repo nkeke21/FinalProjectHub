@@ -42,8 +42,8 @@ public class EventInvitationNotification {
     public String getFromUserName() { return fromUserName; }
     public void setFromUserName(String fromUserName) { this.fromUserName = fromUserName; }
 
-    public String getEventDesctiption() { return eventDesctiption; }
-    public void setEventDesctiption(String eventDesctiption) { this.eventDesctiption = eventDesctiption; }
+    public String getEventDescription() { return eventDescription; }
+    public void setEventDescription(String eventDescription) { this.eventDescription = eventDescription; }
 
     public String getEventDate() { return eventDate; }
     public void setEventDate(String eventDate) { this.eventDate = eventDate; }
