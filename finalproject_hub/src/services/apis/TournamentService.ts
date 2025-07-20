@@ -1,4 +1,4 @@
-import { Tournament, TournamentFormat, TournamentStatus } from '../../models/Tournament'
+import { Tournament, TournamentFormat } from '../../models/Tournament'
 
 export interface TournamentRequest {
   name: string
@@ -27,7 +27,6 @@ export interface TournamentResponse {
   sportType: string
   format: string
   tournamentType: string
-  status: string
   hostId: string
   hostName: string
   location: string
@@ -157,24 +156,6 @@ export class TournamentService {
     }
   }
 
-  static async updateTournamentStatus(id: string, status: string): Promise<TournamentResponse> {
-    try {
-      const response = await fetch(`${this.BASE_URL}/${id}/status?status=${status}`, {
-        method: 'PATCH',
-        credentials: 'include', // Include session cookies
-      })
-
-      if (!response.ok) {
-        throw new Error(`Failed to update tournament status: ${response.statusText}`)
-      }
-
-      return await response.json()
-    } catch (error) {
-      console.error('Error updating tournament status:', error)
-      throw error
-    }
-  }
-
   static convertToTournament(response: TournamentResponse): Tournament {
     return {
       id: response.id,
@@ -183,7 +164,6 @@ export class TournamentService {
       sportType: response.sportType as any,
       format: TournamentService.mapBackendFormatToFrontend(response.format) as TournamentFormat,
       tournamentType: response.tournamentType as 'individual' | 'team',
-      status: TournamentService.mapBackendStatusToFrontend(response.status) as TournamentStatus,
       hostId: response.hostId,
       hostName: response.hostName,
       location: response.location,
@@ -214,17 +194,5 @@ export class TournamentService {
       'SWISS_SYSTEM': 'Swiss System'
     }
     return formatMap[backendFormat] || backendFormat
-  }
-
-  static mapBackendStatusToFrontend(backendStatus: string): string {
-    const statusMap: { [key: string]: string } = {
-      'DRAFT': 'Draft',
-      'REGISTRATION_OPEN': 'Registration Open',
-      'REGISTRATION_CLOSED': 'Registration Closed',
-      'IN_PROGRESS': 'In Progress',
-      'COMPLETED': 'Completed',
-      'CANCELLED': 'Cancelled'
-    }
-    return statusMap[backendStatus] || backendStatus
   }
 } 

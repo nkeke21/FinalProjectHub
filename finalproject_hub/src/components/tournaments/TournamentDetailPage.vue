@@ -26,10 +26,6 @@
             </n-icon>
             <span class="sport-type">{{ tournament.sportType }}</span>
           </div>
-          
-          <div class="status-badge" :class="tournament.status.toLowerCase().replace(' ', '-')">
-            {{ tournament.status }}
-          </div>
         </div>
 
         <h1 class="tournament-title">{{ tournament.name }}</h1>

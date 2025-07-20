@@ -215,9 +215,6 @@
             </n-icon>
             <span class="sport-type">{{ tournament.sportType }}</span>
           </div>
-          <div class="tournament-status" :class="tournament.status.toLowerCase()">
-            {{ tournament.status }}
-          </div>
         </div>
         
         <div class="registration-status-badge" v-if="!registrationLoading">
@@ -474,10 +471,6 @@ const filteredTournaments = computed(() => {
     }
 
     if (filters.value.sportType && tournament.sportType !== filters.value.sportType) {
-      return false
-    }
-
-    if (filters.value.status && tournament.status !== filters.value.status) {
       return false
     }
 
