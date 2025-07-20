@@ -5,7 +5,6 @@ export interface Tournament {
   sportType: SportType
   format: TournamentFormat
   tournamentType: TournamentType
-  status: TournamentStatus
   hostId: string
   hostName: string
   location: string
@@ -111,15 +110,6 @@ export enum TournamentFormat {
   SWISS_SYSTEM = 'Swiss System'
 }
 
-export enum TournamentStatus {
-  DRAFT = 'Draft',
-  REGISTRATION_OPEN = 'Registration Open',
-  REGISTRATION_CLOSED = 'Registration Closed',
-  IN_PROGRESS = 'In Progress',
-  COMPLETED = 'Completed',
-  CANCELLED = 'Cancelled'
-}
-
 export enum TeamRole {
   CAPTAIN = 'CAPTAIN',
   MEMBER = 'MEMBER',
@@ -145,7 +135,6 @@ export type TournamentType = 'individual' | 'team'
 export interface TournamentFilters {
   sportType?: SportType
   format?: TournamentFormat
-  status?: TournamentStatus
   location?: string
   dateRange?: {
     start: string

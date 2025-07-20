@@ -2,7 +2,6 @@ package ge.join2play.join2playback.model.dto;
 
 import ge.join2play.join2playback.model.enums.SportType;
 import ge.join2play.join2playback.model.enums.TournamentFormat;
-import ge.join2play.join2playback.model.enums.TournamentStatus;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,7 +13,6 @@ public class TournamentResponse {
     private SportType sportType;
     private TournamentFormat format;
     private String tournamentType;
-    private TournamentStatus status;
     private UUID hostId;
     private String hostName;
     private String location;
@@ -37,18 +35,17 @@ public class TournamentResponse {
     }
 
     public TournamentResponse(UUID id, String name, String description, SportType sportType,
-                            TournamentFormat format, String tournamentType, TournamentStatus status,
-                            UUID hostId, String hostName, String location, double latitude, double longitude,
-                            long startDate, long endDate, long registrationDeadline,
-                            int maxParticipants, int currentParticipants, double entryFee, double prizePool,
-                            int minAge, int maxAge, List<String> rules, long createdAt, long updatedAt) {
+                             TournamentFormat format, String tournamentType,
+                             UUID hostId, String hostName, String location, double latitude, double longitude,
+                             long startDate, long endDate, long registrationDeadline,
+                             int maxParticipants, int currentParticipants, double entryFee, double prizePool,
+                             int minAge, int maxAge, List<String> rules, long createdAt, long updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.sportType = sportType;
         this.format = format;
         this.tournamentType = tournamentType;
-        this.status = status;
         this.hostId = hostId;
         this.hostName = hostName;
         this.location = location;
@@ -115,14 +112,6 @@ public class TournamentResponse {
 
     public void setTournamentType(String tournamentType) {
         this.tournamentType = tournamentType;
-    }
-
-    public TournamentStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(TournamentStatus status) {
-        this.status = status;
     }
 
     public UUID getHostId() {

@@ -4,9 +4,9 @@ import ge.join2play.join2playback.model.Tournament;
 import ge.join2play.join2playback.model.User;
 import ge.join2play.join2playback.model.dto.TournamentRequest;
 import ge.join2play.join2playback.model.dto.TournamentResponse;
-import ge.join2play.join2playback.model.enums.TournamentStatus;
 import ge.join2play.join2playback.repository.TournamentRepository;
 import ge.join2play.join2playback.repository.UserRepository;
+import ge.join2play.join2playback.service.UserPermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +49,6 @@ public class TournamentService {
         tournament.setSportType(request.getSportType());
         tournament.setFormat(request.getFormat());
         tournament.setTournamentType(request.getTournamentType());
-        tournament.setStatus(TournamentStatus.DRAFT);
         tournament.setHostId(hostId);
         tournament.setHostName(host.getName());
         tournament.setLocation(request.getLocation());
@@ -141,24 +140,6 @@ public class TournamentService {
         tournamentRepository.delete(id);
     }
 
-    public TournamentResponse updateTournamentStatus(UUID id, TournamentStatus status, UUID hostId) {
-        Tournament tournament = tournamentRepository.getById(id);
-        if (tournament == null) {
-            throw new RuntimeException("Tournament not found");
-        }
-
-        // Check if user is the host
-        if (!tournament.getHostId().equals(hostId)) {
-            throw new RuntimeException("Only tournament host can update tournament status");
-        }
-
-        tournament.setStatus(status);
-        tournament.setUpdatedAt(Instant.now());
-
-        Tournament updatedTournament = tournamentRepository.update(tournament);
-        return convertToResponse(updatedTournament);
-    }
-
     private TournamentResponse convertToResponse(Tournament tournament) {
         return new TournamentResponse(
                 tournament.getId(),
@@ -167,7 +148,6 @@ public class TournamentService {
                 tournament.getSportType(),
                 tournament.getFormat(),
                 tournament.getTournamentType(),
-                tournament.getStatus(),
                 tournament.getHostId(),
                 tournament.getHostName(),
                 tournament.getLocation(),
