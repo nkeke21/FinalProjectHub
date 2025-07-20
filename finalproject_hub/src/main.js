@@ -6,8 +6,11 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createVfm } from 'vue-final-modal'
 import router from './router'
+import { validateEnvironment } from './utils/config'
 
 import App from './App.vue'
+
+validateEnvironment()
 const app = createApp(App)
 const vfm = createVfm()
 const pinia = createPinia();

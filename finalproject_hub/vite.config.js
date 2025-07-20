@@ -23,7 +23,8 @@ export default defineConfig({
     },
   },
   define: {
-    global: 'globalThis'
+    global: 'globalThis',
+    __VUE_PROD_DEVTOOLS__: false
   },
   server: {
     proxy: {

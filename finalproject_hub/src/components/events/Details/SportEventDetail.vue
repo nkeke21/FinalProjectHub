@@ -210,6 +210,7 @@ import { useSportEventStore } from '../../../store/events/useSportEventStore'
 import { useRoute } from 'vue-router'
 import CustomModal from '../Dialog/CustomModal.vue'
 import AddSportEventModalContent from '../Dialog/AddSportEventModalContent.vue'
+import { config } from '../../../utils/config'
 
 const route = useRoute();
 const store = useSportEventStore()
@@ -275,7 +276,7 @@ const loadGoogleMapsScript = () => {
     }
 
     const script = document.createElement('script')
-    script.src = 'https://maps.googleapis.com/maps/api/js?key=&libraries=places'
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${config.googleMapsApiKey}&libraries=places`
     script.async = true
     script.onload = () => resolve((window as any).google)
     script.onerror = reject

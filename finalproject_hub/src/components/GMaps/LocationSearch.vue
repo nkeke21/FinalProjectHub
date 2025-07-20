@@ -4,30 +4,53 @@
   </div>
 </template>
   
-<script>
-export default {
-  props: {
-    modelValue: String
-  },
-  emits: ['update:modelValue', 'location-selected'],
-  mounted() {
-    customElements.whenDefined('gmpx-place-picker').then(() => {
-      const picker = document.getElementById('place-picker')
-      picker.addEventListener('gmpx-placechange', () => {
-        const place = picker.value
-        if (place && place.formattedAddress) {
-          this.$emit('update:modelValue', place.formattedAddress)
-          if (place.location) {
-            this.$emit('location-selected', {
-              lat: place.location.lat(),
-              lng: place.location.lng(),
-              name: place.formattedAddress
-            })
-          }
-        }
-      })
-    })
+<script setup>
+import { onMounted } from 'vue'
+import { config } from '../../utils/config'
+
+const props = defineProps({
+  modelValue: String
+})
+
+const emit = defineEmits(['update:modelValue', 'location-selected'])
+
+onMounted(async () => {
+  // Initialize Google Maps API if not already loaded
+  if (!window.google) {
+    await loadGoogleMapsScript()
   }
+  
+  customElements.whenDefined('gmpx-place-picker').then(() => {
+    const picker = document.getElementById('place-picker')
+    picker.addEventListener('gmpx-placechange', () => {
+      const place = picker.value
+      if (place && place.formattedAddress) {
+        emit('update:modelValue', place.formattedAddress)
+        if (place.location) {
+          emit('location-selected', {
+            lat: place.location.lat(),
+            lng: place.location.lng(),
+            name: place.formattedAddress
+          })
+        }
+      }
+    })
+  })
+})
+
+const loadGoogleMapsScript = () => {
+  return new Promise((resolve, reject) => {
+    if (window.google) {
+      return resolve(window.google)
+    }
+
+    const script = document.createElement('script')
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${config.googleMapsApiKey}&libraries=places`
+    script.async = true
+    script.onload = () => resolve(window.google)
+    script.onerror = reject
+    document.head.appendChild(script)
+  })
 }
 </script>
   
