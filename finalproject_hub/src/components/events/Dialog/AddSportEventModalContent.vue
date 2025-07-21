@@ -13,7 +13,7 @@
 
 
     <n-form-item label="Number of Participants">
-        <n-input-number v-model:value="formValue.participants" :min="1" />
+        <n-input-number v-model:value="formValue.participants" :min="1" :disabled="isEditMode" />
     </n-form-item>
 
     <n-form-item label="Age Range">
@@ -24,6 +24,7 @@
                 :min="1" 
                 :max="100"
                 class="age-input"
+                :disabled="isEditMode"
             />
             <span class="age-separator">to</span>
             <n-input-number 
@@ -32,6 +33,7 @@
                 :min="1" 
                 :max="100"
                 class="age-input"
+                :disabled="isEditMode"
             />
         </div>
     </n-form-item>
@@ -45,6 +47,7 @@
             v-model:value="formValue.sportType"
             :options="sportOptions"
             placeholder="Select sport"
+            :disabled="isEditMode"
         />
     </n-form-item>
     <n-form-item label="Description">
@@ -64,7 +67,7 @@
 </template>
   
 <script setup lang="ts">
-import { reactive, ref, watchEffect } from 'vue'
+import { reactive, ref, watchEffect, computed } from 'vue'
 import {
   NForm, NFormItem, NInput, NInputNumber, NDatePicker, NSelect, NButton
 } from 'naive-ui'
@@ -78,6 +81,8 @@ const props = defineProps({
   },
   submitButtonText: { type: String, default: 'Add Event' }
 })
+
+const isEditMode = computed(() => !!props.initialData)
 
 const locationError = ref('')
 
