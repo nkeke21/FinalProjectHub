@@ -92,6 +92,9 @@ export const useSportEventStore = defineStore('sportEvent', {
         if (!response.ok) {
           const errorData = await response.json()
           console.error('Error joining event:', errorData)
+          if (errorData.code === 'USER_AGE_NOT_IN_RANGE') {
+            throw new Error('You do not meet the age requirement for this event.')
+          }
           throw new Error(errorData.message || 'Failed to join event')
         }
         
