@@ -60,6 +60,13 @@ public class EventInvitationService {
             throw new UserDoesNotExistException("Recipient with id " + toUserId + " does not exist");
         }
 
+        int recipientAge = calculateAge(recipient.get().getBirthDate());
+        if (recipientAge < event.getMinAge() || recipientAge > event.getMaxAge()) {
+            throw new UserAgeNotInRangeException(
+                String.format("User age %d is outside the event's age range (%d-%d).", recipientAge, event.getMinAge(), event.getMaxAge())
+            );
+        }
+
         if (!event.getHostId().equals(fromUserId)) {
             throw new UnauthorizedException("Only event creator can send invitations");
         }
@@ -185,5 +192,17 @@ public class EventInvitationService {
         if (user.isEmpty()) {
             throw new UserDoesNotExistException("User with id " + userId + " does not exist");
         }
+    }
+
+    private int calculateAge(Long birthDateMillis) {
+        if (birthDateMillis == null) {
+            return 0;
+        }
+        java.time.LocalDate birthDate = java.time.Instant.ofEpochMilli(birthDateMillis)
+                .atZone(java.time.ZoneId.systemDefault())
+                .toLocalDate();
+        java.time.LocalDate currentDate = java.time.LocalDate.now();
+        return currentDate.getYear() - birthDate.getYear() -
+                (currentDate.getDayOfYear() < birthDate.getDayOfYear() ? 1 : 0);
     }
 }
