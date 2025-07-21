@@ -20,6 +20,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static ge.join2play.join2playback.model.enums.SportType.getSportTypeOptions;
+import ge.join2play.join2playback.model.exceptions.UserAgeNotInRangeException;
 
 @Service
 public class ApplicationService {
@@ -145,7 +146,7 @@ public class ApplicationService {
         
         int userAge = calculateAge(user.get().getBirthDate());
         if (userAge < event.getMinAge() || userAge > event.getMaxAge()) {
-            throw new RuntimeException(
+            throw new UserAgeNotInRangeException(
                 String.format("User age %d is outside the event's age range (%d-%d).", 
                     userAge, event.getMinAge(), event.getMaxAge()));
         }
