@@ -19,12 +19,20 @@
         <h2>My Teams</h2>
         <div class="teams-grid">
           <TeamCard
-            v-for="(team, index) in myTeams"
+            v-for="(team, index) in paginatedMyTeams"
             :key="team?.id || index"
             :team="team"
             :show-role="true"
             :current-user-id="currentUserId"
             @manage-team="openTeamManagement"
+          />
+        </div>
+        <div v-if="myTeams.length > 0" class="pagination-wrapper">
+          <n-pagination
+            v-model:page="myTeamsPage"
+            :page-count="Math.ceil(myTeams.length / PAGE_SIZE)"
+            :page-size="PAGE_SIZE"
+            style="margin-top: 1rem;"
           />
         </div>
         <div v-if="myTeams.length === 0" class="empty-section">
@@ -36,11 +44,19 @@
         <h2>Available Teams to Join</h2>
         <div class="teams-grid">
           <TeamCard
-            v-for="(team, index) in availableTeams"
+            v-for="(team, index) in paginatedAvailableTeams"
             :key="team?.id || index"
             :team="team"
             :show-role="false"
             @join-team="requestToJoinTeam"
+          />
+        </div>
+        <div v-if="availableTeams.length > 0" class="pagination-wrapper">
+          <n-pagination
+            v-model:page="availableTeamsPage"
+            :page-count="Math.ceil(availableTeams.length / PAGE_SIZE)"
+            :page-size="PAGE_SIZE"
+            style="margin-top: 1rem;"
           />
         </div>
         <div v-if="availableTeams.length === 0 && myTeams.length > 0" class="empty-section">
@@ -78,7 +94,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { NButton, NIcon, useMessage } from 'naive-ui'
+import { NButton, NIcon, useMessage, NPagination } from 'naive-ui'
 import { AddOutline, PeopleOutline } from '@vicons/ionicons5'
 import { UserTeamService } from '@/services/apis/UserTeamService'
 import { TeamJoinRequestService } from '@/services/apis/TeamJoinRequestService'
@@ -95,6 +111,19 @@ const showTeamManagementModal = ref(false)
 const selectedTeam = ref<Team | null>(null)
 const loading = ref(false)
 const currentUserId = ref<string>('') 
+
+const PAGE_SIZE = 6
+const myTeamsPage = ref(1)
+const availableTeamsPage = ref(1)
+
+const paginatedMyTeams = computed(() => {
+  const start = (myTeamsPage.value - 1) * PAGE_SIZE
+  return myTeams.value.slice(start, start + PAGE_SIZE)
+})
+const paginatedAvailableTeams = computed(() => {
+  const start = (availableTeamsPage.value - 1) * PAGE_SIZE
+  return availableTeams.value.slice(start, start + PAGE_SIZE)
+})
 
 const isCaptain = computed(() => {
   if (!selectedTeam.value || !selectedTeam.value.members || !currentUserId.value) return false
@@ -243,6 +272,12 @@ onMounted(() => {
   padding: 2rem;
   color: #64748b;
   font-style: italic;
+}
+
+.pagination-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
 }
 
 @media (max-width: 768px) {

@@ -20,6 +20,82 @@
       </div>
     </div>
 
+    <div v-if="myHostedTournaments.length > 0" class="tournaments-section">
+      <h2>My Hosted Tournaments</h2>
+      <div class="tournament-grid">
+        <div class="tournament-card" v-for="tournament in myHostedTournaments" :key="tournament.id">
+          <div class="tournament-header">
+            <div class="tournament-badge">
+              <n-icon size="20" color="#f97316">
+                <FootballOutline v-if="tournament.sportType === 'Football'" />
+                <BasketballOutline v-else-if="tournament.sportType === 'Basketball'" />
+                <TennisballOutline v-else-if="tournament.sportType === 'Tennis'" />
+                <FitnessOutline v-else />
+              </n-icon>
+              <span class="sport-type">{{ tournament.sportType }}</span>
+            </div>
+          </div>
+          <h3 class="tournament-title">{{ tournament.name }}</h3>
+          <div class="tournament-meta">
+            <div class="meta-item">
+              <n-icon size="16" color="#64748b">
+                <PersonOutline />
+              </n-icon>
+              <span>{{ tournament.hostName }}</span>
+            </div>
+            <div class="meta-item">
+              <n-icon size="16" color="#64748b">
+                <LocationOutline />
+              </n-icon>
+              <span>{{ tournament.location }}</span>
+            </div>
+            <div class="meta-item">
+              <n-icon size="16" color="#64748b">
+                <CalendarOutline />
+              </n-icon>
+              <span>{{ formatDateRange(tournament.startDate, tournament.endDate) }}</span>
+            </div>
+            <div class="meta-item">
+              <n-icon size="16" color="#64748b">
+                <PeopleOutline />
+              </n-icon>
+              <span>{{ tournament.ageRange.min }}-{{ tournament.ageRange.max }} years</span>
+            </div>
+            <div class="meta-item">
+              <n-icon size="16" color="#64748b">
+                <WalletOutline />
+              </n-icon>
+              <span>{{ tournament.entryFee === 0 ? 'Free entry' : `${tournament.entryFee}₾ entry fee` }}</span>
+            </div>
+          </div>
+          <div class="tournament-participants">
+            <span class="participant-count">{{ tournament.currentParticipants }}/{{ tournament.maxParticipants }} participants</span>
+            <div class="progress-bar">
+              <div class="progress-fill" :style="{ width: (tournament.currentParticipants / tournament.maxParticipants * 100) + '%' }"></div>
+            </div>
+          </div>
+          <div class="tournament-actions">
+            <n-button 
+              type="info" 
+              color="#3b82f6" 
+              class="host-badge"
+              disabled
+            >
+              You're the Host
+            </n-button>
+            <n-button 
+              type="primary" 
+              color="orange" 
+              class="view-details-btn"
+              @click="router.push(`/tournaments/${tournament.id}`)"
+            >
+              View Details
+            </n-button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="filters-section">
       <div class="search-bar">
         <n-input
@@ -195,7 +271,7 @@
     </div>
     
     <div v-else class="tournament-grid">
-      <div class="tournament-card" v-for="tournament in sortedTournaments" :key="tournament.id">
+      <div class="tournament-card" v-for="tournament in otherTournaments" :key="tournament.id">
         <div class="tournament-header">
           <div class="tournament-badge">
             <n-icon size="20" color="#f97316">
@@ -497,6 +573,9 @@ const sortedTournaments = computed(() => {
       return sorted.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
   }
 })
+
+const myHostedTournaments = computed(() => sortedTournaments.value.filter(t => isTournamentHost(t)))
+const otherTournaments = computed(() => sortedTournaments.value.filter(t => !isTournamentHost(t)))
 
 const hasActiveFilters = computed(() => {
   return searchQuery.value || 
