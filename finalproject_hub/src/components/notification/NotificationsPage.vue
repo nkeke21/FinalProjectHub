@@ -49,17 +49,6 @@
           </div>
         </div>
         
-        <div class="stat-card">
-          <div class="stat-icon">
-            <n-icon size="24" color="#64748b">
-              <PeopleOutline />
-            </n-icon>
-          </div>
-          <div class="stat-content">
-            <div class="stat-number">{{ teamJoinRequestCount }}</div>
-            <div class="stat-label">Team Requests</div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -94,16 +83,6 @@
             <CalendarOutline />
           </n-icon>
           Event Invitations ({{ eventInvitationCount }})
-        </button>
-        <button 
-          class="filter-tab" 
-          :class="{ active: activeFilter === 'team-join-requests' }"
-          @click="activeFilter = 'team-join-requests'"
-        >
-          <n-icon size="16" color="currentColor">
-            <PeopleOutline />
-          </n-icon>
-          Team Requests ({{ teamJoinRequestCount }})
         </button>
       </div>
       
@@ -269,65 +248,6 @@
           </div>
         </div>
 
-        <div v-else-if="notification.type === 'team-join-request'" class="notification-content" :class="getNotificationStatusClass(notification.status)">
-          <div class="notification-avatar">
-            <div class="avatar-circle team-join-request">
-              <n-icon size="24" color="white">
-                <PeopleOutline />
-              </n-icon>
-            </div>
-          </div>
-          <div class="notification-details">
-            <div class="notification-header">
-              <h3 class="notification-title">
-                <strong>{{ notification.senderName }}</strong> 
-                <span v-if="notification.status === 'PENDING'">wants to join your team</span>
-                <span v-else-if="notification.status === 'APPROVED'">team join request approved</span>
-                <span v-else-if="notification.status === 'REJECTED'">team join request declined</span>
-              </h3>
-              <span class="notification-time">{{ formatTime(notification.timestamp) }}</span>
-            </div>
-            <p class="notification-message">
-              {{ notification.message }}
-            </p>
-            <div v-if="notification.status === 'PENDING'" class="notification-actions">
-              <n-button 
-                type="primary" 
-                color="#22c55e" 
-                size="small"
-                @click="approveTeamJoinRequest(notification.id)"
-              >
-                <template #icon>
-                  <n-icon size="16">
-                    <CheckmarkOutline />
-                  </n-icon>
-                </template>
-                Approve
-              </n-button>
-              <n-button 
-                type="error" 
-                size="small"
-                @click="declineTeamJoinRequest(notification.id)"
-              >
-                <template #icon>
-                  <n-icon size="16">
-                    <CloseOutline />
-                  </n-icon>
-                </template>
-                Decline
-              </n-button>
-            </div>
-            <div v-else class="notification-status">
-              <n-icon size="16" :color="getStatusIconColor(notification.status)">
-                <CheckmarkOutline v-if="notification.status === 'APPROVED'" />
-                <CloseOutline v-else-if="notification.status === 'REJECTED'" />
-              </n-icon>
-              <span :class="getStatusTextClass(notification.status)">
-                {{ notification.status === 'APPROVED' ? 'Approved' : 'Declined' }}
-              </span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -359,7 +279,6 @@ import {
   InformationCircleOutline,
   LocationOutline,
   FootballOutline,
-  PeopleOutline,
   RefreshOutline
 } from '@vicons/ionicons5'
 
@@ -372,13 +291,10 @@ const {
   unreadCount,
   friendRequestCount,
   eventInvitationCount,
-  teamJoinRequestCount,
   acceptFriendRequest,
   declineFriendRequest,
   acceptEventInvitation,
   declineEventInvitation,
-  approveTeamJoinRequest,
-  declineTeamJoinRequest,
   refreshNotifications
 } = useNotifications()
 
@@ -422,8 +338,6 @@ const getEmptyStateMessage = () => {
       return 'No friend requests at the moment. Check back later!'
     case 'event-invitations':
       return 'No event invitations yet. Start connecting with others to get invited!'
-    case 'team-join-requests':
-      return 'No team join requests at the moment. Check back later!'
     default:
       return 'You\'re all caught up! No new notifications.'
   }
@@ -693,10 +607,6 @@ onMounted(() => {
   color: #64748b;
 }
 
-.avatar-circle.team-join-request {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  color: white;
-}
 
 .notification-details {
   flex: 1;
