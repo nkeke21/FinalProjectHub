@@ -17,99 +17,45 @@
         </div>
       </div>
 
-      <n-tabs type="line" animated>
-        <n-tab-pane name="members" tab="Members">
-          <div class="members-section">
-            <div class="members-header">
-              <h4>Team Members</h4>
-            </div>
-            
-            <div class="members-list">
-              <div v-for="member in team.members" :key="member.userId" class="member-item">
-                <div class="member-info">
-                  <div class="member-name">{{ member.name }}</div>
-                  <div class="member-email">{{ member.email }}</div>
-                  <div class="member-role" :class="member.role.toLowerCase()">
-                    {{ member.role }}
-                  </div>
-                </div>
-                <div class="member-actions">
-                  <n-button
-                    v-if="isCaptain && member.role !== 'CAPTAIN' && team.members.length > 1"
-                    size="small"
-                    type="error"
-                    @click="confirmRemoveMember(member)"
-                  >
-                    Remove
-                  </n-button>
-                  <span v-else-if="isCaptain && team.members.length <= 1" class="disabled-text">
-                    Cannot remove last member
-                  </span>
-                </div>
+      <div class="members-section">
+        <div class="members-header">
+          <h4>Team Members</h4>
+        </div>
+        
+        <div class="members-list">
+          <div v-for="member in team.members" :key="member.userId" class="member-item">
+            <div class="member-info">
+              <div class="member-name">{{ member.name }}</div>
+              <div class="member-email">{{ member.email }}</div>
+              <div class="member-role" :class="member.role.toLowerCase()">
+                {{ member.role }}
               </div>
             </div>
-          </div>
-        </n-tab-pane>
-        
-        <n-tab-pane v-if="isCaptain" name="requests" tab="Join Requests">
-          <div class="requests-section">
-            <div class="requests-header">
-              <h4>Pending Join Requests</h4>
-              <n-button 
-                size="small" 
-                @click="showJoinRequestsModal = true"
+            <div class="member-actions">
+              <n-button
+                v-if="isCaptain && member.role !== 'CAPTAIN' && team.members.length > 1"
+                size="small"
+                type="error"
+                @click="confirmRemoveMember(member)"
               >
-                <template #icon>
-                  <n-icon><NotificationsOutline /></n-icon>
-                </template>
-                View Requests
+                Remove
               </n-button>
+              <span v-else-if="isCaptain && team.members.length <= 1" class="disabled-text">
+                Cannot remove last member
+              </span>
             </div>
-            <p class="requests-info">Manage requests from users who want to join your team.</p>
           </div>
-        </n-tab-pane>
-        
-        <n-tab-pane name="settings" tab="Settings">
-          <div class="settings-section">
-            <h4>Team Settings</h4>
-            <n-form :model="settingsForm" label-placement="left" label-width="auto">
-              <n-form-item label="Team Name">
-                <n-input v-model:value="settingsForm.name" />
-              </n-form-item>
-              <n-form-item label="Description">
-                <n-input v-model:value="settingsForm.description" type="textarea" :rows="3" />
-              </n-form-item>
-              <n-form-item label="Max Members">
-                <n-input-number v-model:value="settingsForm.maxMembers" :min="2" :max="50" />
-              </n-form-item>
-              <n-form-item label="Age Range">
-                <div class="age-range-inputs">
-                  <n-input-number v-model:value="settingsForm.minAge" :min="8" :max="80" />
-                  <span class="age-separator">to</span>
-                  <n-input-number v-model:value="settingsForm.maxAge" :min="8" :max="80" />
-                  <span class="age-unit">years</span>
-                </div>
-              </n-form-item>
-            </n-form>
-          </div>
-        </n-tab-pane>
-      </n-tabs>
+        </div>
+      </div>
     </div>
     
     <template #footer>
       <div class="modal-footer">
         <n-button @click="close">Close</n-button>
-        <n-button v-if="isCaptain" type="primary" @click="saveSettings">Save Changes</n-button>
       </div>
     </template>
 
 
-    <!-- Team Join Requests Modal -->
-    <TeamJoinRequestsModal
-      v-model:show="showJoinRequestsModal"
-      :team-id="team?.id || ''"
-      @request-processed="handleRequestProcessed"
-    />
 
     <n-modal v-model:show="showRemoveConfirmation" preset="card" title="Remove Team Member" style="width: 400px">
       <div class="confirmation-content">
@@ -134,11 +80,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue'
-import { NModal, NForm, NFormItem, NInput, NInputNumber, NButton, NTabs, NTabPane, NIcon, useMessage } from 'naive-ui'
-import { NotificationsOutline } from '@vicons/ionicons5'
+import { ref } from 'vue'
+import { NModal, NButton, useMessage } from 'naive-ui'
 import type { Team } from '@/models/Tournament'
-import TeamJoinRequestsModal from './TeamJoinRequestsModal.vue'
 import { UserTeamService } from '@/services/apis/UserTeamService'
 
 interface Props {
@@ -156,17 +100,8 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const showJoinRequestsModal = ref(false)
 const memberToRemove = ref<any>(null)
 const showRemoveConfirmation = ref(false)
-
-const settingsForm = reactive({
-  name: '',
-  description: '',
-  maxMembers: 11,
-  minAge: 18,
-  maxAge: 35
-})
 
 const updateShow = (value: boolean) => {
   emit('update:show', value)
@@ -176,21 +111,6 @@ const close = () => {
   emit('update:show', false)
 }
 
-const saveSettings = () => {
-  if (!props.team) return
-  
-  Object.assign(props.team, {
-    name: settingsForm.name,
-    description: settingsForm.description,
-    maxMembers: settingsForm.maxMembers,
-    minAge: settingsForm.minAge,
-    maxAge: settingsForm.maxAge,
-    updatedAt: new Date().toISOString()
-  })
-  
-  emit('team-updated', props.team)
-  close()
-}
 
 const message = useMessage()
 
@@ -220,22 +140,6 @@ const removeMember = async (member: any) => {
 }
 
 
-const handleRequestProcessed = () => {
-  // Refresh team data when a request is processed
-  emit('team-updated', props.team!)
-}
-
-watch(() => props.team, (newTeam) => {
-  if (newTeam) {
-    Object.assign(settingsForm, {
-      name: newTeam.name,
-      description: newTeam.description,
-      maxMembers: newTeam.maxMembers,
-      minAge: newTeam.minAge,
-      maxAge: newTeam.maxAge
-    })
-  }
-}, { immediate: true })
 </script>
 
 <style scoped>
@@ -353,36 +257,6 @@ watch(() => props.team, (newTeam) => {
   color: #1e40af;
 }
 
-.settings-section {
-  margin-top: 1rem;
-}
-
-.settings-section h4 {
-  margin-bottom: 1rem;
-  color: #1e293b;
-}
-
-.requests-section {
-  margin-top: 1rem;
-}
-
-.requests-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.requests-header h4 {
-  margin: 0;
-  color: #1e293b;
-}
-
-.requests-info {
-  color: #64748b;
-  font-size: 0.875rem;
-  margin: 0;
-}
 
 .confirmation-content {
   text-align: center;
@@ -412,21 +286,6 @@ watch(() => props.team, (newTeam) => {
   gap: 0.5rem;
 }
 
-.age-range-inputs {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.age-separator {
-  color: #64748b;
-  font-size: 0.875rem;
-}
-
-.age-unit {
-  color: #64748b;
-  font-size: 0.875rem;
-}
 
 
 
