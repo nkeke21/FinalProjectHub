@@ -9,6 +9,8 @@ export interface SportEvent {
     eventId: string | null
     hostId: string | null
     hostName: string | null
+    hostEmail: string | null
+    hostPhone: string | null
     latitude: number | null
     longitude: number | null
     location: string

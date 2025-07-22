@@ -7,6 +7,8 @@ public class EventResponse {
     private UUID eventId;
     private UUID hostId;
     private String hostName;
+    private String hostEmail;
+    private String hostPhone;
     private String ageRange;
     private String description;
     private long eventTime;
@@ -18,11 +20,13 @@ public class EventResponse {
     private String sportType;
     private List<ParticipantInfo> participantsList;
 
-    public EventResponse(UUID eventId, UUID hostId, String hostName, String ageRange, String description, long eventTime, double latitude,
+    public EventResponse(UUID eventId, UUID hostId, String hostName, String hostEmail, String hostPhone, String ageRange, String description, long eventTime, double latitude,
                          double longitude, String location, int numberOfParticipantsTotal, int numberOfParticipantsRegistered, String sportType, List<ParticipantInfo> participantsList) {
         this.eventId = eventId;
         this.hostId = hostId;
         this.hostName = hostName;
+        this.hostEmail = hostEmail;
+        this.hostPhone = hostPhone;
         this.ageRange = ageRange;
         this.description = description;
         this.eventTime = eventTime;
@@ -121,6 +125,22 @@ public class EventResponse {
 
     public void setHostName(String hostName) {
         this.hostName = hostName;
+    }
+
+    public String getHostEmail() {
+        return hostEmail;
+    }
+
+    public void setHostEmail(String hostEmail) {
+        this.hostEmail = hostEmail;
+    }
+
+    public String getHostPhone() {
+        return hostPhone;
+    }
+
+    public void setHostPhone(String hostPhone) {
+        this.hostPhone = hostPhone;
     }
 
     public String getLocation() {

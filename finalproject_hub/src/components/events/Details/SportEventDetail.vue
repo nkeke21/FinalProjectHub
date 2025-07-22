@@ -39,6 +39,22 @@
                 <div class="info-label">Host</div>
                 <div class="info-value">{{ event?.hostName }}</div>
               </div>
+              <div class="info-item" v-if="event?.hostEmail">
+                <div class="info-label">Host Email</div>
+                <div class="info-value">
+                  <a :href="`mailto:${event.hostEmail}`" class="contact-link">
+                    {{ event.hostEmail }}
+                  </a>
+                </div>
+              </div>
+              <div class="info-item" v-if="event?.hostPhone">
+                <div class="info-label">Host Phone</div>
+                <div class="info-value">
+                  <a :href="`tel:${event.hostPhone}`" class="contact-link">
+                    {{ event.hostPhone }}
+                  </a>
+                </div>
+              </div>
               <div class="info-item">
                 <div class="info-label">Age Range</div>
                 <div class="info-value">{{ event?.ageRange }} years</div>
@@ -533,7 +549,7 @@ const onJoinClick = async () => {
 
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -554,6 +570,17 @@ const onJoinClick = async () => {
   font-size: 1rem;
   font-weight: 600;
   color: #1e293b;
+}
+
+.contact-link {
+  color: #3b82f6;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.contact-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
 }
 
 .description-section h3 {

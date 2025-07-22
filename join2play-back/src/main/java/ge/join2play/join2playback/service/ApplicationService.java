@@ -54,7 +54,7 @@ public class ApplicationService {
             throw new SportTypeDoesNotExistException("Invalid sport type " + eventRequest.getSportType() + " provided.");
         }
         return new Event(
-                UUID.randomUUID(), eventRequest.getHostId(), eventRequest.getMinAge(), eventRequest.getMaxAge(), eventRequest.getDescription(), Instant.ofEpochMilli(eventRequest.getEventTime()),
+                UUID.randomUUID(), eventRequest.getHostId(), null, null, eventRequest.getMinAge(), eventRequest.getMaxAge(), eventRequest.getDescription(), Instant.ofEpochMilli(eventRequest.getEventTime()),
                 eventRequest.getLatitude(), eventRequest.getLongitude(), eventRequest.getLocation(), eventRequest.getNumberOfParticipantsTotal(),
                 eventRequest.getNumberOfParticipantsRegistered(), sportType
         );
@@ -83,7 +83,7 @@ public class ApplicationService {
                 })
                 .collect(Collectors.toList());
         
-        return new EventResponse(event.getId(), event.getHostId(), hostName, ageRange, event.getDescription(), event.getEventTime().toEpochMilli(),
+        return new EventResponse(event.getId(), event.getHostId(), hostName, hostUser.get().getEmail(), hostUser.get().getPhoneNumber(), ageRange, event.getDescription(), event.getEventTime().toEpochMilli(),
                 event.getLatitude(), event.getLongitude(), event.getLocation(), event.getNumberOfParticipantsTotal(), event.getNumberOfParticipantsRegistered(),
                 event.getSportType().toString(), participantsList);
     }
