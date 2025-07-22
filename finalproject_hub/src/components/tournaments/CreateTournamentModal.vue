@@ -116,13 +116,19 @@
               />
             </n-form-item>
             <n-form-item label="Entry Fee (₾)" path="entryFee">
-              <n-input-number
-                v-model:value="formData.entryFee"
-                placeholder="Enter entry fee"
-                :min="0"
-                :max="10000"
-                clearable
-              />
+              <div class="entry-fee-container">
+                <n-input-number
+                  v-model:value="formData.entryFee"
+                  placeholder="Free entry (launch phase)"
+                  :min="0"
+                  :max="0"
+                  :disabled="true"
+                  clearable
+                />
+                <div class="entry-fee-note">
+                  <small>Free entry during platform launch phase</small>
+                </div>
+              </div>
             </n-form-item>
           </div>
           
@@ -626,6 +632,17 @@ const handleSubmit = async () => {
   gap: 1rem;
   padding-top: 1rem;
   border-top: 1px solid #e2e8f0;
+}
+
+.entry-fee-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.entry-fee-note {
+  color: #64748b;
+  font-style: italic;
 }
 
 /* Responsive design */
