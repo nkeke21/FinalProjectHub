@@ -25,6 +25,8 @@ public class EventInMemoryRepository implements EventRepository {
         Event mockEvent = new Event(
                 mockEventId,
                 mockHostId,
+                "kakha.salukvadze@example.com",
+                "+995 555 123 456",
                 18,
                 35,
                 "Weekend Football Match - Join us for a friendly game!",

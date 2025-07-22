@@ -9,6 +9,8 @@ import java.util.UUID;
 public class Event {
     private UUID id;
     private UUID hostId;
+    private String hostEmail;
+    private String hostPhone;
     private int minAge;
     private int maxAge;
     private String description;
@@ -20,10 +22,12 @@ public class Event {
     private int numberOfParticipantsRegistered;
     private SportType sportType;
 
-    public Event(UUID id, UUID hostId, int minAge, int maxAge, String description, Instant eventTime,
+    public Event(UUID id, UUID hostId, String hostEmail, String hostPhone, int minAge, int maxAge, String description, Instant eventTime,
                  double latitude, double longitude, String location, int numberOfParticipantsTotal, int numberOfParticipantsRegistered, SportType sportType) {
         this.id = id;
         this.hostId = hostId;
+        this.hostEmail = hostEmail;
+        this.hostPhone = hostPhone;
         this.minAge = minAge;
         this.maxAge = maxAge;
         this.description = description;
@@ -50,6 +54,22 @@ public class Event {
 
     public void setHostId(UUID hostId) {
         this.hostId = hostId;
+    }
+
+    public String getHostEmail() {
+        return hostEmail;
+    }
+
+    public void setHostEmail(String hostEmail) {
+        this.hostEmail = hostEmail;
+    }
+
+    public String getHostPhone() {
+        return hostPhone;
+    }
+
+    public void setHostPhone(String hostPhone) {
+        this.hostPhone = hostPhone;
     }
 
     public int getMinAge() {
