@@ -68,17 +68,6 @@
         </div>
       </div>
 
-      <div class="message-section">
-        <h3>Personal Message (Optional)</h3>
-        <n-input
-          v-model:value="personalMessage"
-          type="textarea"
-          placeholder="Add a personal message to your invitation..."
-          :rows="3"
-          maxlength="500"
-          show-count
-        />
-      </div>
 
       <div class="modal-footer">
         <n-button @click="closeModal" :disabled="isSending">
@@ -132,7 +121,6 @@ const emit = defineEmits<Emits>()
 
 const message = useMessage()
 const selectedUsers = ref<User[]>([])
-const personalMessage = ref('')
 const isSending = ref(false)
 
 const show = computed({
@@ -222,8 +210,7 @@ const sendInvitations = async () => {
       try {
         const invitation: EventInvitationDTO = {
           eventId: props.eventId,
-          toUserId: user.id,
-          message: personalMessage.value.trim() || undefined
+          toUserId: user.id
         }
 
         await EventInvitationService.sendInvitation(invitation)
@@ -253,7 +240,6 @@ const sendInvitations = async () => {
 
 const closeModal = () => {
   selectedUsers.value = []
-  personalMessage.value = ''
   show.value = false
 }
 
@@ -261,7 +247,6 @@ const closeModal = () => {
 watch(show, (newValue) => {
   if (!newValue) {
     selectedUsers.value = []
-    personalMessage.value = ''
   }
 })
 </script>
@@ -278,8 +263,7 @@ watch(show, (newValue) => {
 }
 
 .search-section h3,
-.selected-users-section h3,
-.message-section h3 {
+.selected-users-section h3 {
   font-size: 0.875rem;
   font-weight: 600;
   color: #1e293b;
