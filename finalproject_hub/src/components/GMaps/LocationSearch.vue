@@ -1,6 +1,7 @@
 <template>
   <div class="location-search-container">
     <n-input
+      ref="locationInput"
       v-model:value="locationValue"
       placeholder="Enter location (e.g., Tbilisi, Georgia)"
       clearable
@@ -15,7 +16,7 @@
 </template>
   
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, nextTick } from 'vue'
 import { NInput, NIcon } from 'naive-ui'
 import { config } from '../../utils/config'
 
@@ -26,10 +27,12 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'location-selected'])
 
 const locationValue = ref(props.modelValue || '')
+const locationInput = ref(null)
 const statusMessage = ref('')
 const statusType = ref('info')
 const statusIcon = ref('info-circle')
 const statusColor = ref('#1890ff')
+let autocomplete = null
 
 watch(() => props.modelValue, (newValue) => {
   if (newValue !== locationValue.value) {
@@ -46,8 +49,9 @@ onMounted(async () => {
       statusColor.value = '#1890ff'
       
       await loadGoogleMapsScript()
-      
-      await setupPlacePicker()
+      await setupAutocomplete()
+    } else if (window.google) {
+      await setupAutocomplete()
     }
   } catch (error) {
     console.warn('Google Maps not available, using manual input:', error)
@@ -78,67 +82,69 @@ const loadGoogleMapsScript = () => {
   })
 }
 
-const setupPlacePicker = async () => {
+const setupAutocomplete = async () => {
   try {
-    await waitForCustomElement('gmpx-place-picker', 5000)
+    await nextTick()
     
-    const picker = document.createElement('gmpx-place-picker')
-    picker.id = 'place-picker'
-    picker.style.width = '100%'
-    
-    const container = document.querySelector('.location-search-container')
-    const input = container.querySelector('.n-input')
-    if (input && input.parentNode) {
-      input.parentNode.replaceChild(picker, input)
+    if (!locationInput.value || !window.google) {
+      throw new Error('Input element or Google Maps not available')
     }
-    
-    picker.addEventListener('gmpx-placechange', () => {
-      const place = picker.value
-      if (place && place.formattedAddress) {
-        locationValue.value = place.formattedAddress
-        emit('update:modelValue', place.formattedAddress)
-        if (place.location) {
-          emit('location-selected', {
-            lat: place.location.lat(),
-            lng: place.location.lng(),
-            name: place.formattedAddress
-          })
+
+    const inputElement = locationInput.value.$el.querySelector('input')
+    if (!inputElement) {
+      throw new Error('Input element not found')
+    }
+
+    autocomplete = new window.google.maps.places.Autocomplete(inputElement, {
+      types: ['geocode', 'establishment'],
+      componentRestrictions: { country: 'ge' }
+    })
+
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace()
+      
+      if (place.geometry) {
+        const location = {
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng(),
+          name: place.formatted_address || place.name
         }
+        
+        locationValue.value = location.name
+        emit('update:modelValue', location.name)
+        emit('location-selected', location)
+        
+        statusMessage.value = 'Location selected from Google Maps'
+        statusType.value = 'success'
+        statusIcon.value = 'check-circle'
+        statusColor.value = '#52c41a'
+        
+        setTimeout(() => {
+          if (statusMessage.value === 'Location selected from Google Maps') {
+            statusMessage.value = ''
+          }
+        }, 3000)
       }
     })
     
-    statusMessage.value = 'Google Maps location picker ready'
+    statusMessage.value = 'Google Maps autocomplete ready'
     statusType.value = 'success'
     statusIcon.value = 'check-circle'
     statusColor.value = '#52c41a'
     
+    setTimeout(() => {
+      if (statusMessage.value === 'Google Maps autocomplete ready') {
+        statusMessage.value = ''
+      }
+    }, 3000)
+    
   } catch (error) {
-    console.warn('Could not setup Google Maps picker:', error)
+    console.warn('Could not setup Google Maps autocomplete:', error)
     statusMessage.value = 'Using manual location input'
     statusType.value = 'warning'
     statusIcon.value = 'warning'
     statusColor.value = '#faad14'
   }
-}
-
-const waitForCustomElement = (tagName, timeout = 5000) => {
-  return new Promise((resolve, reject) => {
-    if (customElements.get(tagName)) {
-      return resolve()
-    }
-    
-    const timeoutId = setTimeout(() => {
-      reject(new Error(`Custom element ${tagName} not defined within ${timeout}ms`))
-    }, timeout)
-    
-    customElements.whenDefined(tagName).then(() => {
-      clearTimeout(timeoutId)
-      resolve()
-    }).catch((error) => {
-      clearTimeout(timeoutId)
-      reject(error)
-    })
-  })
 }
 
 const onLocationInput = (value) => {
@@ -183,9 +189,9 @@ const onLocationInput = (value) => {
   color: #ff4d4f;
 }
 
-gmpx-place-picker {
+:deep(.pac-container) {
   z-index: 9999;
-  position: relative;
-  display: block;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 </style>
