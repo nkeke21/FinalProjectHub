@@ -498,10 +498,10 @@ const sportTypeOptions = [
 
 
 const formatOptions = [
-  { label: 'Single Elimination', value: 'SINGLE_ELIMINATION' },
-  { label: 'Double Elimination', value: 'DOUBLE_ELIMINATION' },
-  { label: 'Round Robin', value: 'ROUND_ROBIN' },
-  { label: 'Swiss System', value: 'SWISS_SYSTEM' }
+  { label: 'Single Elimination', value: 'Single Elimination' },
+  { label: 'Double Elimination', value: 'Double Elimination' },
+  { label: 'Round Robin', value: 'Round Robin' },
+  { label: 'Swiss System', value: 'Swiss System' }
 ]
 
 const sortOptions = [
@@ -601,7 +601,7 @@ const activeFilterTags = computed(() => {
     tags.push({ key: 'sportType', label: `Sport: ${filters.value.sportType}`, type: 'success' })
   }
   if (filters.value.format) {
-    tags.push({ key: 'format', label: `Format: ${filters.value.format.replace('_', ' ')}`, type: 'info' })
+    tags.push({ key: 'format', label: `Format: ${filters.value.format}`, type: 'info' })
   }
   if (filters.value.location) {
     tags.push({ key: 'location', label: `Location: ${filters.value.location}`, type: 'default' })
