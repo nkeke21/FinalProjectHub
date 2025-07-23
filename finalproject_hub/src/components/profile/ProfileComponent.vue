@@ -41,7 +41,15 @@ const route = useRoute()
 const router = useRouter()
 
 const isOwnProfile = computed(() => {
-    return !route.params.id
+    const userStr = localStorage.getItem('user')
+    const loggedInUser = userStr ? JSON.parse(userStr) : null
+    const currentUserId = loggedInUser?.id || ''
+    
+    if (!route.params.id) {
+        return true
+    }
+    
+    return currentUserId === route.params.id
 })
 
 const profileUserId = computed(() => {

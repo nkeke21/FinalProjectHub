@@ -110,7 +110,12 @@
                     {{ participant.name.charAt(0).toUpperCase() }}
                   </div>
                   <div class="participant-info">
-                    <div class="participant-name">{{ participant.name }}</div>
+                    <router-link 
+                      :to="`/profile/${participant.userId}`" 
+                      class="participant-name-link"
+                    >
+                      {{ participant.name }}
+                    </router-link>
                     <div class="participant-email">{{ participant.email }}</div>
                     <div class="participant-age">{{ participant.age }} years old</div>
                   </div>
@@ -680,10 +685,19 @@ const onJoinClick = async () => {
   flex: 1;
 }
 
-.participant-name {
+.participant-name-link {
   font-weight: 600;
-  color: #1e293b;
+  color: #3b82f6;
   margin-bottom: 0.25rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.participant-name-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+  transform: translateY(-1px);
 }
 
 .participant-email {
