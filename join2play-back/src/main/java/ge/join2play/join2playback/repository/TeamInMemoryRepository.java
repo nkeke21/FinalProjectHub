@@ -4,6 +4,8 @@ import ge.join2play.join2playback.model.Team;
 import ge.join2play.join2playback.model.enums.SportType;
 import ge.join2play.join2playback.model.exceptions.TeamAlreadyExistsException;
 import ge.join2play.join2playback.model.exceptions.TeamDoesNotExistException;
+import ge.join2play.join2playback.repository.interfaces.TeamRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -15,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "memory", matchIfMissing = true)
 public class TeamInMemoryRepository implements TeamRepository {
     private final Map<UUID, Team> teams = new ConcurrentHashMap<>();
 

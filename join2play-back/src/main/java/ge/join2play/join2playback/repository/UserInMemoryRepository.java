@@ -3,6 +3,8 @@ package ge.join2play.join2playback.repository;
 import ge.join2play.join2playback.model.User;
 import ge.join2play.join2playback.model.exceptions.UserAlreadyExistsException;
 import ge.join2play.join2playback.model.exceptions.UserDoesNotExistException;
+import ge.join2play.join2playback.repository.interfaces.UserRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -12,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "memory", matchIfMissing = true)
 public class UserInMemoryRepository implements UserRepository {
     private final Map<UUID, User> users = new ConcurrentHashMap<>();
 

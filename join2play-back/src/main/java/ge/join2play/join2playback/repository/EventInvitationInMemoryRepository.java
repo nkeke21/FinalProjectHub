@@ -1,15 +1,21 @@
 package ge.join2play.join2playback.repository;
 
-import ge.join2play.join2playback.model.enums.EventInvitationStatus;
 import ge.join2play.join2playback.model.EventInvitation;
+import ge.join2play.join2playback.model.enums.EventInvitationStatus;
+import ge.join2play.join2playback.repository.interfaces.EventInvitationRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "memory", matchIfMissing = true)
 public class EventInvitationInMemoryRepository implements EventInvitationRepository {
     private final Map<UUID, EventInvitation> invitations = new ConcurrentHashMap<>();
 

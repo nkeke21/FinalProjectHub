@@ -2,6 +2,8 @@ package ge.join2play.join2playback.repository;
 
 import ge.join2play.join2playback.model.FriendRequest;
 import ge.join2play.join2playback.model.enums.FriendRequestStatus;
+import ge.join2play.join2playback.repository.interfaces.FriendRequestRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -13,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "memory", matchIfMissing = true)
 public class FriendRequestInMemoryRepository implements FriendRequestRepository {
     private final Map<UUID, FriendRequest> requests = new ConcurrentHashMap<>();
 

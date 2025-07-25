@@ -4,6 +4,8 @@ import ge.join2play.join2playback.model.Event;
 import ge.join2play.join2playback.model.enums.SportType;
 import ge.join2play.join2playback.model.exceptions.EventAlreadyExistsException;
 import ge.join2play.join2playback.model.exceptions.EventDoesNotExistException;
+import ge.join2play.join2playback.repository.interfaces.EventRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -14,6 +16,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "memory", matchIfMissing = true)
 public class EventInMemoryRepository implements EventRepository {
     private final Map<UUID, Event> events = new ConcurrentHashMap<>();
 

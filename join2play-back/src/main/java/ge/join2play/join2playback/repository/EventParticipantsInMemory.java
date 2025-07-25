@@ -3,6 +3,8 @@ package ge.join2play.join2playback.repository;
 import ge.join2play.join2playback.model.EventParticipant;
 import ge.join2play.join2playback.model.exceptions.EventParticipantAlreadyExistsException;
 import ge.join2play.join2playback.model.exceptions.EventParticipantDoesNotExistException;
+import ge.join2play.join2playback.repository.interfaces.EventParticipantsRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "memory", matchIfMissing = true)
 public class EventParticipantsInMemory implements EventParticipantsRepository {
     private final Map<UUID, EventParticipant> eventsParticipants = new ConcurrentHashMap<>();
 

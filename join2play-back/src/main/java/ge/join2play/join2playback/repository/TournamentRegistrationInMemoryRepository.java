@@ -2,14 +2,19 @@ package ge.join2play.join2playback.repository;
 
 import ge.join2play.join2playback.model.TournamentRegistration;
 import ge.join2play.join2playback.model.enums.RegistrationStatus;
+import ge.join2play.join2playback.repository.interfaces.TournamentRegistrationRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "memory", matchIfMissing = true)
 public class TournamentRegistrationInMemoryRepository implements TournamentRegistrationRepository {
     private final Map<UUID, TournamentRegistration> registrations = new ConcurrentHashMap<>();
 
@@ -25,7 +30,7 @@ public class TournamentRegistrationInMemoryRepository implements TournamentRegis
             registration.setRegisteredAt(Instant.now());
         }
         registration.setUpdatedAt(Instant.now());
-        
+
         registrations.put(registration.getId(), registration);
         return registration;
     }
@@ -52,7 +57,7 @@ public class TournamentRegistrationInMemoryRepository implements TournamentRegis
     @Override
     public TournamentRegistration getByTournamentIdAndUserId(UUID tournamentId, UUID userId) {
         return registrations.values().stream()
-                .filter(registration -> registration.getTournamentId().equals(tournamentId) 
+                .filter(registration -> registration.getTournamentId().equals(tournamentId)
                         && registration.getUserId().equals(userId))
                 .findFirst()
                 .orElse(null);

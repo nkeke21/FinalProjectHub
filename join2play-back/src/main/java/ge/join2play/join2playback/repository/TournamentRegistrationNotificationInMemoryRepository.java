@@ -1,6 +1,8 @@
 package ge.join2play.join2playback.repository;
 
 import ge.join2play.join2playback.model.TournamentRegistrationNotification;
+import ge.join2play.join2playback.repository.interfaces.TournamentRegistrationNotificationRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "memory", matchIfMissing = true)
 public class TournamentRegistrationNotificationInMemoryRepository implements TournamentRegistrationNotificationRepository {
     private final Map<UUID, TournamentRegistrationNotification> notifications = new ConcurrentHashMap<>();
 
