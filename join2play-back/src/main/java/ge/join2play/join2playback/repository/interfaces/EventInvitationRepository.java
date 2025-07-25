@@ -1,4 +1,4 @@
-package ge.join2play.join2playback.repository;
+package ge.join2play.join2playback.repository.interfaces;
 
 import ge.join2play.join2playback.model.EventInvitation;
 import ge.join2play.join2playback.model.enums.EventInvitationStatus;
