@@ -1,64 +1,89 @@
 package ge.join2play.join2playback.model;
 
 import ge.join2play.join2playback.model.enums.RegistrationStatus;
-
+import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
 
+@Entity
+@Table(name = "tournament_registrations")
 public class TournamentRegistration {
+    @Id
     private UUID id;
+
+    @Column(name = "tournament_id", nullable = false)
     private UUID tournamentId;
+
+    @Column(name = "user_id", nullable = false)
     private UUID userId;
+
+    @Column(name = "registration_type", nullable = false, length = 20)
     private String registrationType;
+
+    @Column(name = "team_id")
     private UUID teamId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private RegistrationStatus status;
+
+    @Column(name = "registered_at", nullable = false)
     private Instant registeredAt;
+
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
-    
+
+    @Column(name = "full_name", length = 255)
     private String fullName;
+
+    @Column
     private Integer age;
+
+    @Column(length = 320)
     private String email;
+
+    @Column(name = "phone_number", length = 20)
     private String phoneNumber;
+
+    @Column(columnDefinition = "TEXT")
     private String address;
+
+    @Column(name = "emergency_contact_name", length = 255)
     private String emergencyContactName;
+
+    @Column(name = "emergency_contact_relationship", length = 100)
     private String emergencyContactRelationship;
+
+    @Column(name = "emergency_contact_phone", length = 20)
     private String emergencyContactPhone;
+
+    @Column(name = "emergency_contact_email", length = 320)
     private String emergencyContactEmail;
+
+    @Column(name = "previous_experience", columnDefinition = "TEXT")
     private String previousExperience;
+
+    @Column(name = "skill_level", length = 50)
     private String skillLevel;
+
+    @Column(name = "previous_achievements", columnDefinition = "TEXT")
     private String previousAchievements;
 
-    public TournamentRegistration() {
-    }
+    // Default constructor for JPA
+    public TournamentRegistration() {}
 
-    public TournamentRegistration(UUID id, UUID tournamentId, UUID userId, String registrationType, 
-                                UUID teamId, RegistrationStatus status, Instant registeredAt, Instant updatedAt,
-                                String fullName, Integer age, String email, String phoneNumber, String address,
-                                String emergencyContactName, String emergencyContactRelationship, 
-                                String emergencyContactPhone, String emergencyContactEmail,
-                                String previousExperience, String skillLevel, String previousAchievements) {
-        this.id = id;
-        this.tournamentId = tournamentId;
-        this.userId = userId;
-        this.registrationType = registrationType;
-        this.teamId = teamId;
-        this.status = status;
-        this.registeredAt = registeredAt;
-        this.updatedAt = updatedAt;
-        this.fullName = fullName;
-        this.age = age;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.address = address;
-        this.emergencyContactName = emergencyContactName;
-        this.emergencyContactRelationship = emergencyContactRelationship;
-        this.emergencyContactPhone = emergencyContactPhone;
-        this.emergencyContactEmail = emergencyContactEmail;
+    public TournamentRegistration(UUID id, UUID tournamentId, UUID userId, String registrationType,
+                                  UUID teamId, RegistrationStatus status, Instant registeredAt, Instant updatedAt,
+                                  String fullName, Integer age, String email, String phoneNumber, String address,
+                                  String emergencyContactName, String emergencyContactRelationship,
+                                  String emergencyContactPhone, String emergencyContactEmail,
+                                  String previousExperience, String skillLevel, String previousAchievements) {
         this.previousExperience = previousExperience;
         this.skillLevel = skillLevel;
         this.previousAchievements = previousAchievements;
     }
 
+    // Getters and Setters
     public UUID getId() {
         return id;
     }
@@ -218,4 +243,4 @@ public class TournamentRegistration {
     public void setPreviousAchievements(String previousAchievements) {
         this.previousAchievements = previousAchievements;
     }
-} 
+}
