@@ -1,4 +1,4 @@
-package ge.join2play.join2playback.repository;
+package ge.join2play.join2playback.repository.interfaces;
 
 import ge.join2play.join2playback.model.enums.TeamJoinRequestStatus;
 import ge.join2play.join2playback.model.TeamJoinRequest;
@@ -10,11 +10,9 @@ import java.util.UUID;
 public interface TeamJoinRequestRepository {
     TeamJoinRequest saveRequest(UUID teamId, UUID fromUserId);
     List<TeamJoinRequest> getPendingRequestsForTeam(UUID teamId);
-    List<TeamJoinRequest> getPendingRequestsForUser(UUID userId);
-    List<TeamJoinRequest> getPendingRequestsForTeamCaptain(UUID captainId);
+    List<TeamJoinRequest> getAllPendingRequests();
     List<TeamJoinRequest> getAllRequestsForTeam(UUID teamId);
-    List<TeamJoinRequest> getAllRequestsForUser(UUID userId);
-    List<TeamJoinRequest> getAllRequestsForTeamCaptain(UUID captainId);
+    List<TeamJoinRequest> getAllRequests();
     Optional<TeamJoinRequest> findById(UUID requestId);
     void updateStatus(UUID requestId, TeamJoinRequestStatus status);
     Optional<TeamJoinRequest> findRequestBetweenTeamAndUser(UUID teamId, UUID userId);
