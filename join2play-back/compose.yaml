@@ -1,9 +1,10 @@
 services:
   postgres:
     image: 'postgres:latest'
+    container_name: join2play_container
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      - 'POSTGRES_DB=join2play_db'
+      - 'POSTGRES_PASSWORD=root_password'
+      - 'POSTGRES_USER=root'
     ports:
-      - '5432'
+      - '5432:5432'
