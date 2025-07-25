@@ -23,7 +23,4 @@ public interface UserJPARepository extends JpaRepository<User, UUID> {
             "LOWER(u.email) = LOWER(:emailOrName) OR " +
             "LOWER(u.name) = LOWER(:emailOrName)")
     Optional<User> findByEmailOrNameIgnoreCase(@Param("emailOrName") String emailOrName);
-
-    @Query("SELECT u FROM User u WHERE u.birthDate BETWEEN :startDate AND :endDate")
-    List<User> findByBirthDateBetween(@Param("startDate") Long startDate, @Param("endDate") Long endDate);
 }

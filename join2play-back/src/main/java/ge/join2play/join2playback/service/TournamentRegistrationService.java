@@ -179,12 +179,8 @@ public class TournamentRegistrationService {
         }
 
         TournamentRegistration existingRegistration = registrationRepository.getByTournamentIdAndUserId(tournamentId, userId);
-        if (existingRegistration != null && (existingRegistration.getStatus() == RegistrationStatus.REGISTERED || 
-                                            existingRegistration.getStatus() == RegistrationStatus.PENDING)) {
-            return false;
-        }
-
-        return true;
+        return existingRegistration == null || (existingRegistration.getStatus() != RegistrationStatus.REGISTERED &&
+                existingRegistration.getStatus() != RegistrationStatus.PENDING);
     }
 
     public TournamentRegistrationResponse approveRegistration(UUID registrationId, UUID hostId) {
