@@ -1,7 +1,7 @@
 package ge.join2play.join2playback.service;
 
 import ge.join2play.join2playback.model.UserPermission;
-import ge.join2play.join2playback.repository.UserPermissionRepository;
+import ge.join2play.join2playback.repository.interfaces.UserPermissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

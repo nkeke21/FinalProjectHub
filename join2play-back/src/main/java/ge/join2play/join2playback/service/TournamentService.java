@@ -4,9 +4,8 @@ import ge.join2play.join2playback.model.Tournament;
 import ge.join2play.join2playback.model.User;
 import ge.join2play.join2playback.model.dto.TournamentRequest;
 import ge.join2play.join2playback.model.dto.TournamentResponse;
-import ge.join2play.join2playback.repository.TournamentRepository;
-import ge.join2play.join2playback.repository.UserRepository;
-import ge.join2play.join2playback.service.UserPermissionService;
+import ge.join2play.join2playback.repository.interfaces.TournamentRepository;
+import ge.join2play.join2playback.repository.interfaces.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

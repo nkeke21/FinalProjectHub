@@ -2,7 +2,7 @@ package ge.join2play.join2playback.service;
 
 import ge.join2play.join2playback.model.TournamentRegistrationNotification;
 import ge.join2play.join2playback.model.dto.TournamentRegistrationNotificationDTO;
-import ge.join2play.join2playback.repository.TournamentRegistrationNotificationRepository;
+import ge.join2play.join2playback.repository.interfaces.TournamentRegistrationNotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

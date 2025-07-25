@@ -8,10 +8,10 @@ import ge.join2play.join2playback.model.User;
 import ge.join2play.join2playback.model.enums.TeamJoinRequestStatus;
 import ge.join2play.join2playback.model.enums.TeamRole;
 import ge.join2play.join2playback.model.exceptions.*;
-import ge.join2play.join2playback.repository.TeamJoinRequestRepository;
-import ge.join2play.join2playback.repository.TeamMemberRepository;
-import ge.join2play.join2playback.repository.TeamRepository;
-import ge.join2play.join2playback.repository.UserRepository;
+import ge.join2play.join2playback.repository.interfaces.TeamJoinRequestRepository;
+import ge.join2play.join2playback.repository.interfaces.TeamMemberRepository;
+import ge.join2play.join2playback.repository.interfaces.TeamRepository;
+import ge.join2play.join2playback.repository.interfaces.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -99,7 +99,7 @@ public class TeamJoinRequestService {
         // Get all teams where this user is the captain
         List<Team> teamsWhereCaptain = teamRepository.getAllTeams().stream()
                 .filter(team -> team.getCaptainId().equals(userId))
-                .collect(Collectors.toList());
+                .toList();
         
         // Get all pending requests for these teams
         return teamsWhereCaptain.stream()
@@ -116,7 +116,7 @@ public class TeamJoinRequestService {
         // Get all teams where this user is the captain
         List<Team> teamsWhereCaptain = teamRepository.getAllTeams().stream()
                 .filter(team -> team.getCaptainId().equals(captainId))
-                .collect(Collectors.toList());
+                .toList();
         
         // Get all pending requests for these teams
         return teamsWhereCaptain.stream()
@@ -141,7 +141,7 @@ public class TeamJoinRequestService {
         // Get all teams where this user is the captain
         List<Team> teamsWhereCaptain = teamRepository.getAllTeams().stream()
                 .filter(team -> team.getCaptainId().equals(userId))
-                .collect(Collectors.toList());
+                .toList();
         
         // Get all requests for these teams
         return teamsWhereCaptain.stream()
@@ -156,7 +156,7 @@ public class TeamJoinRequestService {
         }
         
         // Get all requests where this user is the requester
-        return repository.getAllRequestsForUser(userId).stream()
+        return repository.getAllPendingRequests().stream()
                 .filter(req -> req.getFromUserId().equals(userId))
                 .collect(Collectors.toList());
     }
@@ -168,7 +168,7 @@ public class TeamJoinRequestService {
         }
         
         // Get all pending requests where this user is the requester
-        return repository.getPendingRequestsForUser(userId).stream()
+        return repository.getAllPendingRequests().stream()
                 .filter(req -> req.getFromUserId().equals(userId))
                 .collect(Collectors.toList());
     }
@@ -182,7 +182,7 @@ public class TeamJoinRequestService {
         // Get all teams where this user is the captain
         List<Team> teamsWhereCaptain = teamRepository.getAllTeams().stream()
                 .filter(team -> team.getCaptainId().equals(captainId))
-                .collect(Collectors.toList());
+                .toList();
         
         // Get all requests for these teams
         return teamsWhereCaptain.stream()

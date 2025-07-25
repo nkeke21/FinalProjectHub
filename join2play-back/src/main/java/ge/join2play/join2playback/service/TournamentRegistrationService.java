@@ -7,10 +7,10 @@ import ge.join2play.join2playback.model.User;
 import ge.join2play.join2playback.model.dto.TournamentRegistrationRequest;
 import ge.join2play.join2playback.model.dto.TournamentRegistrationResponse;
 import ge.join2play.join2playback.model.enums.RegistrationStatus;
-import ge.join2play.join2playback.repository.TournamentRegistrationNotificationRepository;
-import ge.join2play.join2playback.repository.TournamentRegistrationRepository;
-import ge.join2play.join2playback.repository.TournamentRepository;
-import ge.join2play.join2playback.repository.UserRepository;
+import ge.join2play.join2playback.repository.interfaces.TournamentRegistrationNotificationRepository;
+import ge.join2play.join2playback.repository.interfaces.TournamentRegistrationRepository;
+import ge.join2play.join2playback.repository.interfaces.TournamentRepository;
+import ge.join2play.join2playback.repository.interfaces.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

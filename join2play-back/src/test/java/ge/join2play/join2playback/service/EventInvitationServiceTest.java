@@ -6,9 +6,9 @@ import ge.join2play.join2playback.model.User;
 import ge.join2play.join2playback.model.enums.EventInvitationStatus;
 import ge.join2play.join2playback.model.enums.SportType;
 import ge.join2play.join2playback.model.exceptions.*;
-import ge.join2play.join2playback.repository.EventInvitationRepository;
-import ge.join2play.join2playback.repository.EventRepository;
-import ge.join2play.join2playback.repository.UserRepository;
+import ge.join2play.join2playback.repository.interfaces.EventInvitationRepository;
+import ge.join2play.join2playback.repository.interfaces.EventRepository;
+import ge.join2play.join2playback.repository.interfaces.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,7 +55,8 @@ class EventInvitationServiceTest {
         hostId = UUID.randomUUID();
         inviteeId = UUID.randomUUID();
 
-        event = new Event(eventId, hostId, 18, 40, "Test Event", Instant.now().plusSeconds(86400),
+        event = new Event(eventId, hostId, "host@gmail.com",
+                "host_phone", 18, 40, "Test Event", Instant.now().plusSeconds(86400),
                 41.0, 44.0, "Test Location", 20, 5, SportType.FOOTBALL);
 
         host = new User(

@@ -1,4 +1,4 @@
-package ge.join2play.join2playback.repository;
+package ge.join2play.join2playback.repository.db;
 
 import ge.join2play.join2playback.model.UserPermission;
 import ge.join2play.join2playback.repository.interfaces.UserPermissionRepository;
