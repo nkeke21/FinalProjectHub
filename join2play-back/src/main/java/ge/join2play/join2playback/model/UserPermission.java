@@ -1,17 +1,29 @@
 package ge.join2play.join2playback.model;
 
+import jakarta.persistence.*;
 import java.util.UUID;
 
+@Entity
+@Table(name = "user_permissions")
 public class UserPermission {
+    @Id
+    @Column(name = "user_id")
     private UUID userId;
+
+    @Column(name = "can_host_tournaments", nullable = false)
     private boolean canHostTournaments;
+
+    @Column(name = "granted_by", length = 255)
     private String grantedBy;
+
+    @Column(name = "granted_at", length = 255)
     private String grantedAt;
+
+    @Column(columnDefinition = "TEXT")
     private String reason;
 
-    public UserPermission() {
-        // Default constructor for Spring
-    }
+    // Default constructor for JPA
+    public UserPermission() {}
 
     public UserPermission(UUID userId, boolean canHostTournaments, String grantedBy, String grantedAt, String reason) {
         this.userId = userId;
@@ -61,4 +73,4 @@ public class UserPermission {
     public void setReason(String reason) {
         this.reason = reason;
     }
-} 
+}
