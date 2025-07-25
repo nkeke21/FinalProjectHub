@@ -3,54 +3,104 @@ package ge.join2play.join2playback.model;
 import ge.join2play.join2playback.model.enums.SportType;
 import ge.join2play.join2playback.model.enums.TournamentFormat;
 import ge.join2play.join2playback.model.enums.TournamentStatus;
-
+import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+@Entity
+@Table(name = "tournaments")
 public class Tournament {
+    @Id
     private UUID id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sport_type", nullable = false, length = 50)
     private SportType sportType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 50)
     private TournamentFormat format;
-    private String tournamentType; // "individual" or "team"
+
+    @Column(name = "tournament_type", nullable = false, length = 20)
+    private String tournamentType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private TournamentStatus status;
+
+    @Column(name = "host_id", nullable = false)
     private UUID hostId;
+
+    @Column(name = "host_name", nullable = false)
     private String hostName;
+
+    @Column(nullable = false, length = 500)
     private String location;
+
+    @Column(nullable = false)
     private double latitude;
+
+    @Column(nullable = false)
     private double longitude;
+
+    @Column(name = "start_date", nullable = false)
     private Instant startDate;
+
+    @Column(name = "end_date", nullable = false)
     private Instant endDate;
+
+    @Column(name = "registration_deadline", nullable = false)
     private Instant registrationDeadline;
+
+    @Column(name = "max_participants", nullable = false)
     private int maxParticipants;
+
+    @Column(name = "current_participants", nullable = false)
     private int currentParticipants;
+
+    @Column(name = "entry_fee", nullable = false)
     private double entryFee;
+
+    @Column(name = "prize_pool", nullable = false)
     private double prizePool;
+
+    @Column(name = "min_age", nullable = false)
     private int minAge;
+
+    @Column(name = "max_age", nullable = false)
     private int maxAge;
-    private List<String> rules;
+
+    @Column(columnDefinition = "TEXT")
+    private String rules;
+
+    @Column(name = "created_at", nullable = false)
     private Instant createdAt;
+
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    public Tournament() {
-        // Default constructor for Spring
-    }
+    // Default constructor for JPA
+    public Tournament() {}
 
-    public Tournament(UUID id, String name, String description, SportType sportType, 
-                     TournamentFormat format, String tournamentType,
-                     UUID hostId, String hostName, String location, double latitude, double longitude,
-                     Instant startDate, Instant endDate, Instant registrationDeadline,
-                     int maxParticipants, int currentParticipants, double entryFee, double prizePool,
-                     int minAge, int maxAge, List<String> rules, Instant createdAt, Instant updatedAt) {
+    public Tournament(UUID id, String name, String description, SportType sportType,
+                      TournamentFormat format, String tournamentType,
+                      UUID hostId, String hostName, String location, double latitude, double longitude,
+                      Instant startDate, Instant endDate, Instant registrationDeadline,
+                      int maxParticipants, int currentParticipants, double entryFee, double prizePool,
+                      int minAge, int maxAge, List<String> rules, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.sportType = sportType;
         this.format = format;
         this.tournamentType = tournamentType;
-        this.status = status;
         this.hostId = hostId;
         this.hostName = hostName;
         this.location = location;
@@ -65,9 +115,18 @@ public class Tournament {
         this.prizePool = prizePool;
         this.minAge = minAge;
         this.maxAge = maxAge;
-        this.rules = rules;
+        this.rules = rules != null ? String.join("\n", rules) : null;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    // Helper methods for rules conversion
+    public List<String> getRules() {
+        return rules != null ? List.of(rules.split("\n")) : null;
+    }
+
+    public void setRules(List<String> rules) {
+        this.rules = rules != null ? String.join("\n", rules) : null;
     }
 
     // Getters and Setters
@@ -239,14 +298,6 @@ public class Tournament {
         this.maxAge = maxAge;
     }
 
-    public List<String> getRules() {
-        return rules;
-    }
-
-    public void setRules(List<String> rules) {
-        this.rules = rules;
-    }
-
     public Instant getCreatedAt() {
         return createdAt;
     }
@@ -262,4 +313,13 @@ public class Tournament {
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
-} 
+
+    // Direct rules field access for JPA
+    public String getRulesText() {
+        return rules;
+    }
+
+    public void setRulesText(String rules) {
+        this.rules = rules;
+    }
+}

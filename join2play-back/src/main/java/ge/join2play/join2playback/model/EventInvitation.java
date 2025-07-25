@@ -1,19 +1,35 @@
 package ge.join2play.join2playback.model;
 
 import ge.join2play.join2playback.model.enums.EventInvitationStatus;
-
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
+@Entity
+@Table(name = "event_invitations")
 public class EventInvitation {
+    @Id
+    @Column(name = "invitation_id")
     private UUID invitationId;
+
+    @Column(name = "event_id", nullable = false)
     private UUID eventId;
+
+    @Column(name = "from_user_id", nullable = false)
     private UUID fromUserId;
+
+    @Column(name = "to_user_id", nullable = false)
     private UUID toUserId;
+
+    @Column(name = "sent_at", nullable = false)
     private LocalDateTime sentAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private EventInvitationStatus status;
 
+    // Default constructor for JPA
     public EventInvitation() {}
 
     public EventInvitation(UUID invitationId, UUID eventId, UUID fromUserId, UUID toUserId, LocalDateTime sentAt, EventInvitationStatus status) {
@@ -25,6 +41,7 @@ public class EventInvitation {
         this.status = status;
     }
 
+    // Getters and Setters
     public UUID getInvitationId() {
         return invitationId;
     }

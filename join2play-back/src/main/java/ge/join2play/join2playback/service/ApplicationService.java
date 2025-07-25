@@ -5,10 +5,11 @@ import ge.join2play.join2playback.config.FilterConfig;
 import ge.join2play.join2playback.model.*;
 import ge.join2play.join2playback.model.enums.SportType;
 import ge.join2play.join2playback.model.exceptions.SportTypeDoesNotExistException;
+import ge.join2play.join2playback.model.exceptions.UserAgeNotInRangeException;
 import ge.join2play.join2playback.model.exceptions.UserDoesNotExistException;
-import ge.join2play.join2playback.repository.EventParticipantsRepository;
-import ge.join2play.join2playback.repository.EventRepository;
-import ge.join2play.join2playback.repository.UserRepository;
+import ge.join2play.join2playback.repository.interfaces.EventParticipantsRepository;
+import ge.join2play.join2playback.repository.interfaces.EventRepository;
+import ge.join2play.join2playback.repository.interfaces.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -20,7 +21,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static ge.join2play.join2playback.model.enums.SportType.getSportTypeOptions;
-import ge.join2play.join2playback.model.exceptions.UserAgeNotInRangeException;
 
 @Service
 public class ApplicationService {

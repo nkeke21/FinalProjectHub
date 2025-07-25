@@ -4,6 +4,7 @@ import ge.join2play.join2playback.model.Event;
 import ge.join2play.join2playback.model.enums.SportType;
 import ge.join2play.join2playback.model.exceptions.EventAlreadyExistsException;
 import ge.join2play.join2playback.model.exceptions.EventDoesNotExistException;
+import ge.join2play.join2playback.repository.inmemory.EventInMemoryRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,8 @@ public class EventInMemoryRepositoryTests {
         sampleEvent = new Event(
                 eventId,
                 hostId,
+                "host@gmail.com",
+                "host_phone",
                 18,
                 25,
                 "Football Match",
@@ -71,6 +74,8 @@ public class EventInMemoryRepositoryTests {
         Event updatedEvent = new Event(
                 sampleEvent.getId(),
                 sampleEvent.getHostId(),
+                "host@gmail.com",
+                "host_phone",
                 20,
                 30,
                 "Updated Football Match",
@@ -93,6 +98,8 @@ public class EventInMemoryRepositoryTests {
         Event nonExistentEvent = new Event(
                 UUID.randomUUID(),
                 hostId,
+                "host@gmail.com",
+                "host_phone",
                 20,
                 30,
                 "Nonexistent Event",
@@ -129,6 +136,8 @@ public class EventInMemoryRepositoryTests {
         Event anotherEvent = new Event(
                 UUID.randomUUID(),
                 hostId,
+                "host@gmail.com",
+                "host_phone",
                 16,
                 40,
                 "Basketball Game",
@@ -162,6 +171,8 @@ public class EventInMemoryRepositoryTests {
         Event sameIdEvent = new Event(
                 sampleEvent.getId(),
                 sampleEvent.getHostId(),
+                "host@gmail.com",
+                "host_phone",
                 19,
                 26,
                 "Modified Football Match",

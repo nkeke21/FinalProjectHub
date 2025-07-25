@@ -7,9 +7,9 @@ import ge.join2play.join2playback.model.EventRequest;
 import ge.join2play.join2playback.model.EventResponse;
 import ge.join2play.join2playback.model.User;
 import ge.join2play.join2playback.model.enums.SportType;
-import ge.join2play.join2playback.repository.EventParticipantsRepository;
-import ge.join2play.join2playback.repository.EventRepository;
-import ge.join2play.join2playback.repository.UserRepository;
+import ge.join2play.join2playback.repository.interfaces.EventParticipantsRepository;
+import ge.join2play.join2playback.repository.interfaces.EventRepository;
+import ge.join2play.join2playback.repository.interfaces.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -89,6 +89,8 @@ public class ApplicationServiceTests {
         Event event = new Event(
                 UUID.randomUUID(),
                 hostId,
+                "host@gmail.com",
+                "host_phone",
                 18,
                 25,
                 "Football Match",
@@ -183,6 +185,8 @@ public class ApplicationServiceTests {
         Event event = new Event(
                 eventId,
                 hostId,
+                "host@gmail.com",
+                "host_phone",
                 18,
                 25,
                 "Football Match",
@@ -279,6 +283,8 @@ public class ApplicationServiceTests {
         events.add(new Event(
                 UUID.randomUUID(),
                 hostId,
+                "host@gmail.com",
+                "host_phone",
                 18,
                 25,
                 "Football Match",
@@ -293,6 +299,8 @@ public class ApplicationServiceTests {
         events.add(new Event(
                 UUID.randomUUID(),
                 hostId,
+                "host2@gmail.com",
+                "host_phone2",
                 20,
                 30,
                 "Basketball Game",

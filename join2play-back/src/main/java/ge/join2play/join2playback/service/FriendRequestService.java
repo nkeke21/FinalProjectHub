@@ -5,8 +5,8 @@ import ge.join2play.join2playback.model.FriendRequest;
 import ge.join2play.join2playback.model.FriendRequestNotification;
 import ge.join2play.join2playback.model.User;
 import ge.join2play.join2playback.model.exceptions.*;
-import ge.join2play.join2playback.repository.FriendRequestRepository;
-import ge.join2play.join2playback.repository.UserRepository;
+import ge.join2play.join2playback.repository.interfaces.FriendRequestRepository;
+import ge.join2play.join2playback.repository.interfaces.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

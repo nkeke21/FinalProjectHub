@@ -1,19 +1,31 @@
 package ge.join2play.join2playback.model;
 
 import ge.join2play.join2playback.model.enums.TeamRole;
-
+import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
 
+@Entity
+@Table(name = "team_members")
 public class TeamMember {
+    @Id
     private UUID id;
+
+    @Column(name = "team_id", nullable = false)
     private UUID teamId;
+
+    @Column(name = "user_id", nullable = false)
     private UUID userId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 50)
     private TeamRole role;
+
+    @Column(name = "joined_at", nullable = false)
     private Instant joinedAt;
 
-    public TeamMember() {
-    }
+    // Default constructor for JPA
+    public TeamMember() {}
 
     public TeamMember(UUID id, UUID teamId, UUID userId, TeamRole role, Instant joinedAt) {
         this.id = id;
@@ -23,6 +35,7 @@ public class TeamMember {
         this.joinedAt = joinedAt;
     }
 
+    // Getters and Setters
     public UUID getId() {
         return id;
     }
@@ -62,4 +75,4 @@ public class TeamMember {
     public void setJoinedAt(Instant joinedAt) {
         this.joinedAt = joinedAt;
     }
-} 
+}

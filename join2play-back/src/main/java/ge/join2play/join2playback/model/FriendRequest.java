@@ -1,16 +1,32 @@
 package ge.join2play.join2playback.model;
 
 import ge.join2play.join2playback.model.enums.FriendRequestStatus;
-
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Entity
+@Table(name = "friend_requests")
 public class FriendRequest {
+    @Id
+    @Column(name = "request_id")
     private UUID requestId;
+
+    @Column(name = "from_user_id", nullable = false)
     private UUID fromUserId;
+
+    @Column(name = "to_user_id", nullable = false)
     private UUID toUserId;
+
+    @Column(name = "sent_at", nullable = false)
     private LocalDateTime sentAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private FriendRequestStatus status;
+
+    // Default constructor for JPA
+    public FriendRequest() {}
 
     public FriendRequest(UUID requestId, UUID fromUserId, UUID toUserId, LocalDateTime sentAt, FriendRequestStatus status) {
         this.requestId = requestId;
@@ -20,6 +36,7 @@ public class FriendRequest {
         this.status = status;
     }
 
+    // Getters and Setters
     public UUID getRequestId() {
         return requestId;
     }

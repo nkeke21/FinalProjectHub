@@ -6,7 +6,7 @@ import ge.join2play.join2playback.model.dto.SignInRequest;
 import ge.join2play.join2playback.model.dto.SignUpRequest;
 import ge.join2play.join2playback.model.exceptions.EmailAlreadyExistsException;
 import ge.join2play.join2playback.model.exceptions.InvalidCredentialsException;
-import ge.join2play.join2playback.repository.UserRepository;
+import ge.join2play.join2playback.repository.interfaces.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -30,7 +30,7 @@ public class AuthenticationService {
         }
 
         String hashedPassword = passwordService.hashPassword(signUpRequest.getPassword());
-        
+
         User newUser = new User(
                 UUID.randomUUID(),
                 signUpRequest.getName(),
@@ -55,7 +55,7 @@ public class AuthenticationService {
 
     public AuthResponse signIn(SignInRequest signInRequest) {
         User user = userRepository.findByEmailOrName(signInRequest.getUsername());
-        
+
         if (user == null) {
             throw new InvalidCredentialsException("Invalid username or password.");
         }

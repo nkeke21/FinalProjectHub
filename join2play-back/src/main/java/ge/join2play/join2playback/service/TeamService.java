@@ -6,20 +6,20 @@ import ge.join2play.join2playback.model.User;
 import ge.join2play.join2playback.model.dto.TeamMemberResponse;
 import ge.join2play.join2playback.model.dto.TeamRequest;
 import ge.join2play.join2playback.model.dto.TeamResponse;
-import ge.join2play.join2playback.model.enums.SportType;
 import ge.join2play.join2playback.model.enums.TeamRole;
 import ge.join2play.join2playback.model.exceptions.TeamDoesNotExistException;
 import ge.join2play.join2playback.model.exceptions.TeamMemberAlreadyExistsException;
 import ge.join2play.join2playback.model.exceptions.UserDoesNotExistException;
-import ge.join2play.join2playback.repository.TeamMemberRepository;
-import ge.join2play.join2playback.repository.TeamRepository;
-import ge.join2play.join2playback.repository.UserRepository;
+import ge.join2play.join2playback.repository.interfaces.TeamMemberRepository;
+import ge.join2play.join2playback.repository.interfaces.TeamRepository;
+import ge.join2play.join2playback.repository.interfaces.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -85,7 +85,7 @@ public class TeamService {
         List<TeamMember> userTeamMemberships = teamMemberRepository.getTeamsByUser(userId);
         return userTeamMemberships.stream()
                 .map(membership -> teamRepository.getById(membership.getTeamId()))
-                .filter(team -> team != null)
+                .filter(Objects::nonNull)
                 .map(this::convertTeamToTeamResponse)
                 .collect(Collectors.toList());
     }
@@ -98,7 +98,7 @@ public class TeamService {
         // Get team IDs where user is already a member
         List<UUID> userTeamIds = userMemberships.stream()
                 .map(TeamMember::getTeamId)
-                .collect(Collectors.toList());
+                .toList();
 
         return allTeams.stream()
                 .filter(team -> !userTeamIds.contains(team.getId()))
