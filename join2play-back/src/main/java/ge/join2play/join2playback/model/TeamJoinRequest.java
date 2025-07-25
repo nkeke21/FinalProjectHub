@@ -1,16 +1,32 @@
 package ge.join2play.join2playback.model;
 
 import ge.join2play.join2playback.model.enums.TeamJoinRequestStatus;
-
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Entity
+@Table(name = "team_join_requests")
 public class TeamJoinRequest {
+    @Id
+    @Column(name = "request_id")
     private UUID requestId;
+
+    @Column(name = "team_id", nullable = false)
     private UUID teamId;
+
+    @Column(name = "from_user_id", nullable = false)
     private UUID fromUserId;
+
+    @Column(name = "sent_at", nullable = false)
     private LocalDateTime sentAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private TeamJoinRequestStatus status;
+
+    // Default constructor for JPA
+    public TeamJoinRequest() {}
 
     public TeamJoinRequest(UUID requestId, UUID teamId, UUID fromUserId, LocalDateTime sentAt, TeamJoinRequestStatus status) {
         this.requestId = requestId;
@@ -20,9 +36,7 @@ public class TeamJoinRequest {
         this.status = status;
     }
 
-    public TeamJoinRequest() {
-    }
-
+    // Getters and Setters
     public UUID getRequestId() {
         return requestId;
     }
@@ -62,4 +76,4 @@ public class TeamJoinRequest {
     public void setStatus(TeamJoinRequestStatus status) {
         this.status = status;
     }
-} 
+}
