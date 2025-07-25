@@ -1,26 +1,58 @@
 package ge.join2play.join2playback.model;
 
 import ge.join2play.join2playback.model.enums.SportType;
-
+import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
 
-
+@Entity
+@Table(name = "events")
 public class Event {
+    @Id
     private UUID id;
+
+    @Column(name = "host_id", nullable = false)
     private UUID hostId;
+
+    @Column(name = "host_email", nullable = false, length = 320)
     private String hostEmail;
+
+    @Column(name = "host_phone", length = 20)
     private String hostPhone;
+
+    @Column(name = "min_age", nullable = false)
     private int minAge;
+
+    @Column(name = "max_age", nullable = false)
     private int maxAge;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "event_time", nullable = false)
     private Instant eventTime;
+
+    @Column(nullable = false)
     private double latitude;
+
+    @Column(nullable = false)
     private double longitude;
+
+    @Column(nullable = false, length = 500)
     private String location;
+
+    @Column(name = "number_of_participants_total", nullable = false)
     private int numberOfParticipantsTotal;
+
+    @Column(name = "number_of_participants_registered", nullable = false)
     private int numberOfParticipantsRegistered;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sport_type", nullable = false, length = 50)
     private SportType sportType;
+
+    // Default constructor for JPA
+    public Event() {}
 
     public Event(UUID id, UUID hostId, String hostEmail, String hostPhone, int minAge, int maxAge, String description, Instant eventTime,
                  double latitude, double longitude, String location, int numberOfParticipantsTotal, int numberOfParticipantsRegistered, SportType sportType) {
@@ -40,6 +72,7 @@ public class Event {
         this.sportType = sportType;
     }
 
+    // Getters and Setters
     public UUID getId() {
         return id;
     }
@@ -120,20 +153,20 @@ public class Event {
         this.longitude = longitude;
     }
 
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
     public int getNumberOfParticipantsTotal() {
         return numberOfParticipantsTotal;
     }
 
     public void setNumberOfParticipantsTotal(int numberOfParticipantsTotal) {
         this.numberOfParticipantsTotal = numberOfParticipantsTotal;
-    }
-
-    public SportType getSportType() {
-        return sportType;
-    }
-
-    public void setSportType(SportType sportType) {
-        this.sportType = sportType;
     }
 
     public int getNumberOfParticipantsRegistered() {
@@ -144,11 +177,11 @@ public class Event {
         this.numberOfParticipantsRegistered = numberOfParticipantsRegistered;
     }
 
-    public String getLocation() {
-        return location;
+    public SportType getSportType() {
+        return sportType;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setSportType(SportType sportType) {
+        this.sportType = sportType;
     }
 }
