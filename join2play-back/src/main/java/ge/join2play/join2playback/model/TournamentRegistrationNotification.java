@@ -13,19 +13,19 @@ public class TournamentRegistrationNotification {
     @Column(name = "tournament_id", nullable = false)
     private UUID tournamentId;
 
-    @Column(name = "tournament_name", nullable = false, length = 255)
+    @Column(name = "tournament_name", nullable = false)
     private String tournamentName;
 
     @Column(name = "requester_id", nullable = false)
     private UUID requesterId;
 
-    @Column(name = "requester_name", nullable = false, length = 255)
+    @Column(name = "requester_name", nullable = false)
     private String requesterName;
 
     @Column(name = "host_id", nullable = false)
     private UUID hostId;
 
-    @Column(name = "host_name", nullable = false, length = 255)
+    @Column(name = "host_name", nullable = false)
     private String hostName;
 
     @Column(name = "registration_id", nullable = false)

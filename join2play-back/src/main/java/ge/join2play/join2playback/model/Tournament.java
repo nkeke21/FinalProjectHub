@@ -14,7 +14,7 @@ public class Tournament {
     @Id
     private UUID id;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String name;
 
     @Column(columnDefinition = "TEXT")
@@ -38,7 +38,7 @@ public class Tournament {
     @Column(name = "host_id", nullable = false)
     private UUID hostId;
 
-    @Column(name = "host_name", nullable = false, length = 255)
+    @Column(name = "host_name", nullable = false)
     private String hostName;
 
     @Column(nullable = false, length = 500)

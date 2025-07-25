@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -84,7 +85,7 @@ public class TeamService {
         List<TeamMember> userTeamMemberships = teamMemberRepository.getTeamsByUser(userId);
         return userTeamMemberships.stream()
                 .map(membership -> teamRepository.getById(membership.getTeamId()))
-                .filter(team -> team != null)
+                .filter(Objects::nonNull)
                 .map(this::convertTeamToTeamResponse)
                 .collect(Collectors.toList());
     }
@@ -97,7 +98,7 @@ public class TeamService {
         // Get team IDs where user is already a member
         List<UUID> userTeamIds = userMemberships.stream()
                 .map(TeamMember::getTeamId)
-                .collect(Collectors.toList());
+                .toList();
 
         return allTeams.stream()
                 .filter(team -> !userTeamIds.contains(team.getId()))

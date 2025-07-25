@@ -33,7 +33,7 @@ public class TournamentRegistration {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    @Column(name = "full_name", length = 255)
+    @Column(name = "full_name")
     private String fullName;
 
     @Column
@@ -48,7 +48,7 @@ public class TournamentRegistration {
     @Column(columnDefinition = "TEXT")
     private String address;
 
-    @Column(name = "emergency_contact_name", length = 255)
+    @Column(name = "emergency_contact_name")
     private String emergencyContactName;
 
     @Column(name = "emergency_contact_relationship", length = 100)

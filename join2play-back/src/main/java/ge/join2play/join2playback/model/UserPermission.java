@@ -13,10 +13,10 @@ public class UserPermission {
     @Column(name = "can_host_tournaments", nullable = false)
     private boolean canHostTournaments;
 
-    @Column(name = "granted_by", length = 255)
+    @Column(name = "granted_by")
     private String grantedBy;
 
-    @Column(name = "granted_at", length = 255)
+    @Column(name = "granted_at")
     private String grantedAt;
 
     @Column(columnDefinition = "TEXT")
