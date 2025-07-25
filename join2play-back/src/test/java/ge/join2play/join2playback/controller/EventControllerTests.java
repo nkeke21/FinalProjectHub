@@ -2,8 +2,8 @@ package ge.join2play.join2playback.controller;
 
 import ge.join2play.join2playback.model.*;
 import ge.join2play.join2playback.model.enums.SportType;
-import ge.join2play.join2playback.repository.EventInMemoryRepository;
-import ge.join2play.join2playback.repository.UserInMemoryRepository;
+import ge.join2play.join2playback.repository.inmemory.EventInMemoryRepository;
+import ge.join2play.join2playback.repository.inmemory.UserInMemoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,6 +93,8 @@ public class EventControllerTests {
         Event event = new Event(
                 eventId,
                 hostId,
+                "host@gmail.com",
+                "host_phone",
                 18,
                 25,
                 "Basketball Game",
@@ -130,6 +132,8 @@ public class EventControllerTests {
         Event existingEvent = new Event(
                 eventId,
                 hostId,
+                "host@gmail.com",
+                "host_phone",
                 18,
                 25,
                 "Original Match",
@@ -173,6 +177,8 @@ public class EventControllerTests {
         Event event1 = new Event(
                 UUID.randomUUID(),
                 hostId,
+                "host@gmail.com",
+                "host_phone",
                 18,
                 25,
                 "Football Match",
@@ -187,6 +193,8 @@ public class EventControllerTests {
         Event event2 = new Event(
                 UUID.randomUUID(),
                 hostId,
+                "host@gmail.com",
+                "host_phone",
                 25,
                 35,
                 "Basketball Game",

@@ -1,4 +1,4 @@
-package ge.join2play.join2playback.repository;
+package ge.join2play.join2playback.repository.inmemory;
 
 import ge.join2play.join2playback.model.TeamJoinRequest;
 import ge.join2play.join2playback.model.enums.TeamJoinRequestStatus;

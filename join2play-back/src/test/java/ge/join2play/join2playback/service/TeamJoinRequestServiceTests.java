@@ -7,10 +7,10 @@ import ge.join2play.join2playback.model.enums.TeamJoinRequestStatus;
 import ge.join2play.join2playback.model.enums.TeamRole;
 import ge.join2play.join2playback.model.exceptions.TeamJoinRequestAlreadyExistsException;
 import ge.join2play.join2playback.model.exceptions.UserAgeNotInRangeException;
-import ge.join2play.join2playback.repository.TeamJoinRequestInMemoryRepository;
-import ge.join2play.join2playback.repository.TeamMemberInMemoryRepository;
-import ge.join2play.join2playback.repository.TeamInMemoryRepository;
-import ge.join2play.join2playback.repository.UserInMemoryRepository;
+import ge.join2play.join2playback.repository.inmemory.TeamJoinRequestInMemoryRepository;
+import ge.join2play.join2playback.repository.inmemory.TeamMemberInMemoryRepository;
+import ge.join2play.join2playback.repository.inmemory.TeamInMemoryRepository;
+import ge.join2play.join2playback.repository.inmemory.UserInMemoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
