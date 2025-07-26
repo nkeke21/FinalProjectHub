@@ -1,5 +1,6 @@
-import { API_BASE_URL, ENDPOINTS, HEADERS } from '../../constants/apis'
-import type { Team, TeamMember } from '../../models/Tournament'
+import { Team } from '../../models/Tournament'
+import { getAuthHeaders } from '../../utils/auth'
+import { API_BASE_URL, ENDPOINTS } from '../../constants/apis'
 
 export interface TeamRequest {
   name: string
@@ -11,13 +12,12 @@ export interface TeamRequest {
 }
 
 export class UserTeamService {
-  private static readonly BASE_URL = '/api/teams'
+  private static readonly BASE_URL = `${API_BASE_URL}/api/teams`
 
   static async createTeam(teamRequest: TeamRequest): Promise<Team> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.CREATE_TEAM}`, {
       method: 'POST',
-      headers: HEADERS.JSON,
-      credentials: 'include',
+      headers: getAuthHeaders(),
       body: JSON.stringify(teamRequest)
     })
 
@@ -35,7 +35,7 @@ export class UserTeamService {
       console.log('Fetching teams from:', `${this.BASE_URL}/my`)
       const response = await fetch(`${this.BASE_URL}/my`, {
         method: 'GET',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       console.log('Response status:', response.status)
@@ -64,7 +64,7 @@ export class UserTeamService {
     try {
       const response = await fetch(`${this.BASE_URL}/captain`, {
         method: 'GET',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -84,7 +84,7 @@ export class UserTeamService {
       console.log('Getting team by ID:', teamId)
       const response = await fetch(`${this.BASE_URL}/${teamId}`, {
         method: 'GET',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       console.log('Team response status:', response.status)
@@ -115,7 +115,7 @@ export class UserTeamService {
     try {
       const response = await fetch(`${this.BASE_URL}/available`, {
         method: 'GET',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -133,8 +133,7 @@ export class UserTeamService {
   static async getTeam(teamId: string): Promise<Team> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.GET_TEAM(teamId)}`, {
       method: 'GET',
-      headers: HEADERS.JSON,
-      credentials: 'include'
+      headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -153,8 +152,7 @@ export class UserTeamService {
   static async leaveTeam(teamId: string): Promise<void> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.LEAVE_TEAM(teamId)}`, {
       method: 'DELETE',
-      headers: HEADERS.JSON,
-      credentials: 'include'
+      headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -167,8 +165,7 @@ export class UserTeamService {
   static async updateTeam(teamId: string, teamRequest: TeamRequest): Promise<Team> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.UPDATE_TEAM(teamId)}`, {
       method: 'PUT',
-      headers: HEADERS.JSON,
-      credentials: 'include',
+      headers: getAuthHeaders(),
       body: JSON.stringify(teamRequest)
     })
 
@@ -184,8 +181,7 @@ export class UserTeamService {
   static async removeTeamMember(teamId: string, memberId: string): Promise<void> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.REMOVE_TEAM_MEMBER(teamId, memberId)}`, {
       method: 'DELETE',
-      headers: HEADERS.JSON,
-      credentials: 'include'
+      headers: getAuthHeaders()
     })
 
     if (!response.ok) {

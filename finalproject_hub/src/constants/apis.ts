@@ -1,4 +1,4 @@
-export const API_BASE_URL = ''
+export const API_BASE_URL = 'http://13.60.247.145:8080'
 
 export const ENDPOINTS = {
     CREATE_EVENT: '/events',
@@ -39,7 +39,24 @@ export const ENDPOINTS = {
     GET_SENT_EVENT_INVITATIONS: '/event-invitations/user/sent',
     RESPOND_TO_EVENT_INVITATION: '/event-invitations/respond',
     DELETE_EVENT_INVITATION: (invitationId: string) => `/event-invitations/${invitationId}`,
-    CHECK_EVENT_INVITATION: (eventId: string, userId: string) => `/event-invitations/check-invitation/${eventId}/${userId}`
+    CHECK_EVENT_INVITATION: (eventId: string, userId: string) => `/event-invitations/check-invitation/${eventId}/${userId}`,
+    CREATE_TOURNAMENT: '/tournaments',
+    GET_TOURNAMENT: (id: string) => `/tournaments/${id}`,
+    GET_ALL_TOURNAMENTS: '/tournaments',
+    GET_CURRENT_USER_TOURNAMENTS: '/tournaments/my',
+    UPDATE_TOURNAMENT: (id: string) => `/tournaments/${id}`,
+    DELETE_TOURNAMENT: (id: string) => `/tournaments/${id}`,
+    CREATE_TEAM: '/teams',
+    GET_TEAM: (id: string) => `/teams/${id}`,
+    UPDATE_TEAM: (id: string) => `/teams/${id}`,
+    MY_TEAMS: '/teams/my',
+    AVAILABLE_TEAMS: '/teams/available',
+    JOIN_TEAM: (id: string) => `/teams/${id}/join`,
+    LEAVE_TEAM: (id: string) => `/teams/${id}/leave`,
+    REMOVE_TEAM_MEMBER: (teamId: string, memberId: string) => `/teams/${teamId}/members/${memberId}`,
+    GET_TOURNAMENT_REGISTRATION_NOTIFICATIONS: '/tournament-registration-notifications/host',
+    GET_UNREAD_NOTIFICATION_COUNT: '/tournament-registration-notifications/unread-count',
+    MARK_NOTIFICATION_AS_READ: (notificationId: string) => `/tournament-registration-notifications/${notificationId}/read'
 }
 
 export const HEADERS = {

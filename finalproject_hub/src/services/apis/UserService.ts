@@ -1,4 +1,5 @@
-import { API_BASE_URL, ENDPOINTS, HEADERS } from '../../constants/apis'
+import { API_BASE_URL, ENDPOINTS } from '../../constants/apis'
+import { getAuthHeaders } from '../../utils/auth'
 
 export interface UserDetails {
   id: string
@@ -14,8 +15,7 @@ export class UserService {
     try {
       const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.USER_DETAILS(userId)}`, {
         method: 'GET',
-        headers: HEADERS.JSON,
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -34,8 +34,7 @@ export class UserService {
     try {
       const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.CURRENT_USER_DETAILS}`, {
         method: 'GET',
-        headers: HEADERS.JSON,
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {

@@ -1,4 +1,6 @@
 import { TournamentRegistration, RegistrationRequest, RegistrationResponse, RegistrationStatus } from '../../models/TournamentRegistration'
+import { getAuthHeaders } from '../../utils/auth'
+import { API_BASE_URL } from '../../constants/apis'
 
 interface ExtendedRegistrationRequest extends RegistrationRequest {
   registrationType?: 'individual' | 'team'
@@ -45,22 +47,19 @@ interface BackendRegistrationResponse {
 }
 
 export class TournamentRegistrationService {
-  private static readonly BASE_URL = '/api/tournament-registrations'
+  private static readonly BASE_URL = `${API_BASE_URL}/api/tournament-registrations`
 
   static async registerForTournament(request: ExtendedRegistrationRequest): Promise<RegistrationResponse> {
     try {
       const response = await fetch(this.BASE_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           tournamentId: request.tournamentId,
           registrationType: request.registrationType || 'individual',
           teamId: request.teamId,
           participantInfo: request.participantInfo
         }),
-        credentials: 'include',
       })
 
       if (!response.ok) {
@@ -99,7 +98,7 @@ export class TournamentRegistrationService {
     try {
       const response = await fetch(`${this.BASE_URL}/tournament/${tournamentId}/can-register`, {
         method: 'GET',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -117,7 +116,7 @@ export class TournamentRegistrationService {
     try {
       const response = await fetch(`${this.BASE_URL}/${tournamentId}/withdraw`, {
         method: 'POST',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -156,7 +155,7 @@ export class TournamentRegistrationService {
     try {
       const response = await fetch(`${this.BASE_URL}/tournament/${tournamentId}`, {
         method: 'GET',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -199,7 +198,7 @@ export class TournamentRegistrationService {
     try {
       const response = await fetch(`${this.BASE_URL}/${registrationId}/approve`, {
         method: 'PUT',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -238,7 +237,7 @@ export class TournamentRegistrationService {
     try {
       const response = await fetch(`${this.BASE_URL}/${registrationId}/reject`, {
         method: 'PUT',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -277,7 +276,7 @@ export class TournamentRegistrationService {
     try {
       const response = await fetch(`${this.BASE_URL}/tournament/${tournamentId}/all`, {
         method: 'GET',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -317,7 +316,7 @@ export class TournamentRegistrationService {
     try {
       const response = await fetch(`${this.BASE_URL}/${registrationId}`, {
         method: 'GET',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {

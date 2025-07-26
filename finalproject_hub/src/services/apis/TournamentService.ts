@@ -1,4 +1,6 @@
 import { Tournament, TournamentFormat } from '../../models/Tournament'
+import { getAuthHeaders } from '../../utils/auth'
+import { API_BASE_URL } from '../../constants/apis'
 
 export interface TournamentRequest {
   name: string
@@ -47,17 +49,14 @@ export interface TournamentResponse {
 }
 
 export class TournamentService {
-  private static readonly BASE_URL = '/api/tournaments'
+  private static readonly BASE_URL = `${API_BASE_URL}/api/tournaments`
 
   static async createTournament(request: TournamentRequest): Promise<TournamentResponse> {
     try {
       const response = await fetch(this.BASE_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(request),
-        credentials: 'include', // Include session cookies
       })
 
       if (!response.ok) {
@@ -104,7 +103,7 @@ export class TournamentService {
   static async getCurrentUserTournaments(): Promise<TournamentResponse[]> {
     try {
       const response = await fetch(`${this.BASE_URL}/host`, {
-        credentials: 'include', // Include session cookies
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -122,11 +121,8 @@ export class TournamentService {
     try {
       const response = await fetch(`${this.BASE_URL}/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(request),
-        credentials: 'include', // Include session cookies
       })
 
       if (!response.ok) {
@@ -144,7 +140,7 @@ export class TournamentService {
     try {
       const response = await fetch(`${this.BASE_URL}/${id}`, {
         method: 'DELETE',
-        credentials: 'include', // Include session cookies
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {

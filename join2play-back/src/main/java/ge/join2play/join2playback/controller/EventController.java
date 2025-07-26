@@ -2,9 +2,9 @@ package ge.join2play.join2playback.controller;
 
 import ge.join2play.join2playback.model.*;
 import ge.join2play.join2playback.service.ApplicationService;
+import ge.join2play.join2playback.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,10 +14,12 @@ import java.util.UUID;
 @CrossOrigin(origins = "*")
 public class EventController {
     private final ApplicationService applicationService;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public EventController(ApplicationService applicationService) {
+    public EventController(ApplicationService applicationService, JwtUtil jwtUtil) {
         this.applicationService = applicationService;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping("/setup")
@@ -26,13 +28,13 @@ public class EventController {
     }
 
     @PostMapping
-    public EventResponse createEvent(@RequestBody EventRequest eventRequest, HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
-        if (currentUser == null) {
-            throw new RuntimeException("Not authenticated");
-        }
-        eventRequest.setHostId(currentUser.getId());
-        return applicationService.createEvent(eventRequest);
+    public EventResponse createEvent(@RequestBody EventRequest eventRequest) {
+        return jwtUtil.getCurrentUserId()
+                .map(userId -> {
+                    eventRequest.setHostId(userId);
+                    return applicationService.createEvent(eventRequest);
+                })
+                .orElseThrow(() -> new RuntimeException("Not authenticated"));
     }
 
     @GetMapping("/{id}")
@@ -41,13 +43,13 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
-    public EventResponse updateEvent(@RequestBody EventRequest eventRequest, @PathVariable UUID id, HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
-        if (currentUser == null) {
-            throw new RuntimeException("Not authenticated");
-        }
-        eventRequest.setHostId(currentUser.getId());
-        return applicationService.updateEvent(eventRequest, id);
+    public EventResponse updateEvent(@RequestBody EventRequest eventRequest, @PathVariable UUID id) {
+        return jwtUtil.getCurrentUserId()
+                .map(userId -> {
+                    eventRequest.setHostId(userId);
+                    return applicationService.updateEvent(eventRequest, id);
+                })
+                .orElseThrow(() -> new RuntimeException("Not authenticated"));
     }
 
     @GetMapping
@@ -56,38 +58,32 @@ public class EventController {
     }
 
     @PostMapping("/{id}/join")
-    public EventResponse joinEvent(@PathVariable UUID id, HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
-        if (currentUser == null) {
-            throw new RuntimeException("Not authenticated");
-        }
-        return applicationService.joinEvent(id, currentUser.getId());
+    public EventResponse joinEvent(@PathVariable UUID id) {
+        return jwtUtil.getCurrentUserId()
+                .map(userId -> applicationService.joinEvent(id, userId))
+                .orElseThrow(() -> new RuntimeException("Not authenticated"));
     }
 
     @GetMapping("/{id}/participating")
-    public boolean isUserParticipating(@PathVariable UUID id, HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
-        if (currentUser == null) {
-            throw new RuntimeException("Not authenticated");
-        }
-        return applicationService.isUserParticipating(id, currentUser.getId());
+    public boolean isUserParticipating(@PathVariable UUID id) {
+        return jwtUtil.getCurrentUserId()
+                .map(userId -> applicationService.isUserParticipating(id, userId))
+                .orElseThrow(() -> new RuntimeException("Not authenticated"));
     }
 
     @DeleteMapping("/{eventId}/participants/{participantId}")
-    public EventResponse removeParticipant(@PathVariable UUID eventId, @PathVariable UUID participantId, HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
-        if (currentUser == null) {
-            throw new RuntimeException("Not authenticated");
-        }
-        return applicationService.removeParticipant(eventId, participantId, currentUser.getId());
+    public EventResponse removeParticipant(@PathVariable UUID eventId, @PathVariable UUID participantId) {
+        return jwtUtil.getCurrentUserId()
+                .map(userId -> applicationService.removeParticipant(eventId, participantId, userId))
+                .orElseThrow(() -> new RuntimeException("Not authenticated"));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteEvent(@PathVariable UUID id, HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
-        if (currentUser == null) {
-            throw new RuntimeException("Not authenticated");
-        }
-        applicationService.deleteEvent(id, currentUser.getId());
+    public void deleteEvent(@PathVariable UUID id) {
+        jwtUtil.getCurrentUserId()
+                .ifPresentOrElse(
+                    userId -> applicationService.deleteEvent(id, userId),
+                    () -> { throw new RuntimeException("Not authenticated"); }
+                );
     }
 }

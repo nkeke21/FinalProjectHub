@@ -1,4 +1,5 @@
-import { API_BASE_URL, HEADERS, ENDPOINTS } from "../../constants/apis"
+import { API_BASE_URL, ENDPOINTS } from "../../constants/apis"
+import { getAuthHeaders } from "../../utils/auth"
 
 export interface CommunityMember {
   id: string
@@ -18,8 +19,7 @@ export async function getCommunityMembers(): Promise<CommunityMember[]> {
   try {
     const friendsResponse = await fetch(`${API_BASE_URL}/api${ENDPOINTS.CURRENT_USER_FRIENDS}`, {
       method: 'GET',
-      headers: HEADERS.JSON,
-      credentials: 'include'
+      headers: getAuthHeaders()
     })
 
     if (!friendsResponse.ok) {
@@ -31,8 +31,7 @@ export async function getCommunityMembers(): Promise<CommunityMember[]> {
     const memberPromises = friendIds.map(async (friendId) => {
       const userResponse = await fetch(`${API_BASE_URL}/api${ENDPOINTS.USER_DETAILS(friendId)}`, {
         method: 'GET',
-        headers: HEADERS.JSON,
-        credentials: 'include'
+        headers: getAuthHeaders()
       })
 
       if (!userResponse.ok) {
@@ -65,10 +64,9 @@ export async function getCommunityMembers(): Promise<CommunityMember[]> {
 
 export async function searchCommunityMembers(query: string): Promise<CommunityMember[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.SEARCH_USERS}?query=${encodeURIComponent(query)}`, {
+    const response = await fetch(`${API_BASE_URL}/api/users/search?query=${encodeURIComponent(query)}`, {
       method: 'GET',
-      headers: HEADERS.JSON,
-      credentials: 'include'
+      headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -96,8 +94,7 @@ export async function getCommunityStats(): Promise<CommunityStats> {
   try {
     const friendsResponse = await fetch(`${API_BASE_URL}/api${ENDPOINTS.CURRENT_USER_FRIENDS}`, {
       method: 'GET',
-      headers: HEADERS.JSON,
-      credentials: 'include'
+      headers: getAuthHeaders()
     })
 
     if (!friendsResponse.ok) {

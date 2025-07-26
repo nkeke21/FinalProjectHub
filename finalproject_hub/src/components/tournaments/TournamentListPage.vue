@@ -752,7 +752,10 @@ const openQuickRegistration = (tournament: Tournament) => {
 }
 
 const handleQuickRegistrationSuccess = async () => {
-  await loadUserRegistrations()
+  await Promise.all([
+    loadUserRegistrations(),
+    loadTournaments() // Refresh tournament data to update participant counts
+  ])
 }
 
 const handleQuickRegistrationError = (message: string) => {

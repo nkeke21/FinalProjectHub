@@ -108,6 +108,8 @@ const sportOptions = [
 watchEffect(() => {
   if (props.initialData) {
     formValue.location = props.initialData.location || ''
+    formValue.locationLat = props.initialData.latitude || 0
+    formValue.locationLng = props.initialData.longitude || 0
     formValue.participants = props.initialData.numberOfParticipantsTotal || 1
     
     if (props.initialData.ageRange) {

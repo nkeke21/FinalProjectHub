@@ -31,6 +31,7 @@ import { NButton, NMenu, NTag } from 'naive-ui'
 import { useUserStore } from '@/store/profile/userStore'
 import { useMessage } from 'naive-ui'
 import { useRoute } from 'vue-router'
+import { AuthService } from '@/services/apis/AuthService'
 import AccountDetails from '@/components/profile/AccountDetails.vue'
 import HostedEvents from '@/components/profile/HostedEvents.vue'
 import RegisteredEvents from '@/components/profile/RegisteredEvents.vue'
@@ -59,7 +60,12 @@ const profileUserId = computed(() => {
 const showAddFriendButton = ref(true)
 
 const checkExistingFriendRequest = async () => {
+    console.log('🔍 Checking friend request...')
+    console.log('isOwnProfile.value:', isOwnProfile.value)
+    console.log('profileUserId.value:', profileUserId.value)
+    
     if (isOwnProfile.value) {
+        console.log('✅ Own profile - hiding Add Friend button')
         showAddFriendButton.value = false
         return
     }
@@ -69,22 +75,33 @@ const checkExistingFriendRequest = async () => {
         const loggedInUser = userStr ? JSON.parse(userStr) : null
         const currentUserId = loggedInUser?.id || ''
         
+        console.log('currentUserId:', currentUserId)
+        console.log('profileUserId.value:', profileUserId.value)
+        
         if (!currentUserId || !profileUserId.value) {
+            console.log('❌ Missing user IDs - showing Add Friend button')
             showAddFriendButton.value = true
             return
         }
 
+        console.log('🔍 Checking if friend request exists...')
         const existingRequest = await userStore.checkFriendRequest(currentUserId, profileUserId.value)
+        console.log('existingRequest:', existingRequest)
         
         showAddFriendButton.value = !existingRequest
+        console.log('showAddFriendButton after request check:', showAddFriendButton.value)
         
         if (showAddFriendButton.value) {
+            console.log('🔍 Checking if already friends...')
             await userStore.fetchCurrentUserFriends()
             const isFriend = userStore.friends.includes(profileUserId.value)
+            console.log('userStore.friends:', userStore.friends)
+            console.log('isFriend:', isFriend)
             showAddFriendButton.value = !isFriend
+            console.log('Final showAddFriendButton value:', showAddFriendButton.value)
         }
     } catch (error) {
-        console.error('Error checking friend request:', error)
+        console.error('❌ Error checking friend request:', error)
         showAddFriendButton.value = true
     }
 }
@@ -116,23 +133,16 @@ const handleMenuChange = async (key: string) => {
 
 const logout = async () => {
   try {
-    const response = await fetch('/api/auth/logout', {
-      method: 'POST',
-      credentials: 'include'
-    })
-    
-    if (response.ok) {
-      localStorage.removeItem('user')
-      message.success('Logged out successfully')
-      
-      router.push('/')
-    } else {
-      message.error('Logout failed')
-    }
+    // Use AuthService logout method (client-side only)
+    AuthService.logout()
+    localStorage.removeItem('user')
+    message.success('Logged out successfully')
+    router.push('/')
   } catch (error) {
     console.error('Logout error:', error)
     message.error('Logout failed')
     
+    // Still remove user data and redirect even if there's an error
     localStorage.removeItem('user')
     router.push('/')
   }
@@ -166,7 +176,10 @@ const menuOptions = computed(() => {
     }
   ]
 
+  console.log('🔍 menuOptions computed - isOwnProfile:', isOwnProfile.value, 'showAddFriendButton:', showAddFriendButton.value)
+
   if (!isOwnProfile.value && showAddFriendButton.value) {
+    console.log('✅ Adding Add Friend button to menu')
     baseOptions.push({
       key: 'add-friend',
       label: () =>
@@ -175,6 +188,8 @@ const menuOptions = computed(() => {
           h('span', { class: 'menu-text' }, 'Add Friend')
         ])
     })
+  } else {
+    console.log('❌ Not adding Add Friend button - isOwnProfile:', isOwnProfile.value, 'showAddFriendButton:', showAddFriendButton.value)
   }
 
   return baseOptions

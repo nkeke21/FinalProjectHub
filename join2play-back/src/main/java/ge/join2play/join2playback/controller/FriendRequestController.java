@@ -4,14 +4,13 @@ import ge.join2play.join2playback.model.enums.FriendRequestStatus;
 import ge.join2play.join2playback.model.FriendRequest;
 import ge.join2play.join2playback.model.FriendRequestNotification;
 import ge.join2play.join2playback.model.dto.FriendRequestDTO;
-import ge.join2play.join2playback.model.User;
 import ge.join2play.join2playback.service.FriendRequestService;
+import ge.join2play.join2playback.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.UUID;
 import java.util.Optional;
@@ -23,11 +22,13 @@ public class FriendRequestController {
 
     private final FriendRequestService service;
     private final SimpMessagingTemplate messagingTemplate;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public FriendRequestController(FriendRequestService service, SimpMessagingTemplate messagingTemplate) {
+    public FriendRequestController(FriendRequestService service, SimpMessagingTemplate messagingTemplate, JwtUtil jwtUtil) {
         this.service = service;
         this.messagingTemplate = messagingTemplate;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping("/{id}/requests")
@@ -37,13 +38,10 @@ public class FriendRequestController {
     }
 
     @GetMapping("/requests")
-    public ResponseEntity<List<FriendRequest>> getCurrentUserFriendRequests(HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
-        if (currentUser == null) {
-            return ResponseEntity.status(401).build();
-        }
-        List<FriendRequest> requests = service.getPendingRequests(currentUser.getId());
-        return ResponseEntity.ok(requests);
+    public ResponseEntity<List<FriendRequest>> getCurrentUserFriendRequests() {
+        return jwtUtil.getCurrentUserId()
+                .map(userId -> ResponseEntity.ok(service.getPendingRequests(userId)))
+                .orElse(ResponseEntity.status(401).build());
     }
 
     @GetMapping("/{id}/")
@@ -53,13 +51,10 @@ public class FriendRequestController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<UUID>> getCurrentUserFriends(HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
-        if (currentUser == null) {
-            return ResponseEntity.status(401).build();
-        }
-        List<UUID> friends = service.getFriends(currentUser.getId());
-        return ResponseEntity.ok(friends);
+    public ResponseEntity<List<UUID>> getCurrentUserFriends() {
+        return jwtUtil.getCurrentUserId()
+                .map(userId -> ResponseEntity.ok(service.getFriends(userId)))
+                .orElse(ResponseEntity.status(401).build());
     }
 
     @DeleteMapping("/{userId}/friends/{friendId}")

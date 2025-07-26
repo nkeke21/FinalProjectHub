@@ -1,11 +1,11 @@
-import { API_BASE_URL, HEADERS, ENDPOINTS } from "@/constants/apis"
-import { SportEvent } from "@/models/sportEvent"
+import { API_BASE_URL, ENDPOINTS } from "../../constants/apis"
+import { SportEvent } from "../../models/SportEvent"
+import { getAuthHeaders } from "../../utils/auth"
 
 export async function getUserRegisteredEvents(userId: string): Promise<SportEvent[]> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.USER_REGISTERED_EVENTS(userId)}`, {
         method: 'GET',
-        headers: HEADERS.JSON,
-        credentials: 'include'
+        headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -20,8 +20,7 @@ export async function getUserRegisteredEvents(userId: string): Promise<SportEven
 export async function getCurrentUserRegisteredEvents(): Promise<SportEvent[]> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.CURRENT_USER_REGISTERED_EVENTS}`, {
         method: 'GET',
-        headers: HEADERS.JSON,
-        credentials: 'include'
+        headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -36,8 +35,7 @@ export async function getCurrentUserRegisteredEvents(): Promise<SportEvent[]> {
 export async function getUserHostedEvents(userId: string): Promise<SportEvent[]> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.USER_HOSTED_EVENTS(userId)}`, {
         method: 'GET',
-        headers: HEADERS.JSON,
-        credentials: 'include'
+        headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -49,12 +47,11 @@ export async function getUserHostedEvents(userId: string): Promise<SportEvent[]>
     return await response.json()
 }
 
-// New method for getting current user's hosted events (session-based)
+// New method for getting current user's hosted events (JWT-based)
 export async function getCurrentUserHostedEvents(): Promise<SportEvent[]> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.CURRENT_USER_HOSTED_EVENTS}`, {
         method: 'GET',
-        headers: HEADERS.JSON,
-        credentials: 'include'
+        headers: getAuthHeaders()
     })
 
     if (!response.ok) {

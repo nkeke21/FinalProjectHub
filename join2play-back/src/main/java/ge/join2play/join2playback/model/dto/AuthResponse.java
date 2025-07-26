@@ -7,6 +7,7 @@ public class AuthResponse {
     private String name;
     private String email;
     private String message;
+    private String token;
 
     public AuthResponse() {}
 
@@ -15,6 +16,14 @@ public class AuthResponse {
         this.name = name;
         this.email = email;
         this.message = message;
+    }
+
+    public AuthResponse(UUID userId, String name, String email, String message, String token) {
+        this.userId = userId;
+        this.name = name;
+        this.email = email;
+        this.message = message;
+        this.token = token;
     }
 
     public UUID getUserId() {
@@ -47,5 +56,13 @@ public class AuthResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 } 

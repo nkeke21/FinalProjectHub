@@ -1,3 +1,6 @@
+import { getAuthHeaders } from '../../utils/auth'
+import { API_BASE_URL } from '../../constants/apis'
+
 export interface TournamentRegistrationNotification {
   id: string
   tournamentId: string
@@ -12,13 +15,13 @@ export interface TournamentRegistrationNotification {
 }
 
 export class TournamentRegistrationNotificationService {
-  private static readonly BASE_URL = '/api/tournament-registration-notifications'
+  private static readonly BASE_URL = `${API_BASE_URL}/api/tournament-registration-notifications`
 
   static async getHostNotifications(): Promise<TournamentRegistrationNotification[]> {
     try {
       const response = await fetch(`${this.BASE_URL}/host`, {
         method: 'GET',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -36,7 +39,7 @@ export class TournamentRegistrationNotificationService {
     try {
       const response = await fetch(`${this.BASE_URL}/host/unread-count`, {
         method: 'GET',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -54,7 +57,7 @@ export class TournamentRegistrationNotificationService {
     try {
       const response = await fetch(`${this.BASE_URL}/${notificationId}/mark-read`, {
         method: 'PUT',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {

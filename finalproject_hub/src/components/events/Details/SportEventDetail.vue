@@ -448,10 +448,31 @@ const onEditClick = () => {
   showEditModal.value = true
 }
 
-const handleEditSubmit = async (eventDetails: SportEvent) => {
+const handleEditSubmit = async (eventDetails: any) => {
   isUpdating.value = true
   try {
-    await store.updateEvent(route.params.id as string, eventDetails)
+    // Convert form data to SportEvent format
+    const sportEvent = {
+      eventId: event.value?.eventId || null,
+      hostId: event.value?.hostId || null,
+      hostName: event.value?.hostName || null,
+      hostEmail: event.value?.hostEmail || null,
+      hostPhone: event.value?.hostPhone || null,
+      latitude: eventDetails.locationLat || eventDetails.latitude, // Handle both formats
+      longitude: eventDetails.locationLng || eventDetails.longitude, // Handle both formats
+      location: eventDetails.location,
+      participants: eventDetails.participants,
+      numberOfParticipantsTotal: eventDetails.participants,
+      numberOfParticipantsRegistered: event.value?.numberOfParticipantsRegistered || 0,
+      minAge: eventDetails.minAge,
+      maxAge: eventDetails.maxAge,
+      eventTime: eventDetails.eventTime,
+      sportType: eventDetails.sportType,
+      description: eventDetails.description,
+      participantsList: event.value?.participantsList || []
+    }
+
+    await store.updateEvent(route.params.id as string, sportEvent)
     message.success('Event updated successfully!')
     showEditModal.value = false
     await store.fetchEventById(route.params.id as string)
