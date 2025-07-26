@@ -429,6 +429,10 @@ const registerForTournament = async () => {
     if (response.success && response.registration) {
       userRegistration.value = response.registration
       canRegister.value = false
+      
+      // Refresh tournament data to update participant count
+      await loadTournamentData()
+      
       showConfirmation('success', 'Registration Successful', 'You have been successfully registered for this tournament!')
     } else {
       showConfirmation('error', 'Registration Failed', response.message)
@@ -451,6 +455,10 @@ const withdrawFromTournament = async () => {
     if (response.success && response.registration) {
       userRegistration.value = response.registration
       canRegister.value = true
+      
+      // Refresh tournament data to update participant count
+      await loadTournamentData()
+      
       showConfirmation('success', 'Withdrawal Successful', 'You have successfully withdrawn from this tournament.')
     } else {
       showConfirmation('error', 'Withdrawal Failed', response.message)

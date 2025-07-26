@@ -126,10 +126,22 @@ public class TournamentRegistrationService {
             throw new RuntimeException("Registration is already withdrawn");
         }
 
+        boolean wasRegistered = registration.getStatus() == RegistrationStatus.REGISTERED;
+        
         registration.setStatus(RegistrationStatus.WITHDRAWN);
         registration.setUpdatedAt(Instant.now());
 
         TournamentRegistration updatedRegistration = registrationRepository.update(registration);
+        
+        if (wasRegistered) {
+            Tournament tournament = tournamentRepository.getById(tournamentId);
+            if (tournament != null) {
+                int currentParticipants = tournament.getCurrentParticipants();
+                tournament.setCurrentParticipants(Math.max(0, currentParticipants - 1));
+                tournamentRepository.update(tournament);
+            }
+        }
+        
         return convertToResponse(updatedRegistration);
     }
 
