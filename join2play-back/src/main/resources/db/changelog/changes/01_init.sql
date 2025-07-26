@@ -113,7 +113,6 @@ CREATE TABLE tournaments (
                              sport_type VARCHAR(50) NOT NULL,
                              format VARCHAR(50) NOT NULL,
                              tournament_type VARCHAR(20) NOT NULL,
-                             status VARCHAR(20) NOT NULL,
                              host_id UUID NOT NULL,
                              host_name VARCHAR(255) NOT NULL,
                              location VARCHAR(500) NOT NULL,
@@ -136,7 +135,6 @@ CREATE TABLE tournaments (
 
 -- Create indexes for tournaments table
 CREATE INDEX idx_tournaments_sport_type ON tournaments(sport_type);
-CREATE INDEX idx_tournaments_status ON tournaments(status);
 CREATE INDEX idx_tournaments_start_date ON tournaments(start_date);
 CREATE INDEX idx_tournaments_host_id ON tournaments(host_id);
 
