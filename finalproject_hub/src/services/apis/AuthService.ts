@@ -53,6 +53,25 @@ export class AuthService {
             throw new Error(errorData.message || 'Login failed')
         }
 
-        return response.json()
+        const authResponse = await response.json()
+        
+        // Store the JWT token in localStorage
+        if (authResponse.token) {
+            localStorage.setItem('jwt_token', authResponse.token)
+        }
+        
+        return authResponse
+    }
+
+    static logout(): void {
+        localStorage.removeItem('jwt_token')
+    }
+
+    static getToken(): string | null {
+        return localStorage.getItem('jwt_token')
+    }
+
+    static isAuthenticated(): boolean {
+        return !!this.getToken()
     }
 } 

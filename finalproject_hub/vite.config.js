@@ -27,11 +27,11 @@ export default defineConfig({
     __VUE_PROD_DEVTOOLS__: false
   },
   server: {
-    proxy: {
-      '/api': {
-        target: 'http://13.60.247.145:8080',
-        changeOrigin: true
-      }
-    }
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://13.60.247.145:8080',
+    //     changeOrigin: true
+    //   }
+    // }
   }
 })

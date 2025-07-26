@@ -1,5 +1,6 @@
-import { API_BASE_URL, HEADERS, ENDPOINTS } from "@/constants/apis"
-import { UserUpdateDTO } from "@/models/UserUpdateDTO"
+import { API_BASE_URL, ENDPOINTS } from "../../constants/apis"
+import { UserUpdateDTO } from "../../models/UserUpdateDTO"
+import { getAuthHeaders } from "../../utils/auth"
 
 export interface UserDetailsResponse {
   id: string
@@ -13,8 +14,7 @@ export interface UserDetailsResponse {
 export async function getUserDetails(userId: string): Promise<UserDetailsResponse> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.USER_DETAILS(userId)}`, {
         method: 'GET',
-        headers: HEADERS.JSON,
-        credentials: 'include'
+        headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -29,8 +29,7 @@ export async function getUserDetails(userId: string): Promise<UserDetailsRespons
 export async function getCurrentUserDetails(): Promise<UserDetailsResponse> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.CURRENT_USER_DETAILS}`, {
         method: 'GET',
-        headers: HEADERS.JSON,
-        credentials: 'include'
+        headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -45,8 +44,7 @@ export async function getCurrentUserDetails(): Promise<UserDetailsResponse> {
 export async function updateUserDetails(userId: string, update: UserUpdateDTO): Promise<UserUpdateDTO> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.USER_DETAILS(userId)}`, {
         method: 'PATCH',
-        headers: HEADERS.JSON,
-        credentials: 'include',
+        headers: getAuthHeaders(),
         body: JSON.stringify(update)
     })
 
@@ -59,12 +57,11 @@ export async function updateUserDetails(userId: string, update: UserUpdateDTO): 
     return await response.json()
 }
 
-// New method for updating current user details (session-based)
+// New method for updating current user details (JWT-based)
 export async function updateCurrentUserDetails(update: UserUpdateDTO): Promise<UserUpdateDTO> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.UPDATE_CURRENT_USER_DETAILS}`, {
         method: 'PATCH',
-        headers: HEADERS.JSON,
-        credentials: 'include',
+        headers: getAuthHeaders(),
         body: JSON.stringify(update)
     })
 

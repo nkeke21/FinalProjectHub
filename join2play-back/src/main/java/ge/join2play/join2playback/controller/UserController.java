@@ -4,12 +4,11 @@ import ge.join2play.join2playback.model.EventResponse;
 import ge.join2play.join2playback.model.UserDetailsResponse;
 import ge.join2play.join2playback.model.UserResponse;
 import ge.join2play.join2playback.model.UserUpdateDTO;
-import ge.join2play.join2playback.model.User;
 import ge.join2play.join2playback.service.ApplicationService;
+import ge.join2play.join2playback.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,10 +18,12 @@ import java.util.UUID;
 @CrossOrigin(origins = "*")
 public class UserController {
     private final ApplicationService applicationService;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public UserController(ApplicationService applicationService) {
+    public UserController(ApplicationService applicationService, JwtUtil jwtUtil) {
         this.applicationService = applicationService;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping("/details/{id}")
@@ -31,12 +32,10 @@ public class UserController {
     }
 
     @GetMapping("/details")
-    public ResponseEntity<UserDetailsResponse> getCurrentUserDetails(HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
-        if (currentUser == null) {
-            return ResponseEntity.status(401).build();
-        }
-        return ResponseEntity.ok(applicationService.getUserDetails(currentUser.getId()));
+    public ResponseEntity<UserDetailsResponse> getCurrentUserDetails() {
+        return jwtUtil.getCurrentUserId()
+                .map(userId -> ResponseEntity.ok(applicationService.getUserDetails(userId)))
+                .orElse(ResponseEntity.status(401).build());
     }
 
     @PatchMapping("/details/{id}")
@@ -45,12 +44,10 @@ public class UserController {
     }
 
     @PatchMapping("/details")
-    public ResponseEntity<UserUpdateDTO> updateCurrentUserDetails(@RequestBody UserUpdateDTO userUpdateDTO, HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
-        if (currentUser == null) {
-            return ResponseEntity.status(401).build();
-        }
-        return ResponseEntity.ok(applicationService.updateUserDetails(currentUser.getId(), userUpdateDTO));
+    public ResponseEntity<UserUpdateDTO> updateCurrentUserDetails(@RequestBody UserUpdateDTO userUpdateDTO) {
+        return jwtUtil.getCurrentUserId()
+                .map(userId -> ResponseEntity.ok(applicationService.updateUserDetails(userId, userUpdateDTO)))
+                .orElse(ResponseEntity.status(401).build());
     }
 
     @GetMapping("/events/hosted/{id}")
@@ -59,12 +56,10 @@ public class UserController {
     }
 
     @GetMapping("/events/hosted")
-    public ResponseEntity<List<EventResponse>> getCurrentUserHostedEvents(HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
-        if (currentUser == null) {
-            return ResponseEntity.status(401).build();
-        }
-        return ResponseEntity.ok(applicationService.getUserHostedEvents(currentUser.getId()));
+    public ResponseEntity<List<EventResponse>> getCurrentUserHostedEvents() {
+        return jwtUtil.getCurrentUserId()
+                .map(userId -> ResponseEntity.ok(applicationService.getUserHostedEvents(userId)))
+                .orElse(ResponseEntity.status(401).build());
     }
 
     @GetMapping("/events/registered/{id}")
@@ -73,12 +68,10 @@ public class UserController {
     }
 
     @GetMapping("/events/registered")
-    public ResponseEntity<List<EventResponse>> getCurrentUserRegisteredEvents(HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
-        if (currentUser == null) {
-            return ResponseEntity.status(401).build();
-        }
-        return ResponseEntity.ok(applicationService.getUserRegisteredEvents(currentUser.getId()));
+    public ResponseEntity<List<EventResponse>> getCurrentUserRegisteredEvents() {
+        return jwtUtil.getCurrentUserId()
+                .map(userId -> ResponseEntity.ok(applicationService.getUserRegisteredEvents(userId)))
+                .orElse(ResponseEntity.status(401).build());
     }
 
     @GetMapping("/search")

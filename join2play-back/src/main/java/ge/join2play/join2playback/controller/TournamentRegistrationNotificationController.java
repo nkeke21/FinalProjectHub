@@ -1,9 +1,8 @@
 package ge.join2play.join2playback.controller;
 
-import ge.join2play.join2playback.model.User;
 import ge.join2play.join2playback.model.dto.TournamentRegistrationNotificationDTO;
 import ge.join2play.join2playback.service.TournamentRegistrationNotificationService;
-import jakarta.servlet.http.HttpSession;
+import ge.join2play.join2playback.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,53 +14,65 @@ import java.util.UUID;
 @RequestMapping("/api/tournament-registration-notifications")
 @CrossOrigin(origins = "*")
 public class TournamentRegistrationNotificationController {
+
     private final TournamentRegistrationNotificationService notificationService;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public TournamentRegistrationNotificationController(TournamentRegistrationNotificationService notificationService) {
+    public TournamentRegistrationNotificationController(TournamentRegistrationNotificationService notificationService, JwtUtil jwtUtil) {
         this.notificationService = notificationService;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping("/host")
-    public ResponseEntity<List<TournamentRegistrationNotificationDTO>> getHostNotifications(HttpSession session) {
+    public ResponseEntity<List<TournamentRegistrationNotificationDTO>> getHostNotifications() {
         try {
-            User currentUser = (User) session.getAttribute("user");
-            if (currentUser == null) {
-                return ResponseEntity.status(401).build(); // Unauthorized
-            }
-            
-            List<TournamentRegistrationNotificationDTO> notifications = notificationService.getNotificationsByHostId(currentUser.getId());
-            return ResponseEntity.ok(notifications);
+            return jwtUtil.getCurrentUserId()
+                    .map(userId -> {
+                        try {
+                            List<TournamentRegistrationNotificationDTO> notifications = notificationService.getNotificationsByHostId(userId);
+                            return ResponseEntity.ok(notifications);
+                        } catch (Exception e) {
+                            return ResponseEntity.<List<TournamentRegistrationNotificationDTO>>badRequest().build();
+                        }
+                    })
+                    .orElse(ResponseEntity.<List<TournamentRegistrationNotificationDTO>>status(401).build());
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @GetMapping("/host/unread-count")
-    public ResponseEntity<Integer> getUnreadCount(HttpSession session) {
+    public ResponseEntity<Integer> getUnreadCount() {
         try {
-            User currentUser = (User) session.getAttribute("user");
-            if (currentUser == null) {
-                return ResponseEntity.status(401).build(); // Unauthorized
-            }
-            
-            int count = notificationService.getUnreadCountByHostId(currentUser.getId());
-            return ResponseEntity.ok(count);
+            return jwtUtil.getCurrentUserId()
+                    .map(userId -> {
+                        try {
+                            Integer count = notificationService.getUnreadCountByHostId(userId);
+                            return ResponseEntity.ok(count);
+                        } catch (Exception e) {
+                            return ResponseEntity.<Integer>badRequest().build();
+                        }
+                    })
+                    .orElse(ResponseEntity.<Integer>status(401).build());
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @PutMapping("/{id}/mark-read")
-    public ResponseEntity<Void> markAsRead(@PathVariable UUID id, HttpSession session) {
+    public ResponseEntity<Void> markAsRead(@PathVariable UUID id) {
         try {
-            User currentUser = (User) session.getAttribute("user");
-            if (currentUser == null) {
-                return ResponseEntity.status(401).build(); // Unauthorized
-            }
-            
-            notificationService.markAsRead(id, currentUser.getId());
-            return ResponseEntity.ok().build();
+            return jwtUtil.getCurrentUserId()
+                    .map(userId -> {
+                        try {
+                            notificationService.markAsRead(id, userId);
+                            return ResponseEntity.<Void>ok().build();
+                        } catch (Exception e) {
+                            return ResponseEntity.<Void>badRequest().build();
+                        }
+                    })
+                    .orElse(ResponseEntity.<Void>status(401).build());
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
