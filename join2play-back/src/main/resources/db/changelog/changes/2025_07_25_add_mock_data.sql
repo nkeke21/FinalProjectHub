@@ -64,12 +64,12 @@ VALUES ('13fa5e4e-1d9e-4a2a-9a20-7385f24e9097', true, 'system', '2024-01-01',
         'Experienced organizer - Runner and sports event organizer');
 
 -- Insert Tournaments
-INSERT INTO tournaments (id, name, description, sport_type, format, tournament_type, status, host_id, host_name,
+INSERT INTO tournaments (id, name, description, sport_type, format, tournament_type, host_id, host_name,
                          location, latitude, longitude, start_date, end_date, registration_deadline, max_participants,
                          current_participants, entry_fee, prize_pool, min_age, max_age, rules, created_at, updated_at)
 VALUES (gen_random_uuid(), 'Tbilisi Football Championship',
         'Annual football tournament featuring the best teams from Tbilisi. Join us for an exciting competition with great prizes!',
-        'FOOTBALL', 'SINGLE_ELIMINATION', 'team', 'UPCOMING', '13fa5e4e-1d9e-4a2a-9a20-7385f24e9097', 'Kakha Salukvadze',
+        'FOOTBALL', 'SINGLE_ELIMINATION', 'team', '13fa5e4e-1d9e-4a2a-9a20-7385f24e9097', 'Kakha Salukvadze',
         'Tbilisi, Georgia', 41.7151, 44.8271, '2025-06-15 09:00:00+00', '2025-06-20 18:00:00+00',
         '2025-06-10 23:59:59+00', 16, 8, 50.0, 1000.0, 18, 35,
         'All participants must follow fair play rules.
@@ -77,7 +77,7 @@ Teams must have 11 players.
 Matches are 90 minutes long.', NOW(), NOW()),
        (gen_random_uuid(), 'Basketball 3v3 Tournament',
         'Fast-paced 3v3 basketball tournament. Perfect for teams looking for quick, exciting games!', 'BASKETBALL',
-        'DOUBLE_ELIMINATION', 'team', 'UPCOMING', '46bd8e5f-4abc-6a1c-8ef3-dcba87654321', 'Mike Johnson',
+        'DOUBLE_ELIMINATION', 'team', '46bd8e5f-4abc-6a1c-8ef3-dcba87654321', 'Mike Johnson',
         'Tbilisi Sports Complex', 41.7151, 44.8271, '2025-07-01 10:00:00+00', '2025-07-03 18:00:00+00',
         '2025-06-25 23:59:59+00', 32, 12, 25.0, 500.0, 16, 40,
         '3v3 format

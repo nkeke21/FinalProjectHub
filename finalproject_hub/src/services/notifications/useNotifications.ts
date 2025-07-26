@@ -28,7 +28,7 @@ export interface Notification {
 export function useNotifications() {
   const userStore = useUserStore()
   const notifications = ref<Notification[]>([])
-  const activeFilter = ref<'all' | 'friend-requests' | 'event-invitations'>('all')
+  const activeFilter = ref<'all' | 'friend-requests' | 'event-invitations' | 'team-join-requests'>('all')
 
   const convertFriendRequestsToNotifications = async (friendRequests: FriendRequest[]): Promise<Notification[]> => {
     const notifications: Notification[] = []
@@ -245,6 +245,9 @@ export function useNotifications() {
     switch (activeFilter.value) {
       case 'friend-requests':
         filterType = 'friend-request'
+        break
+      case 'team-join-requests':
+        filterType = 'team-join-request'
         break
       default:
         filterType = 'event-invitation'
@@ -470,6 +473,7 @@ export function useNotifications() {
   const refreshNotifications = async () => {
     await Promise.all([
       loadFriendRequests(),
+      loadTeamJoinRequests(),
       loadEventInvitations()
     ])
   }
@@ -485,11 +489,14 @@ export function useNotifications() {
     unreadCount,
     friendRequestCount,
     eventInvitationCount,
+    teamJoinRequestCount,
     markAsRead,
     acceptFriendRequest,
     declineFriendRequest,
     acceptEventInvitation,
     declineEventInvitation,
+    approveTeamJoinRequest,
+    declineTeamJoinRequest,
     markAllAsRead,
     deleteNotification,
     addNotification,

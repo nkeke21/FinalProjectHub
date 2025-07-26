@@ -2,7 +2,6 @@ package ge.join2play.join2playback.model;
 
 import ge.join2play.join2playback.model.enums.SportType;
 import ge.join2play.join2playback.model.enums.TournamentFormat;
-import ge.join2play.join2playback.model.enums.TournamentStatus;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.List;
@@ -30,10 +29,6 @@ public class Tournament {
 
     @Column(name = "tournament_type", nullable = false, length = 20)
     private String tournamentType;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private TournamentStatus status;
 
     @Column(name = "host_id", nullable = false)
     private UUID hostId;
@@ -176,14 +171,6 @@ public class Tournament {
 
     public void setTournamentType(String tournamentType) {
         this.tournamentType = tournamentType;
-    }
-
-    public TournamentStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(TournamentStatus status) {
-        this.status = status;
     }
 
     public UUID getHostId() {
