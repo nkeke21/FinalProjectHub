@@ -4,6 +4,7 @@ import ge.join2play.join2playback.config.EventTableConfig;
 import ge.join2play.join2playback.config.FilterConfig;
 import ge.join2play.join2playback.model.*;
 import ge.join2play.join2playback.model.enums.SportType;
+import ge.join2play.join2playback.model.exceptions.InvalidEventDateException;
 import ge.join2play.join2playback.model.exceptions.SportTypeDoesNotExistException;
 import ge.join2play.join2playback.model.exceptions.UserAgeNotInRangeException;
 import ge.join2play.join2playback.model.exceptions.UserDoesNotExistException;
@@ -54,6 +55,12 @@ public class ApplicationService {
             throw new SportTypeDoesNotExistException("Invalid sport type " + eventRequest.getSportType() + " provided.");
         }
         
+        Instant eventTime = Instant.ofEpochMilli(eventRequest.getEventTime());
+        Instant currentTime = Instant.now();
+        if (eventTime.isBefore(currentTime) || eventTime.equals(currentTime)) {
+            throw new InvalidEventDateException("Event date and time must be in the future.");
+        }
+        
         Optional<User> hostUser = userRepository.getById(eventRequest.getHostId());
         if (hostUser.isEmpty()) {
             throw new UserDoesNotExistException(
@@ -62,7 +69,7 @@ public class ApplicationService {
         
         return new Event(
                 UUID.randomUUID(), eventRequest.getHostId(), hostUser.get().getEmail(), hostUser.get().getPhoneNumber(), 
-                eventRequest.getMinAge(), eventRequest.getMaxAge(), eventRequest.getDescription(), Instant.ofEpochMilli(eventRequest.getEventTime()),
+                eventRequest.getMinAge(), eventRequest.getMaxAge(), eventRequest.getDescription(), eventTime,
                 eventRequest.getLatitude(), eventRequest.getLongitude(), eventRequest.getLocation(), eventRequest.getNumberOfParticipantsTotal(),
                 eventRequest.getNumberOfParticipantsRegistered(), sportType
         );

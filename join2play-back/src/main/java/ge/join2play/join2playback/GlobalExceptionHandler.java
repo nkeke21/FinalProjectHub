@@ -230,6 +230,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+    @ExceptionHandler(InvalidEventDateException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidEventDate(InvalidEventDateException ex) {
+        logger.warn("Invalid event date: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse(
+                "INVALID_EVENT_DATE",
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorized(UnauthorizedException ex) {
         logger.warn("Unauthorized access: {}", ex.getMessage());

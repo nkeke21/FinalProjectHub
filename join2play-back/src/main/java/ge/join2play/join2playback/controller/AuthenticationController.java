@@ -5,6 +5,7 @@ import ge.join2play.join2playback.model.dto.SignInRequest;
 import ge.join2play.join2playback.model.dto.SignUpRequest;
 import ge.join2play.join2playback.model.exceptions.EmailAlreadyExistsException;
 import ge.join2play.join2playback.model.exceptions.InvalidCredentialsException;
+import ge.join2play.join2playback.model.exceptions.UserAgeNotInRangeException;
 import ge.join2play.join2playback.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,9 @@ public class AuthenticationController {
             return ResponseEntity.ok(response);
         } catch (EmailAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new AuthResponse(null, null, null, e.getMessage()));
+        } catch (UserAgeNotInRangeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new AuthResponse(null, null, null, e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

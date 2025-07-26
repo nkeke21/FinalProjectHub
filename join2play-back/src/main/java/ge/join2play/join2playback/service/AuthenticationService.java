@@ -6,16 +6,22 @@ import ge.join2play.join2playback.model.dto.SignInRequest;
 import ge.join2play.join2playback.model.dto.SignUpRequest;
 import ge.join2play.join2playback.model.exceptions.EmailAlreadyExistsException;
 import ge.join2play.join2playback.model.exceptions.InvalidCredentialsException;
+import ge.join2play.join2playback.model.exceptions.UserAgeNotInRangeException;
 import ge.join2play.join2playback.repository.interfaces.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.Period;
 import java.util.UUID;
 
 @Service
 public class AuthenticationService {
     private final UserRepository userRepository;
-    private final UserPermissionService userPermissionService;
     private final PasswordService passwordService;
+    private final UserPermissionService userPermissionService;
 
     public AuthenticationService(UserRepository userRepository, UserPermissionService userPermissionService, PasswordService passwordService) {
         this.userRepository = userRepository;
@@ -27,6 +33,18 @@ public class AuthenticationService {
         User existingUser = userRepository.findByEmail(signUpRequest.getEmail());
         if (existingUser != null) {
             throw new EmailAlreadyExistsException("Email " + signUpRequest.getEmail() + " is already registered.");
+        }
+
+        if (signUpRequest.getBirthDate() != null) {
+            LocalDate birthDate = Instant.ofEpochMilli(signUpRequest.getBirthDate())
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+            LocalDate currentDate = LocalDate.now();
+            int age = Period.between(birthDate, currentDate).getYears();
+            
+            if (age < 8) {
+                throw new UserAgeNotInRangeException("User must be at least 8 years old to register.");
+            }
         }
 
         String hashedPassword = passwordService.hashPassword(signUpRequest.getPassword());
