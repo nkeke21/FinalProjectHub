@@ -10,6 +10,7 @@ public interface EventParticipantsRepository {
     List<EventParticipant> getAllParticipantsOf(UUID eventId);
     List<EventParticipant> getAll();
     EventParticipant getById(UUID id);
+    EventParticipant getByEventIdAndParticipantId(UUID eventId, UUID participantId);
     EventParticipant save(EventParticipant eventParticipant);
     EventParticipant update(EventParticipant eventParticipant);
     void delete(UUID id);

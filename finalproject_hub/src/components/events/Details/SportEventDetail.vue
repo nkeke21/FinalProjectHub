@@ -119,6 +119,20 @@
                     <div class="participant-email">{{ participant.email }}</div>
                     <div class="participant-age">{{ participant.age }} years old</div>
                   </div>
+                  <div class="participant-actions" v-if="isHost && participant.userId !== event.hostId">
+                    <n-button 
+                      type="error" 
+                      size="small" 
+                      @click="onRemoveParticipant(participant.userId, participant.name)"
+                      :loading="isUpdating"
+                      class="remove-button"
+                    >
+                      <template #icon>
+                        <n-icon><CloseCircleOutline /></n-icon>
+                      </template>
+                      Remove
+                    </n-button>
+                  </div>
                 </div>
               </div>
               <div v-else class="no-participants">
@@ -169,6 +183,19 @@
                     <n-icon><RefreshOutline /></n-icon>
                   </template>
                   Refresh
+                </n-button>
+                
+                <n-button 
+                  type="error" 
+                  size="large" 
+                  @click="onDeleteClick"
+                  class="action-button"
+                  :loading="isUpdating"
+                >
+                  <template #icon>
+                    <n-icon><TrashOutline /></n-icon>
+                  </template>
+                  Delete Event
                 </n-button>
               </div>
               
@@ -276,17 +303,19 @@ import {
   AddCircleOutline,
   FitnessOutline,
   PersonAddOutline,
-  RefreshOutline
+  RefreshOutline,
+  TrashOutline
 } from '@vicons/ionicons5'
 import { SportEvent } from '../../../models/SportEvent'
 import { useSportEventStore } from '../../../store/events/useSportEventStore'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import CustomModal from '../Dialog/CustomModal.vue'
 import AddSportEventModalContent from '../Dialog/AddSportEventModalContent.vue'
 import InviteFriendsModal from '../Dialog/InviteFriendsModal.vue'
 import { config } from '../../../utils/config'
 
 const route = useRoute();
+const router = useRouter();
 const store = useSportEventStore()
 const message = useMessage()
 const isUpdating = ref(false)
@@ -463,6 +492,32 @@ const onJoinClick = async () => {
     isUpdating.value = false
   }
 }
+
+const onRemoveParticipant = async (participantId: string, participantName: string) => {
+  try {
+    isUpdating.value = true
+    await store.removeParticipant(route.params.id as string, participantId)
+    message.success(`Successfully removed ${participantName} from the event!`)
+  } catch (err: any) {
+    message.error(err.message || 'Failed to remove participant. Please try again.')
+  } finally {
+    isUpdating.value = false
+  }
+}
+
+const onDeleteClick = async () => {
+  try {
+    isUpdating.value = true
+    await store.deleteEvent(route.params.id as string)
+    message.success('Event deleted successfully!')
+    // Navigate to user's hosted events page
+    router.push('/profile')
+  } catch (err: any) {
+    message.error(err.message || 'Failed to delete the event. Please try again.')
+  } finally {
+    isUpdating.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -522,7 +577,7 @@ const onJoinClick = async () => {
 }
 
 .event-content {
-  max-width: 1400px;
+  max-width: 80%;
   margin: 0 auto;
   padding: 2rem;
 }
@@ -666,6 +721,18 @@ const onJoinClick = async () => {
   background: #f8fafc;
   border-radius: 0.75rem;
   border: 1px solid #e2e8f0;
+}
+
+.participant-actions {
+  margin-left: auto;
+}
+
+.remove-button {
+  transition: all 0.2s ease;
+}
+
+.remove-button:hover {
+  transform: translateY(-1px);
 }
 
 .participant-avatar {

@@ -15,4 +15,7 @@ public interface EventParticipantsJPARepository extends JpaRepository<EventParti
 
     @Query("SELECT ep FROM EventParticipant ep WHERE ep.eventId = :eventId")
     List<EventParticipant> findByEventId(@Param("eventId") UUID eventId);
+
+    @Query("SELECT ep FROM EventParticipant ep WHERE ep.eventId = :eventId AND ep.participantId = :participantId")
+    EventParticipant findByEventIdAndParticipantId(@Param("eventId") UUID eventId, @Param("participantId") UUID participantId);
 }

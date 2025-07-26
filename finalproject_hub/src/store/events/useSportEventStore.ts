@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { SportEvent } from '@/models/sportEvent'
-import { createSportEvent, getSportEventById, updateSportEvent, getAllSportEvents, joinEvent, checkParticipation } from '@/services/apis/SportEventService'
+import { createSportEvent, getSportEventById, updateSportEvent, getAllSportEvents, joinEvent, checkParticipation, removeParticipant, deleteEvent as deleteEventAPI } from '@/services/apis/SportEventService'
 
 export const useSportEventStore = defineStore('sportEvent', {
   state: () => ({
@@ -117,6 +117,35 @@ export const useSportEventStore = defineStore('sportEvent', {
       }
     },
 
+    async removeParticipant(eventId: string, participantId: string) {
+      try {
+        const response = await removeParticipant(eventId, participantId)
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          console.error('Error removing participant:', errorData)
+          throw new Error(errorData.message || 'Failed to remove participant')
+        }
+        
+        const updatedEvent = await response.json()
+        console.log('✅ Removed participant from event:', updatedEvent)
+        
+        if (this.selectedEvent && this.selectedEvent.eventId === eventId) {
+          this.selectedEvent = updatedEvent
+        }
+        
+        const eventIndex = this.events.findIndex(e => e.eventId === eventId)
+        if (eventIndex !== -1) {
+          this.events[eventIndex] = updatedEvent
+        }
+        
+        return updatedEvent
+      } catch (error) {
+        console.error('❌ Failed to remove participant:', error)
+        throw error
+      }
+    },
+
     async checkParticipation(id: string): Promise<boolean> {
       try {
         const response = await checkParticipation(id)
@@ -131,6 +160,34 @@ export const useSportEventStore = defineStore('sportEvent', {
       } catch (error) {
         console.error('❌ Failed to check participation:', error)
         return false
+      }
+    },
+
+    async deleteEvent(id: string) {
+      try {
+        const response = await deleteEventAPI(id)
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          console.error('Error deleting event:', errorData)
+          throw new Error(errorData.message || 'Failed to delete event')
+        }
+        
+        console.log('✅ Event deleted:', id)
+        
+        if (this.selectedEvent && this.selectedEvent.eventId === id) {
+          this.selectedEvent = null
+        }
+        
+        const eventIndex = this.events.findIndex(e => e.eventId === id)
+        if (eventIndex !== -1) {
+          this.events.splice(eventIndex, 1)
+        }
+        
+        return true
+      } catch (error) {
+        console.error('❌ Failed to delete event:', error)
+        throw error
       }
     }
   },

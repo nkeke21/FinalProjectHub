@@ -108,7 +108,7 @@ const sportOptions = [
 watchEffect(() => {
   if (props.initialData) {
     formValue.location = props.initialData.location || ''
-    formValue.participants = props.initialData.total || 1
+    formValue.participants = props.initialData.numberOfParticipantsTotal || 1
     
     if (props.initialData.ageRange) {
       const ages = props.initialData.ageRange.split('-')
@@ -121,7 +121,7 @@ watchEffect(() => {
       formValue.maxAge = props.initialData.maxAge
     }
     
-    formValue.eventTime = props.initialData.date ? new Date(props.initialData.date).getTime() : null
+    formValue.eventTime = props.initialData.eventTime ? new Date(props.initialData.eventTime).getTime() : null
     formValue.sportType = props.initialData.sportType || null
     formValue.description = props.initialData.description || ''
   }
