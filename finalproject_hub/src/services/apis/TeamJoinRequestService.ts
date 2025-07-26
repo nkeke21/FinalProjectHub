@@ -39,8 +39,7 @@ export class TeamJoinRequestService {
   static async getPendingRequestsForTeam(teamId: string): Promise<TeamJoinRequest[]> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.GET_PENDING_TEAM_REQUESTS_FOR_TEAM(teamId)}`, {
       method: 'GET',
-      headers: HEADERS.JSON,
-      credentials: 'include'
+      headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -54,8 +53,7 @@ export class TeamJoinRequestService {
   static async getPendingRequestsForUser(): Promise<TeamJoinRequest[]> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.GET_PENDING_TEAM_REQUESTS_FOR_USER}`, {
       method: 'GET',
-      headers: HEADERS.JSON,
-      credentials: 'include'
+      headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -69,8 +67,7 @@ export class TeamJoinRequestService {
   static async getPendingRequestsForTeamCaptain(): Promise<TeamJoinRequest[]> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.GET_PENDING_TEAM_REQUESTS_FOR_CAPTAIN}`, {
       method: 'GET',
-      headers: HEADERS.JSON,
-      credentials: 'include'
+      headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -84,8 +81,7 @@ export class TeamJoinRequestService {
   static async getAllRequestsForTeam(teamId: string): Promise<TeamJoinRequest[]> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.GET_ALL_TEAM_REQUESTS_FOR_TEAM(teamId)}`, {
       method: 'GET',
-      headers: HEADERS.JSON,
-      credentials: 'include'
+      headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -99,8 +95,7 @@ export class TeamJoinRequestService {
   static async getAllRequestsForUser(): Promise<TeamJoinRequest[]> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.GET_ALL_TEAM_REQUESTS_FOR_USER}`, {
       method: 'GET',
-      headers: HEADERS.JSON,
-      credentials: 'include'
+      headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -114,8 +109,7 @@ export class TeamJoinRequestService {
   static async respondToRequest(requestId: string, status: 'APPROVED' | 'REJECTED'): Promise<TeamJoinRequest> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.RESPOND_TO_TEAM_JOIN_REQUEST}`, {
       method: 'POST',
-      headers: HEADERS.JSON,
-      credentials: 'include',
+      headers: getAuthHeaders(),
       body: JSON.stringify({ requestId, status })
     })
 
@@ -130,8 +124,7 @@ export class TeamJoinRequestService {
   static async checkRequestBetweenTeamAndUser(teamId: string, userId: string): Promise<TeamJoinRequest | null> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.CHECK_TEAM_JOIN_REQUEST(teamId, userId)}`, {
       method: 'GET',
-      headers: HEADERS.JSON,
-      credentials: 'include'
+      headers: getAuthHeaders()
     })
 
     if (response.status === 404) {
@@ -149,8 +142,7 @@ export class TeamJoinRequestService {
   static async getCurrentUserId(): Promise<string> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.GET_CURRENT_USER_ID}`, {
       method: 'GET',
-      headers: HEADERS.JSON,
-      credentials: 'include'
+      headers: getAuthHeaders()
     })
 
     if (!response.ok) {
