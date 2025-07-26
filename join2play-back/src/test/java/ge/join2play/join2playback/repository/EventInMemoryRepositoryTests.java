@@ -8,6 +8,8 @@ import ge.join2play.join2playback.repository.inmemory.EventInMemoryRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
 import java.util.List;
@@ -15,6 +17,8 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
+@ActiveProfiles("test")
 public class EventInMemoryRepositoryTests {
     private EventInMemoryRepository repository;
     private Event sampleEvent;

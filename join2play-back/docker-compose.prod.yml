@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  join2play-backend:
+    image: join2play-backend
+    container_name: join2play-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_PASSWORD=Xixdez-vavsiv-kyfta4
+      - RDS_ENDPOINT=join2play-db.cz4iscegwgva.eu-north-1.rds.amazonaws.com
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s

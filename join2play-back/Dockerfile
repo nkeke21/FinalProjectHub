@@ -1,8 +1,8 @@
-FROM amazoncorretto:21
+FROM amazoncorretto:21-alpine
 
 WORKDIR /join2play-back
 
-COPY join2play/build/libs/*.jar join2play.jar
+COPY build/libs/*.jar join2play.jar
 
 EXPOSE 8080
 

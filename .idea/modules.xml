@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/FinalProjectHub.iml" filepath="$PROJECT_DIR$/.idea/FinalProjectHub.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/join2play-back.test.iml" filepath="$PROJECT_DIR$/.idea/modules/join2play-back.test.iml" />
     </modules>
   </component>
 </project>
