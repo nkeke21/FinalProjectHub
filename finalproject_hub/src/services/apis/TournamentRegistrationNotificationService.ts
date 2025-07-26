@@ -1,3 +1,5 @@
+import { getAuthHeaders } from '../../utils/auth'
+
 export interface TournamentRegistrationNotification {
   id: string
   tournamentId: string
@@ -18,7 +20,7 @@ export class TournamentRegistrationNotificationService {
     try {
       const response = await fetch(`${this.BASE_URL}/host`, {
         method: 'GET',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -36,7 +38,7 @@ export class TournamentRegistrationNotificationService {
     try {
       const response = await fetch(`${this.BASE_URL}/host/unread-count`, {
         method: 'GET',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -54,7 +56,7 @@ export class TournamentRegistrationNotificationService {
     try {
       const response = await fetch(`${this.BASE_URL}/${notificationId}/mark-read`, {
         method: 'PUT',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {

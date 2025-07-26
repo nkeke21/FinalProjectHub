@@ -1,4 +1,5 @@
 import { TournamentRegistration, RegistrationRequest, RegistrationResponse, RegistrationStatus } from '../../models/TournamentRegistration'
+import { getAuthHeaders } from '../../utils/auth'
 
 interface ExtendedRegistrationRequest extends RegistrationRequest {
   registrationType?: 'individual' | 'team'
@@ -51,16 +52,13 @@ export class TournamentRegistrationService {
     try {
       const response = await fetch(this.BASE_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           tournamentId: request.tournamentId,
           registrationType: request.registrationType || 'individual',
           teamId: request.teamId,
           participantInfo: request.participantInfo
         }),
-        credentials: 'include',
       })
 
       if (!response.ok) {
@@ -99,7 +97,7 @@ export class TournamentRegistrationService {
     try {
       const response = await fetch(`${this.BASE_URL}/tournament/${tournamentId}/can-register`, {
         method: 'GET',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -117,7 +115,7 @@ export class TournamentRegistrationService {
     try {
       const response = await fetch(`${this.BASE_URL}/${tournamentId}/withdraw`, {
         method: 'POST',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -156,7 +154,7 @@ export class TournamentRegistrationService {
     try {
       const response = await fetch(`${this.BASE_URL}/tournament/${tournamentId}`, {
         method: 'GET',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -199,7 +197,7 @@ export class TournamentRegistrationService {
     try {
       const response = await fetch(`${this.BASE_URL}/${registrationId}/approve`, {
         method: 'PUT',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -238,7 +236,7 @@ export class TournamentRegistrationService {
     try {
       const response = await fetch(`${this.BASE_URL}/${registrationId}/reject`, {
         method: 'PUT',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -277,7 +275,7 @@ export class TournamentRegistrationService {
     try {
       const response = await fetch(`${this.BASE_URL}/tournament/${tournamentId}/all`, {
         method: 'GET',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -317,7 +315,7 @@ export class TournamentRegistrationService {
     try {
       const response = await fetch(`${this.BASE_URL}/${registrationId}`, {
         method: 'GET',
-        credentials: 'include',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {

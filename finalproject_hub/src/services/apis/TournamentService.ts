@@ -1,4 +1,5 @@
 import { Tournament, TournamentFormat } from '../../models/Tournament'
+import { getAuthHeaders } from '../../utils/auth'
 
 export interface TournamentRequest {
   name: string
@@ -53,11 +54,8 @@ export class TournamentService {
     try {
       const response = await fetch(this.BASE_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(request),
-        credentials: 'include', // Include session cookies
       })
 
       if (!response.ok) {
@@ -104,7 +102,7 @@ export class TournamentService {
   static async getCurrentUserTournaments(): Promise<TournamentResponse[]> {
     try {
       const response = await fetch(`${this.BASE_URL}/host`, {
-        credentials: 'include', // Include session cookies
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -122,11 +120,8 @@ export class TournamentService {
     try {
       const response = await fetch(`${this.BASE_URL}/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(request),
-        credentials: 'include', // Include session cookies
       })
 
       if (!response.ok) {
@@ -144,7 +139,7 @@ export class TournamentService {
     try {
       const response = await fetch(`${this.BASE_URL}/${id}`, {
         method: 'DELETE',
-        credentials: 'include', // Include session cookies
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {

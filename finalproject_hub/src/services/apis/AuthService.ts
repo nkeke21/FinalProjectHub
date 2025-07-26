@@ -55,7 +55,6 @@ export class AuthService {
 
         const authResponse = await response.json()
         
-        // Store the JWT token in localStorage
         if (authResponse.token) {
             localStorage.setItem('jwt_token', authResponse.token)
         }

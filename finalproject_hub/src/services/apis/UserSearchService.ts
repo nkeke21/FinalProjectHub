@@ -1,4 +1,5 @@
-import { API_BASE_URL, HEADERS } from "@/constants/apis";
+import { API_BASE_URL } from "../../constants/apis";
+import { getAuthHeaders } from "../../utils/auth";
 
 export interface UserSearchResult {
     id: string;
@@ -9,8 +10,7 @@ export interface UserSearchResult {
 export async function searchUsers(query: string): Promise<UserSearchResult[]> {
     const response = await fetch(`${API_BASE_URL}/api/users/search?query=${encodeURIComponent(query)}`, {
         method: 'GET',
-        headers: HEADERS.JSON,
-        credentials: 'include'
+        headers: getAuthHeaders()
     });
 
     if (!response.ok) {

@@ -1,4 +1,5 @@
-import { API_BASE_URL, HEADERS, ENDPOINTS } from "@/constants/apis"
+import { API_BASE_URL, ENDPOINTS } from "../../constants/apis"
+import { getAuthHeaders } from "../../utils/auth"
 
 export interface FriendRequestPayload {
     fromUserId: string;

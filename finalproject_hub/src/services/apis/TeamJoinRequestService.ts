@@ -1,4 +1,5 @@
-import { API_BASE_URL, ENDPOINTS, HEADERS } from '../../constants/apis'
+import { API_BASE_URL, ENDPOINTS } from '../../constants/apis'
+import { getAuthHeaders } from '../../utils/auth'
 
 export interface TeamJoinRequest {
   requestId: string
@@ -22,8 +23,7 @@ export class TeamJoinRequestService {
   static async sendJoinRequest(teamId: string): Promise<string> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.SEND_TEAM_JOIN_REQUEST}`, {
       method: 'POST',
-      headers: HEADERS.JSON,
-      credentials: 'include',
+      headers: getAuthHeaders(),
       body: JSON.stringify({ teamId })
     })
 

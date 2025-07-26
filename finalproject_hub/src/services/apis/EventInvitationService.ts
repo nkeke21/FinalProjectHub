@@ -1,4 +1,5 @@
-import { API_BASE_URL, HEADERS } from '@/constants/apis'
+import { API_BASE_URL } from '../../constants/apis'
+import { getAuthHeaders } from '../../utils/auth'
 
 export interface EventInvitationDTO {
   eventId: string
@@ -36,8 +37,7 @@ export class EventInvitationService {
     console.log('Sending event invitation:', invitation)
     const response = await fetch(`${API_BASE_URL}/api/event-invitations/send`, {
       method: 'POST',
-      headers: HEADERS.JSON,
-      credentials: 'include',
+      headers: getAuthHeaders(),
       body: JSON.stringify(invitation)
     })
 
@@ -58,8 +58,7 @@ export class EventInvitationService {
     console.log('Fetching pending event invitations...')
     const response = await fetch(`${API_BASE_URL}/api/event-invitations/user/pending`, {
       method: 'GET',
-      headers: HEADERS.JSON,
-      credentials: 'include'
+      headers: getAuthHeaders()
     })
 
     console.log('Event invitations response status:', response.status)
@@ -78,8 +77,7 @@ export class EventInvitationService {
   static async getSentInvitations(): Promise<EventInvitation[]> {
     const response = await fetch(`${API_BASE_URL}/api/event-invitations/user/sent`, {
       method: 'GET',
-      headers: HEADERS.JSON,
-      credentials: 'include'
+      headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -92,8 +90,7 @@ export class EventInvitationService {
   static async respondToInvitation(response: EventInvitationResponseDTO): Promise<EventInvitation> {
     const apiResponse = await fetch(`${API_BASE_URL}/api/event-invitations/respond`, {
       method: 'POST',
-      headers: HEADERS.JSON,
-      credentials: 'include',
+      headers: getAuthHeaders(),
       body: JSON.stringify(response)
     })
 
@@ -108,8 +105,7 @@ export class EventInvitationService {
   static async deleteInvitation(invitationId: string): Promise<{ message: string }> {
     const response = await fetch(`${API_BASE_URL}/api/event-invitations/${invitationId}`, {
       method: 'DELETE',
-      headers: HEADERS.JSON,
-      credentials: 'include'
+      headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -123,8 +119,7 @@ export class EventInvitationService {
   static async checkInvitationBetweenEventAndUser(eventId: string, userId: string): Promise<EventInvitation | null> {
     const response = await fetch(`${API_BASE_URL}/api/event-invitations/check-invitation/${eventId}/${userId}`, {
       method: 'GET',
-      headers: HEADERS.JSON,
-      credentials: 'include'
+      headers: getAuthHeaders()
     })
 
     if (response.status === 404) {
