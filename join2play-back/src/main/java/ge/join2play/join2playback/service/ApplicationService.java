@@ -196,6 +196,51 @@ public class ApplicationService {
                 .anyMatch(ep -> ep.getParticipantId().equals(userId));
     }
 
+    public EventResponse removeParticipant(UUID eventId, UUID participantId, UUID requestingUserId) {
+        // Verify the requesting user exists
+        if(userRepository.getById(requestingUserId).isEmpty()){
+            throw new UserDoesNotExistException(
+                    String.format("Requesting user with id %s does not exist.", requestingUserId));
+        }
+        
+        // Verify the participant to be removed exists
+        if(userRepository.getById(participantId).isEmpty()){
+            throw new UserDoesNotExistException(
+                    String.format("Participant with id %s does not exist.", participantId));
+        }
+        
+        // Get the event
+        Event event = eventRepository.getById(eventId);
+        if(event == null){
+            throw new RuntimeException("Event with id " + eventId + " does not exist.");
+        }
+        
+        // Check if the requesting user is the host of the event
+        if(!event.getHostId().equals(requestingUserId)){
+            throw new RuntimeException("Only the event host can remove participants.");
+        }
+        
+        // Find the participant record
+        EventParticipant participantRecord = eventParticipantsRepository.getByEventIdAndParticipantId(eventId, participantId);
+        if(participantRecord == null){
+            throw new RuntimeException("User is not participating in this event.");
+        }
+        
+        // Don't allow host to remove themselves
+        if(participantId.equals(event.getHostId())){
+            throw new RuntimeException("Event host cannot be removed from their own event.");
+        }
+        
+        // Remove the participant
+        eventParticipantsRepository.delete(participantRecord.getId());
+        
+        // Update the registered participants count
+        event.setNumberOfParticipantsRegistered(event.getNumberOfParticipantsRegistered() - 1);
+        eventRepository.update(event);
+        
+        return convertEventToEventResponse(event);
+    }
+
     public UserDetailsResponse getUserDetails(UUID id) {
         Optional<User> user = userRepository.getById(id);
         if(user.isEmpty()){

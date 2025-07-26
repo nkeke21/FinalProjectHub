@@ -165,7 +165,7 @@ const props = defineProps<{
 }>()
 
 const currentPage = ref(1)
-const pageSize = ref(6)
+const pageSize = ref(10)
 const showSportTypeSelector = ref(false)
 const selectedSportType = ref<string | null>(null)
 const router = useRouter()
@@ -236,6 +236,7 @@ const handlePageChange = (page: number) => {
 
 const handlePageSizeChange = (size: number) => {
   pageSize.value = size
+  currentPage.value = 1
 }
 
 const truncateDescription = (description: string) => {

@@ -72,4 +72,13 @@ public class EventController {
         }
         return applicationService.isUserParticipating(id, currentUser.getId());
     }
+
+    @DeleteMapping("/{eventId}/participants/{participantId}")
+    public EventResponse removeParticipant(@PathVariable UUID eventId, @PathVariable UUID participantId, HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            throw new RuntimeException("Not authenticated");
+        }
+        return applicationService.removeParticipant(eventId, participantId, currentUser.getId());
+    }
 }

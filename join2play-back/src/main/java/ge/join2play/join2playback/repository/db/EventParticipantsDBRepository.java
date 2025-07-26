@@ -44,6 +44,11 @@ public class EventParticipantsDBRepository implements EventParticipantsRepositor
     }
 
     @Override
+    public EventParticipant getByEventIdAndParticipantId(UUID eventId, UUID participantId) {
+        return eventParticipantsJPARepository.findByEventIdAndParticipantId(eventId, participantId);
+    }
+
+    @Override
     public EventParticipant save(EventParticipant eventParticipant) {
         if (eventParticipant.getId() != null && eventParticipantsJPARepository.existsById(eventParticipant.getId())) {
             throw new EventParticipantAlreadyExistsException("Cannot save: event-participant pair with ID " + eventParticipant.getId() + " already exists.");

@@ -119,6 +119,20 @@
                     <div class="participant-email">{{ participant.email }}</div>
                     <div class="participant-age">{{ participant.age }} years old</div>
                   </div>
+                  <div class="participant-actions" v-if="isHost && participant.userId !== event.hostId">
+                    <n-button 
+                      type="error" 
+                      size="small" 
+                      @click="onRemoveParticipant(participant.userId, participant.name)"
+                      :loading="isUpdating"
+                      class="remove-button"
+                    >
+                      <template #icon>
+                        <n-icon><CloseCircleOutline /></n-icon>
+                      </template>
+                      Remove
+                    </n-button>
+                  </div>
                 </div>
               </div>
               <div v-else class="no-participants">
@@ -463,6 +477,18 @@ const onJoinClick = async () => {
     isUpdating.value = false
   }
 }
+
+const onRemoveParticipant = async (participantId: string, participantName: string) => {
+  try {
+    isUpdating.value = true
+    await store.removeParticipant(route.params.id as string, participantId)
+    message.success(`Successfully removed ${participantName} from the event!`)
+  } catch (err: any) {
+    message.error(err.message || 'Failed to remove participant. Please try again.')
+  } finally {
+    isUpdating.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -666,6 +692,18 @@ const onJoinClick = async () => {
   background: #f8fafc;
   border-radius: 0.75rem;
   border: 1px solid #e2e8f0;
+}
+
+.participant-actions {
+  margin-left: auto;
+}
+
+.remove-button {
+  transition: all 0.2s ease;
+}
+
+.remove-button:hover {
+  transform: translateY(-1px);
 }
 
 .participant-avatar {

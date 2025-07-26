@@ -1,4 +1,4 @@
-import { SportEvent } from "@/models/sportEvent";
+import { SportEvent } from "@/models/SportEvent";
 import { API_BASE_URL, ENDPOINTS, HEADERS } from "@/constants/apis";
 
 export async function getSportEventById(id: string): Promise<Response> {
@@ -42,7 +42,8 @@ export async function updateSportEvent(id: string, event: SportEvent): Promise<R
         headers: HEADERS.JSON,
         credentials: 'include',
         body: JSON.stringify({
-            ageRange: event.ageRange,
+            minAge: event.minAge,
+            maxAge: event.maxAge,
             description: event.description,
             eventTime: event.eventTime,
             latitude: event.locationLat,
@@ -57,6 +58,14 @@ export async function updateSportEvent(id: string, event: SportEvent): Promise<R
 export async function joinEvent(id: string): Promise<Response> {
     return fetch(`${API_BASE_URL}/api/events/${id}/join`, {
         method: 'POST',
+        headers: HEADERS.JSON,
+        credentials: 'include'
+    })
+}
+
+export async function removeParticipant(eventId: string, participantId: string): Promise<Response> {
+    return fetch(`${API_BASE_URL}/api/events/${eventId}/participants/${participantId}`, {
+        method: 'DELETE',
         headers: HEADERS.JSON,
         credentials: 'include'
     })

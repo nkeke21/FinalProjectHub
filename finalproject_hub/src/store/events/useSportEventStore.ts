@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { SportEvent } from '@/models/sportEvent'
-import { createSportEvent, getSportEventById, updateSportEvent, getAllSportEvents, joinEvent, checkParticipation } from '@/services/apis/SportEventService'
+import { createSportEvent, getSportEventById, updateSportEvent, getAllSportEvents, joinEvent, checkParticipation, removeParticipant } from '@/services/apis/SportEventService'
 
 export const useSportEventStore = defineStore('sportEvent', {
   state: () => ({
@@ -113,6 +113,35 @@ export const useSportEventStore = defineStore('sportEvent', {
         return updatedEvent
       } catch (error) {
         console.error('❌ Failed to join event:', error)
+        throw error
+      }
+    },
+
+    async removeParticipant(eventId: string, participantId: string) {
+      try {
+        const response = await removeParticipant(eventId, participantId)
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          console.error('Error removing participant:', errorData)
+          throw new Error(errorData.message || 'Failed to remove participant')
+        }
+        
+        const updatedEvent = await response.json()
+        console.log('✅ Removed participant from event:', updatedEvent)
+        
+        if (this.selectedEvent && this.selectedEvent.eventId === eventId) {
+          this.selectedEvent = updatedEvent
+        }
+        
+        const eventIndex = this.events.findIndex(e => e.eventId === eventId)
+        if (eventIndex !== -1) {
+          this.events[eventIndex] = updatedEvent
+        }
+        
+        return updatedEvent
+      } catch (error) {
+        console.error('❌ Failed to remove participant:', error)
         throw error
       }
     },

@@ -55,6 +55,14 @@ public class EventParticipantsInMemory implements EventParticipantsRepository {
     }
 
     @Override
+    public EventParticipant getByEventIdAndParticipantId(UUID eventId, UUID participantId) {
+        return getAll().stream()
+                .filter(ep -> ep.getEventId().equals(eventId) && ep.getParticipantId().equals(participantId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
     public EventParticipant save(EventParticipant eventParticipant) {
         if (getById(eventParticipant.getId()) != null) {
             throw new EventParticipantAlreadyExistsException("Cannot save: event-participant pair with ID " + eventParticipant.getId() + "already exists.");
