@@ -71,63 +71,67 @@ public class EventInvitationController {
 
     @GetMapping("/user/pending")
     public ResponseEntity<List<EventInvitation>> getCurrentUserPendingInvitations() {
-        return jwtUtil.getCurrentUserId()
-                .map(userId -> {
-                    try {
-                        List<EventInvitation> invitations = service.getPendingInvitationsForUser(userId);
-                        return ResponseEntity.ok(invitations);
-                    } catch (Exception e) {
-                        return ResponseEntity.<List<EventInvitation>>badRequest().build();
-                    }
-                })
-                .orElse(ResponseEntity.<List<EventInvitation>>status(401).build());
+        Optional<UUID> currentUserId = jwtUtil.getCurrentUserId();
+        if (currentUserId.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        
+        try {
+            List<EventInvitation> invitations = service.getPendingInvitationsForUser(currentUserId.get());
+            return ResponseEntity.ok(invitations);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/user/all")
     public ResponseEntity<List<EventInvitation>> getCurrentUserAllInvitations() {
-        return jwtUtil.getCurrentUserId()
-                .map(userId -> {
-                    try {
-                        List<EventInvitation> invitations = service.getAllInvitationsForUser(userId);
-                        return ResponseEntity.ok(invitations);
-                    } catch (Exception e) {
-                        return ResponseEntity.<List<EventInvitation>>badRequest().build();
-                    }
-                })
-                .orElse(ResponseEntity.<List<EventInvitation>>status(401).build());
+        Optional<UUID> currentUserId = jwtUtil.getCurrentUserId();
+        if (currentUserId.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        
+        try {
+            List<EventInvitation> invitations = service.getAllInvitationsForUser(currentUserId.get());
+            return ResponseEntity.ok(invitations);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/user/sent")
     public ResponseEntity<List<EventInvitation>> getCurrentUserSentInvitations() {
-        return jwtUtil.getCurrentUserId()
-                .map(userId -> {
-                    try {
-                        List<EventInvitation> invitations = service.getInvitationsSentByUser(userId);
-                        return ResponseEntity.ok(invitations);
-                    } catch (Exception e) {
-                        return ResponseEntity.<List<EventInvitation>>badRequest().build();
-                    }
-                })
-                .orElse(ResponseEntity.<List<EventInvitation>>status(401).build());
+        Optional<UUID> currentUserId = jwtUtil.getCurrentUserId();
+        if (currentUserId.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        
+        try {
+            List<EventInvitation> invitations = service.getInvitationsSentByUser(currentUserId.get());
+            return ResponseEntity.ok(invitations);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/respond")
     public ResponseEntity<EventInvitation> respondToInvitation(@Valid @RequestBody EventInvitationResponseDTO responseDTO) {
-        return jwtUtil.getCurrentUserId()
-                .map(userId -> {
-                    try {
-                        EventInvitation invitation = service.respondToInvitation(
-                                UUID.fromString(responseDTO.getInvitationId()),
-                                EventInvitationStatus.valueOf(responseDTO.getStatus()),
-                                userId
-                        );
-                        return ResponseEntity.ok(invitation);
-                    } catch (Exception e) {
-                        logger.error("Error responding to invitation", e);
-                        return ResponseEntity.<EventInvitation>badRequest().build();
-                    }
-                })
-                .orElse(ResponseEntity.<EventInvitation>status(401).build());
+        Optional<UUID> currentUserId = jwtUtil.getCurrentUserId();
+        if (currentUserId.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        
+        try {
+            EventInvitation invitation = service.respondToInvitation(
+                    UUID.fromString(responseDTO.getInvitationId()),
+                    EventInvitationStatus.valueOf(responseDTO.getStatus()),
+                    currentUserId.get()
+            );
+            return ResponseEntity.ok(invitation);
+        } catch (Exception e) {
+            logger.error("Error responding to invitation", e);
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @DeleteMapping("/{invitationId}")

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -26,17 +27,14 @@ public class TournamentRegistrationNotificationController {
 
     @GetMapping("/host")
     public ResponseEntity<List<TournamentRegistrationNotificationDTO>> getHostNotifications() {
+        Optional<UUID> currentUserId = jwtUtil.getCurrentUserId();
+        if (currentUserId.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        
         try {
-            return jwtUtil.getCurrentUserId()
-                    .map(userId -> {
-                        try {
-                            List<TournamentRegistrationNotificationDTO> notifications = notificationService.getNotificationsByHostId(userId);
-                            return ResponseEntity.ok(notifications);
-                        } catch (Exception e) {
-                            return ResponseEntity.<List<TournamentRegistrationNotificationDTO>>badRequest().build();
-                        }
-                    })
-                    .orElse(ResponseEntity.<List<TournamentRegistrationNotificationDTO>>status(401).build());
+            List<TournamentRegistrationNotificationDTO> notifications = notificationService.getNotificationsByHostId(currentUserId.get());
+            return ResponseEntity.ok(notifications);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -44,17 +42,14 @@ public class TournamentRegistrationNotificationController {
 
     @GetMapping("/host/unread-count")
     public ResponseEntity<Integer> getUnreadCount() {
+        Optional<UUID> currentUserId = jwtUtil.getCurrentUserId();
+        if (currentUserId.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        
         try {
-            return jwtUtil.getCurrentUserId()
-                    .map(userId -> {
-                        try {
-                            Integer count = notificationService.getUnreadCountByHostId(userId);
-                            return ResponseEntity.ok(count);
-                        } catch (Exception e) {
-                            return ResponseEntity.<Integer>badRequest().build();
-                        }
-                    })
-                    .orElse(ResponseEntity.<Integer>status(401).build());
+            Integer count = notificationService.getUnreadCountByHostId(currentUserId.get());
+            return ResponseEntity.ok(count);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -62,17 +57,14 @@ public class TournamentRegistrationNotificationController {
 
     @PutMapping("/{id}/mark-read")
     public ResponseEntity<Void> markAsRead(@PathVariable UUID id) {
+        Optional<UUID> currentUserId = jwtUtil.getCurrentUserId();
+        if (currentUserId.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        
         try {
-            return jwtUtil.getCurrentUserId()
-                    .map(userId -> {
-                        try {
-                            notificationService.markAsRead(id, userId);
-                            return ResponseEntity.<Void>ok().build();
-                        } catch (Exception e) {
-                            return ResponseEntity.<Void>badRequest().build();
-                        }
-                    })
-                    .orElse(ResponseEntity.<Void>status(401).build());
+            notificationService.markAsRead(id, currentUserId.get());
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

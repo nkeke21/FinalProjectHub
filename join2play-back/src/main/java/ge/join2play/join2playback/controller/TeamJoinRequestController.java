@@ -55,90 +55,96 @@ public class TeamJoinRequestController {
 
     @GetMapping("/team/{teamId}/pending")
     public ResponseEntity<List<TeamJoinRequest>> getPendingRequestsForTeam(@PathVariable UUID teamId) {
-        return jwtUtil.getCurrentUserId()
-                .map(userId -> {
-                    try {
-                        List<TeamJoinRequest> requests = service.getPendingRequestsForTeam(teamId);
-                        return ResponseEntity.ok(requests);
-                    } catch (Exception e) {
-                        return ResponseEntity.<List<TeamJoinRequest>>badRequest().build();
-                    }
-                })
-                .orElse(ResponseEntity.<List<TeamJoinRequest>>status(401).build());
+        Optional<UUID> currentUserId = jwtUtil.getCurrentUserId();
+        if (currentUserId.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        
+        try {
+            List<TeamJoinRequest> requests = service.getPendingRequestsForTeam(teamId);
+            return ResponseEntity.ok(requests);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/user/pending")
     public ResponseEntity<List<TeamJoinRequest>> getPendingRequestsForUser() {
-        return jwtUtil.getCurrentUserId()
-                .map(userId -> {
-                    try {
-                        List<TeamJoinRequest> requests = service.getPendingRequestsForUser(userId);
-                        return ResponseEntity.ok(requests);
-                    } catch (Exception e) {
-                        return ResponseEntity.<List<TeamJoinRequest>>badRequest().build();
-                    }
-                })
-                .orElse(ResponseEntity.<List<TeamJoinRequest>>status(401).build());
+        Optional<UUID> currentUserId = jwtUtil.getCurrentUserId();
+        if (currentUserId.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        
+        try {
+            List<TeamJoinRequest> requests = service.getPendingRequestsForUser(currentUserId.get());
+            return ResponseEntity.ok(requests);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/captain/pending")
     public ResponseEntity<List<TeamJoinRequest>> getPendingRequestsForTeamCaptain() {
-        return jwtUtil.getCurrentUserId()
-                .map(userId -> {
-                    try {
-                        List<TeamJoinRequest> requests = service.getPendingRequestsForTeamCaptain(userId);
-                        return ResponseEntity.ok(requests);
-                    } catch (Exception e) {
-                        return ResponseEntity.<List<TeamJoinRequest>>badRequest().build();
-                    }
-                })
-                .orElse(ResponseEntity.<List<TeamJoinRequest>>status(401).build());
+        Optional<UUID> currentUserId = jwtUtil.getCurrentUserId();
+        if (currentUserId.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        
+        try {
+            List<TeamJoinRequest> requests = service.getPendingRequestsForTeamCaptain(currentUserId.get());
+            return ResponseEntity.ok(requests);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/team/{teamId}/all")
     public ResponseEntity<List<TeamJoinRequest>> getAllRequestsForTeam(@PathVariable UUID teamId) {
-        return jwtUtil.getCurrentUserId()
-                .map(userId -> {
-                    try {
-                        List<TeamJoinRequest> requests = service.getAllRequestsForTeam(teamId);
-                        return ResponseEntity.ok(requests);
-                    } catch (Exception e) {
-                        return ResponseEntity.<List<TeamJoinRequest>>badRequest().build();
-                    }
-                })
-                .orElse(ResponseEntity.<List<TeamJoinRequest>>status(401).build());
+        Optional<UUID> currentUserId = jwtUtil.getCurrentUserId();
+        if (currentUserId.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        
+        try {
+            List<TeamJoinRequest> requests = service.getAllRequestsForTeam(teamId);
+            return ResponseEntity.ok(requests);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/user/all")
     public ResponseEntity<List<TeamJoinRequest>> getAllRequestsForUser() {
-        return jwtUtil.getCurrentUserId()
-                .map(userId -> {
-                    try {
-                        List<TeamJoinRequest> requests = service.getAllRequestsForUser(userId);
-                        return ResponseEntity.ok(requests);
-                    } catch (Exception e) {
-                        return ResponseEntity.<List<TeamJoinRequest>>badRequest().build();
-                    }
-                })
-                .orElse(ResponseEntity.<List<TeamJoinRequest>>status(401).build());
+        Optional<UUID> currentUserId = jwtUtil.getCurrentUserId();
+        if (currentUserId.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        
+        try {
+            List<TeamJoinRequest> requests = service.getAllRequestsForUser(currentUserId.get());
+            return ResponseEntity.ok(requests);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/respond")
     public ResponseEntity<TeamJoinRequest> respondToRequest(@RequestBody TeamJoinRequestResponseDTO responseDTO) {
-        return jwtUtil.getCurrentUserId()
-                .map(userId -> {
-                    try {
-                        TeamJoinRequest request = service.respondToRequest(
-                                responseDTO.getRequestId(), 
-                                TeamJoinRequestStatus.valueOf(responseDTO.getStatus()),
-                                userId
-                        );
-                        return ResponseEntity.ok(request);
-                    } catch (Exception e) {
-                        return ResponseEntity.<TeamJoinRequest>badRequest().build();
-                    }
-                })
-                .orElse(ResponseEntity.<TeamJoinRequest>status(401).build());
+        Optional<UUID> currentUserId = jwtUtil.getCurrentUserId();
+        if (currentUserId.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        
+        try {
+            TeamJoinRequest request = service.respondToRequest(
+                    responseDTO.getRequestId(), 
+                    TeamJoinRequestStatus.valueOf(responseDTO.getStatus()),
+                    currentUserId.get()
+            );
+            return ResponseEntity.ok(request);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/check-request/{teamId}/{userId}")

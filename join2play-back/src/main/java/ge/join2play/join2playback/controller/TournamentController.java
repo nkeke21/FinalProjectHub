@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -27,17 +28,14 @@ public class TournamentController {
     @PostMapping
     public ResponseEntity<TournamentResponse> createTournament(
             @RequestBody TournamentRequest request) {
+        Optional<UUID> currentUserId = jwtUtil.getCurrentUserId();
+        if (currentUserId.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        
         try {
-            return jwtUtil.getCurrentUserId()
-                    .map(userId -> {
-                        try {
-                            TournamentResponse response = tournamentService.createTournament(request, userId);
-                            return ResponseEntity.ok(response);
-                        } catch (Exception e) {
-                            return ResponseEntity.<TournamentResponse>badRequest().build();
-                        }
-                    })
-                    .orElse(ResponseEntity.<TournamentResponse>status(401).build());
+            TournamentResponse response = tournamentService.createTournament(request, currentUserId.get());
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -46,7 +44,7 @@ public class TournamentController {
     @GetMapping("/{id}")
     public ResponseEntity<TournamentResponse> getTournament(@PathVariable UUID id) {
         try {
-            TournamentResponse response = tournamentService.getTournament(id);
+            TournamentResponse response = tournamentService.getTournamentById(id);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
@@ -65,17 +63,14 @@ public class TournamentController {
 
     @GetMapping("/host")
     public ResponseEntity<List<TournamentResponse>> getCurrentUserTournaments() {
+        Optional<UUID> currentUserId = jwtUtil.getCurrentUserId();
+        if (currentUserId.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        
         try {
-            return jwtUtil.getCurrentUserId()
-                    .map(userId -> {
-                        try {
-                            List<TournamentResponse> response = tournamentService.getTournamentsByHost(userId);
-                            return ResponseEntity.ok(response);
-                        } catch (Exception e) {
-                            return ResponseEntity.<List<TournamentResponse>>internalServerError().build();
-                        }
-                    })
-                    .orElse(ResponseEntity.<List<TournamentResponse>>status(401).build());
+            List<TournamentResponse> response = tournamentService.getTournamentsByHost(currentUserId.get());
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -85,17 +80,14 @@ public class TournamentController {
     public ResponseEntity<TournamentResponse> updateTournament(
             @PathVariable UUID id,
             @RequestBody TournamentRequest request) {
+        Optional<UUID> currentUserId = jwtUtil.getCurrentUserId();
+        if (currentUserId.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        
         try {
-            return jwtUtil.getCurrentUserId()
-                    .map(userId -> {
-                        try {
-                            TournamentResponse response = tournamentService.updateTournament(id, request, userId);
-                            return ResponseEntity.ok(response);
-                        } catch (Exception e) {
-                            return ResponseEntity.<TournamentResponse>badRequest().build();
-                        }
-                    })
-                    .orElse(ResponseEntity.<TournamentResponse>status(401).build());
+            TournamentResponse response = tournamentService.updateTournament(id, request, currentUserId.get());
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -104,17 +96,14 @@ public class TournamentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTournament(
             @PathVariable UUID id) {
+        Optional<UUID> currentUserId = jwtUtil.getCurrentUserId();
+        if (currentUserId.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+        
         try {
-            return jwtUtil.getCurrentUserId()
-                    .map(userId -> {
-                        try {
-                            tournamentService.deleteTournament(id, userId);
-                            return ResponseEntity.<Void>ok().build();
-                        } catch (Exception e) {
-                            return ResponseEntity.<Void>badRequest().build();
-                        }
-                    })
-                    .orElse(ResponseEntity.<Void>status(401).build());
+            tournamentService.deleteTournament(id, currentUserId.get());
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

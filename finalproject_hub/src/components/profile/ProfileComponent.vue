@@ -31,6 +31,7 @@ import { NButton, NMenu, NTag } from 'naive-ui'
 import { useUserStore } from '@/store/profile/userStore'
 import { useMessage } from 'naive-ui'
 import { useRoute } from 'vue-router'
+import { AuthService } from '@/services/apis/AuthService'
 import AccountDetails from '@/components/profile/AccountDetails.vue'
 import HostedEvents from '@/components/profile/HostedEvents.vue'
 import RegisteredEvents from '@/components/profile/RegisteredEvents.vue'
@@ -116,23 +117,16 @@ const handleMenuChange = async (key: string) => {
 
 const logout = async () => {
   try {
-    const response = await fetch('/api/auth/logout', {
-      method: 'POST',
-      credentials: 'include'
-    })
-    
-    if (response.ok) {
-      localStorage.removeItem('user')
-      message.success('Logged out successfully')
-      
-      router.push('/')
-    } else {
-      message.error('Logout failed')
-    }
+    // Use AuthService logout method (client-side only)
+    AuthService.logout()
+    localStorage.removeItem('user')
+    message.success('Logged out successfully')
+    router.push('/')
   } catch (error) {
     console.error('Logout error:', error)
     message.error('Logout failed')
     
+    // Still remove user data and redirect even if there's an error
     localStorage.removeItem('user')
     router.push('/')
   }

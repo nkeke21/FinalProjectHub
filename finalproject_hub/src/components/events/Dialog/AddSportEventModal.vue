@@ -23,7 +23,28 @@ const message = useMessage()
 const router = useRouter()
 
 const handleAddEvent = async (eventDetails: any) => {
-  const newEventId = await store.createEvent(eventDetails)
+  // Convert form data to SportEvent format
+  const sportEvent = {
+    eventId: null,
+    hostId: null,
+    hostName: null,
+    hostEmail: null,
+    hostPhone: null,
+    latitude: eventDetails.locationLat, // Convert from locationLat to latitude
+    longitude: eventDetails.locationLng, // Convert from locationLng to longitude
+    location: eventDetails.location,
+    participants: eventDetails.participants,
+    numberOfParticipantsTotal: eventDetails.participants,
+    numberOfParticipantsRegistered: 0,
+    minAge: eventDetails.minAge,
+    maxAge: eventDetails.maxAge,
+    eventTime: eventDetails.eventTime,
+    sportType: eventDetails.sportType,
+    description: eventDetails.description,
+    participantsList: []
+  }
+
+  const newEventId = await store.createEvent(sportEvent)
 
   if (newEventId) {
     message.success('✅ Event created successfully!')
