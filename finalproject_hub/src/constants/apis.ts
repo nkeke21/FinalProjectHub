@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://13.60.247.145:8080'
+export const API_BASE_URL = ''
 
 export const ENDPOINTS = {
     CREATE_EVENT: '/events',
