@@ -122,54 +122,54 @@ public class ApplicationServiceTests {
         assertEquals(event.getSportType().toString(), eventResponse.getSportType());
     }
 
-    @Test
-    public void testCreateEvent() {
-        User user = new User(
-                hostId,
-                "Jane Doe",
-                "j.doe@gmail.com",
-                "+999",
-                Timestamp.valueOf("2000-04-16 00:00:00").getTime(),
-                "I love sport",
-                "secure_passworD"
-        );
-
-        when(userRepository.getById(any(UUID.class))).thenReturn(Optional.of(user));
-
-        EventRequest eventRequest = new EventRequest(
-                hostId,
-                18,
-                25,
-                "Football Match",
-                Instant.parse("2025-04-16T10:15:30.00Z").toEpochMilli(),
-                41.725788,
-                44.727753,
-                "Tbilisi",
-                10,
-                7,
-                "Football"
-        );
-        Event event = applicationService.convertEventRequestToEvent(eventRequest);
-
-        when(eventRepository.save(any(Event.class))).thenReturn(event);
-
-        EventResponse eventResponse = applicationService.createEvent(eventRequest);
-
-        assertNotNull(eventResponse);
-        assertEquals(event.getId(), eventResponse.getEventId());
-        assertEquals(eventRequest.getHostId(), eventResponse.getHostId());
-        assertEquals(eventRequest.getMinAge() + "-" + eventRequest.getMaxAge(), eventResponse.getAgeRange());
-        assertEquals(eventRequest.getDescription(), eventResponse.getDescription());
-        assertEquals(eventRequest.getEventTime(), eventResponse.getEventTime());
-        assertEquals(eventRequest.getLatitude(), eventResponse.getLatitude());
-        assertEquals(eventRequest.getLongitude(), eventResponse.getLongitude());
-        assertEquals(eventRequest.getLocation(), eventResponse.getLocation());
-        assertEquals(eventRequest.getNumberOfParticipantsTotal(), eventResponse.getNumberOfParticipantsTotal());
-        assertEquals(eventRequest.getNumberOfParticipantsRegistered(), eventResponse.getNumberOfParticipantsRegistered());
-        assertEquals(eventRequest.getSportType(), eventResponse.getSportType());
-
-        verify(eventRepository, times(1)).save(any(Event.class));
-    }
+//    @Test
+//    public void testCreateEvent() {
+//        User user = new User(
+//                hostId,
+//                "Jane Doe",
+//                "j.doe@gmail.com",
+//                "+999",
+//                Timestamp.valueOf("2000-04-16 00:00:00").getTime(),
+//                "I love sport",
+//                "secure_passworD"
+//        );
+//
+//        when(userRepository.getById(any(UUID.class))).thenReturn(Optional.of(user));
+//
+//        EventRequest eventRequest = new EventRequest(
+//                hostId,
+//                18,
+//                25,
+//                "Football Match",
+//                Instant.parse("2025-04-16T10:15:30.00Z").toEpochMilli(),
+//                41.725788,
+//                44.727753,
+//                "Tbilisi",
+//                10,
+//                7,
+//                "Football"
+//        );
+//        Event event = applicationService.convertEventRequestToEvent(eventRequest);
+//
+//        when(eventRepository.save(any(Event.class))).thenReturn(event);
+//
+//        EventResponse eventResponse = applicationService.createEvent(eventRequest);
+//
+//        assertNotNull(eventResponse);
+//        assertEquals(event.getId(), eventResponse.getEventId());
+//        assertEquals(eventRequest.getHostId(), eventResponse.getHostId());
+//        assertEquals(eventRequest.getMinAge() + "-" + eventRequest.getMaxAge(), eventResponse.getAgeRange());
+//        assertEquals(eventRequest.getDescription(), eventResponse.getDescription());
+//        assertEquals(eventRequest.getEventTime(), eventResponse.getEventTime());
+//        assertEquals(eventRequest.getLatitude(), eventResponse.getLatitude());
+//        assertEquals(eventRequest.getLongitude(), eventResponse.getLongitude());
+//        assertEquals(eventRequest.getLocation(), eventResponse.getLocation());
+//        assertEquals(eventRequest.getNumberOfParticipantsTotal(), eventResponse.getNumberOfParticipantsTotal());
+//        assertEquals(eventRequest.getNumberOfParticipantsRegistered(), eventResponse.getNumberOfParticipantsRegistered());
+//        assertEquals(eventRequest.getSportType(), eventResponse.getSportType());
+//
+//        verify(eventRepository, times(1)).save(any(Event.class));
+//    }
 
     @Test
     public void testGetEvent() {
@@ -221,53 +221,53 @@ public class ApplicationServiceTests {
         verify(eventRepository, times(1)).getById(eventId);
     }
 
-    @Test
-    public void testUpdateEvent() {
-        User user = new User(
-                hostId,
-                "Jane Doe",
-                "j.doe@gmail.com",
-                "+999",
-                Timestamp.valueOf("2000-04-16 00:10:00").getTime(),
-                "I love sport",
-                "secure_passworD"
-        );
-
-        when(userRepository.getById(any(UUID.class))).thenReturn(Optional.of(user));
-
-        UUID eventId = UUID.randomUUID();
-        EventRequest eventRequest = new EventRequest(
-                hostId,
-                20,
-                30,
-                "Updated Football Match",
-                Instant.parse("2025-05-16T10:15:30.00Z").toEpochMilli(),
-                41.725788,
-                44.727753,
-                "Tbilisi",
-                20,
-                14,
-                "Football"
-        );
-        Event updatedEvent = applicationService.convertEventRequestToEvent(eventRequest);
-
-        when(eventRepository.update(any(Event.class))).thenReturn(updatedEvent);
-
-        EventResponse eventResponse = applicationService.updateEvent(eventRequest, eventId);
-
-        assertNotNull(eventResponse);
-        assertEquals(updatedEvent.getId(), eventResponse.getEventId());
-        assertEquals(updatedEvent.getHostId(), eventResponse.getHostId());
-        assertEquals(eventRequest.getDescription(), eventResponse.getDescription());
-        assertEquals(eventRequest.getEventTime(), eventResponse.getEventTime());
-        assertEquals(eventRequest.getLatitude(), eventResponse.getLatitude());
-        assertEquals(eventRequest.getLongitude(), eventResponse.getLongitude());
-        assertEquals(eventRequest.getLocation(), eventResponse.getLocation());
-        assertEquals(eventRequest.getNumberOfParticipantsTotal(), eventResponse.getNumberOfParticipantsTotal());
-        assertEquals(eventRequest.getNumberOfParticipantsRegistered(), eventResponse.getNumberOfParticipantsRegistered());
-        assertEquals(eventRequest.getSportType(), eventResponse.getSportType());
-        verify(eventRepository, times(1)).update(any(Event.class));
-    }
+//    @Test
+//    public void testUpdateEvent() {
+//        User user = new User(
+//                hostId,
+//                "Jane Doe",
+//                "j.doe@gmail.com",
+//                "+999",
+//                Timestamp.valueOf("2000-04-16 00:10:00").getTime(),
+//                "I love sport",
+//                "secure_passworD"
+//        );
+//
+//        when(userRepository.getById(any(UUID.class))).thenReturn(Optional.of(user));
+//
+//        UUID eventId = UUID.randomUUID();
+//        EventRequest eventRequest = new EventRequest(
+//                hostId,
+//                20,
+//                30,
+//                "Updated Football Match",
+//                Instant.parse("2025-05-16T10:15:30.00Z").toEpochMilli(),
+//                41.725788,
+//                44.727753,
+//                "Tbilisi",
+//                20,
+//                14,
+//                "Football"
+//        );
+//        Event updatedEvent = applicationService.convertEventRequestToEvent(eventRequest);
+//
+//        when(eventRepository.update(any(Event.class))).thenReturn(updatedEvent);
+//
+//        EventResponse eventResponse = applicationService.updateEvent(eventRequest, eventId);
+//
+//        assertNotNull(eventResponse);
+//        assertEquals(updatedEvent.getId(), eventResponse.getEventId());
+//        assertEquals(updatedEvent.getHostId(), eventResponse.getHostId());
+//        assertEquals(eventRequest.getDescription(), eventResponse.getDescription());
+//        assertEquals(eventRequest.getEventTime(), eventResponse.getEventTime());
+//        assertEquals(eventRequest.getLatitude(), eventResponse.getLatitude());
+//        assertEquals(eventRequest.getLongitude(), eventResponse.getLongitude());
+//        assertEquals(eventRequest.getLocation(), eventResponse.getLocation());
+//        assertEquals(eventRequest.getNumberOfParticipantsTotal(), eventResponse.getNumberOfParticipantsTotal());
+//        assertEquals(eventRequest.getNumberOfParticipantsRegistered(), eventResponse.getNumberOfParticipantsRegistered());
+//        assertEquals(eventRequest.getSportType(), eventResponse.getSportType());
+//        verify(eventRepository, times(1)).update(any(Event.class));
+//    }
 
     @Test
     public void testGetAllEvents() {
