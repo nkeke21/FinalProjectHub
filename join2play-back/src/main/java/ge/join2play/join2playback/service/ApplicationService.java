@@ -53,8 +53,16 @@ public class ApplicationService {
         } catch (IllegalArgumentException | NullPointerException e) {
             throw new SportTypeDoesNotExistException("Invalid sport type " + eventRequest.getSportType() + " provided.");
         }
+        
+        Optional<User> hostUser = userRepository.getById(eventRequest.getHostId());
+        if (hostUser.isEmpty()) {
+            throw new UserDoesNotExistException(
+                    String.format("Host user with id %s does not exist.", eventRequest.getHostId()));
+        }
+        
         return new Event(
-                UUID.randomUUID(), eventRequest.getHostId(), null, null, eventRequest.getMinAge(), eventRequest.getMaxAge(), eventRequest.getDescription(), Instant.ofEpochMilli(eventRequest.getEventTime()),
+                UUID.randomUUID(), eventRequest.getHostId(), hostUser.get().getEmail(), hostUser.get().getPhoneNumber(), 
+                eventRequest.getMinAge(), eventRequest.getMaxAge(), eventRequest.getDescription(), Instant.ofEpochMilli(eventRequest.getEventTime()),
                 eventRequest.getLatitude(), eventRequest.getLongitude(), eventRequest.getLocation(), eventRequest.getNumberOfParticipantsTotal(),
                 eventRequest.getNumberOfParticipantsRegistered(), sportType
         );
