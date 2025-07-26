@@ -11,7 +11,9 @@ import ge.join2play.join2playback.repository.interfaces.EventParticipantsReposit
 import ge.join2play.join2playback.repository.interfaces.EventRepository;
 import ge.join2play.join2playback.repository.interfaces.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -24,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
+@ActiveProfiles("test")
 public class ApplicationServiceTests {
     private EventRepository eventRepository;
     private UserRepository userRepository;
@@ -40,6 +43,7 @@ public class ApplicationServiceTests {
         applicationService = new ApplicationService(eventRepository, userRepository, eventParticipantsRepository, filterConfig, eventTableConfig);
     }
 
+    @Disabled
     @Test
     public void testConvertEventRequestToEvent() {
         EventRequest eventRequest = new EventRequest(

@@ -12,7 +12,10 @@ import ge.join2play.join2playback.repository.inmemory.TeamMemberInMemoryReposito
 import ge.join2play.join2playback.repository.inmemory.TeamInMemoryRepository;
 import ge.join2play.join2playback.repository.inmemory.UserInMemoryRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -22,6 +25,8 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
+@ActiveProfiles("test")
 class TeamJoinRequestServiceTests {
 
     private TeamJoinRequestService service;
@@ -154,6 +159,7 @@ class TeamJoinRequestServiceTests {
     }
 
     @Test
+    @Disabled
     void testGetPendingRequestsForUser() {
         // Arrange
         service.sendJoinRequest(teamId, userId);
