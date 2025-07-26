@@ -22,8 +22,7 @@ export interface FriendRequestResponse {
 export async function sendFriendRequest(payload: FriendRequestPayload): Promise<void> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.SEND_FRIEND_REQUEST}`, {
         method: 'POST',
-        headers: HEADERS.JSON,
-        credentials: 'include',
+        headers: getAuthHeaders(),
         body: JSON.stringify(payload)
     })
 
@@ -37,8 +36,7 @@ export async function sendFriendRequest(payload: FriendRequestPayload): Promise<
 export async function getPendingFriendRequests(userId: string): Promise<FriendRequest[]> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.GET_PENDING_FRIEND_REQUESTS(userId)}`, {
         method: 'GET',
-        headers: HEADERS.JSON,
-        credentials: 'include'
+        headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -56,8 +54,7 @@ export async function getCurrentUserPendingFriendRequests(): Promise<FriendReque
     
     const response = await fetch(url, {
         method: 'GET',
-        headers: HEADERS.JSON,
-        credentials: 'include'
+        headers: getAuthHeaders()
     })
 
     console.log('Response status:', response.status)
@@ -77,8 +74,7 @@ export async function getCurrentUserPendingFriendRequests(): Promise<FriendReque
 export async function respondToFriendRequest(requestId: string, status: 'ACCEPTED' | 'REJECTED'): Promise<FriendRequest> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.RESPOND_TO_FRIEND_REQUEST}`, {
         method: 'POST',
-        headers: HEADERS.JSON,
-        credentials: 'include',
+        headers: getAuthHeaders(),
         body: JSON.stringify({
             requestId: requestId,
             status: status
@@ -97,8 +93,7 @@ export async function respondToFriendRequest(requestId: string, status: 'ACCEPTE
 export async function getFriends(userId: string): Promise<string[]> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.GET_FRIENDS(userId)}`, {
         method: 'GET',
-        headers: HEADERS.JSON,
-        credentials: 'include'
+        headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -113,8 +108,7 @@ export async function getFriends(userId: string): Promise<string[]> {
 export async function getCurrentUserFriends(): Promise<string[]> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.CURRENT_USER_FRIENDS}`, {
         method: 'GET',
-        headers: HEADERS.JSON,
-        credentials: 'include'
+        headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -129,8 +123,7 @@ export async function getCurrentUserFriends(): Promise<string[]> {
 export async function deleteFriend(userId: string, friendId: string): Promise<void> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.DELETE_FRIEND(userId, friendId)}`, {
         method: 'DELETE',
-        headers: HEADERS.JSON,
-        credentials: 'include'
+        headers: getAuthHeaders()
     })
 
     if (!response.ok) {
@@ -143,8 +136,7 @@ export async function deleteFriend(userId: string, friendId: string): Promise<vo
 export async function checkFriendRequestAPI(user1Id: string, user2Id: string): Promise<FriendRequest | null> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.CHECK_FRIEND_REQUEST(user1Id, user2Id)}`, {
         method: 'GET',
-        headers: HEADERS.JSON,
-        credentials: 'include'
+        headers: getAuthHeaders()
     })
 
     if (response.status === 404) {

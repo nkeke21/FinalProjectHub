@@ -60,7 +60,12 @@ const profileUserId = computed(() => {
 const showAddFriendButton = ref(true)
 
 const checkExistingFriendRequest = async () => {
+    console.log('🔍 Checking friend request...')
+    console.log('isOwnProfile.value:', isOwnProfile.value)
+    console.log('profileUserId.value:', profileUserId.value)
+    
     if (isOwnProfile.value) {
+        console.log('✅ Own profile - hiding Add Friend button')
         showAddFriendButton.value = false
         return
     }
@@ -70,22 +75,33 @@ const checkExistingFriendRequest = async () => {
         const loggedInUser = userStr ? JSON.parse(userStr) : null
         const currentUserId = loggedInUser?.id || ''
         
+        console.log('currentUserId:', currentUserId)
+        console.log('profileUserId.value:', profileUserId.value)
+        
         if (!currentUserId || !profileUserId.value) {
+            console.log('❌ Missing user IDs - showing Add Friend button')
             showAddFriendButton.value = true
             return
         }
 
+        console.log('🔍 Checking if friend request exists...')
         const existingRequest = await userStore.checkFriendRequest(currentUserId, profileUserId.value)
+        console.log('existingRequest:', existingRequest)
         
         showAddFriendButton.value = !existingRequest
+        console.log('showAddFriendButton after request check:', showAddFriendButton.value)
         
         if (showAddFriendButton.value) {
+            console.log('🔍 Checking if already friends...')
             await userStore.fetchCurrentUserFriends()
             const isFriend = userStore.friends.includes(profileUserId.value)
+            console.log('userStore.friends:', userStore.friends)
+            console.log('isFriend:', isFriend)
             showAddFriendButton.value = !isFriend
+            console.log('Final showAddFriendButton value:', showAddFriendButton.value)
         }
     } catch (error) {
-        console.error('Error checking friend request:', error)
+        console.error('❌ Error checking friend request:', error)
         showAddFriendButton.value = true
     }
 }
@@ -160,7 +176,10 @@ const menuOptions = computed(() => {
     }
   ]
 
+  console.log('🔍 menuOptions computed - isOwnProfile:', isOwnProfile.value, 'showAddFriendButton:', showAddFriendButton.value)
+
   if (!isOwnProfile.value && showAddFriendButton.value) {
+    console.log('✅ Adding Add Friend button to menu')
     baseOptions.push({
       key: 'add-friend',
       label: () =>
@@ -169,6 +188,8 @@ const menuOptions = computed(() => {
           h('span', { class: 'menu-text' }, 'Add Friend')
         ])
     })
+  } else {
+    console.log('❌ Not adding Add Friend button - isOwnProfile:', isOwnProfile.value, 'showAddFriendButton:', showAddFriendButton.value)
   }
 
   return baseOptions

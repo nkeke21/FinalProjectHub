@@ -1,5 +1,6 @@
 import { TournamentRegistration, RegistrationRequest, RegistrationResponse, RegistrationStatus } from '../../models/TournamentRegistration'
 import { getAuthHeaders } from '../../utils/auth'
+import { API_BASE_URL } from '../../constants/apis'
 
 interface ExtendedRegistrationRequest extends RegistrationRequest {
   registrationType?: 'individual' | 'team'
@@ -46,7 +47,7 @@ interface BackendRegistrationResponse {
 }
 
 export class TournamentRegistrationService {
-  private static readonly BASE_URL = '/api/tournament-registrations'
+  private static readonly BASE_URL = `${API_BASE_URL}/api/tournament-registrations`
 
   static async registerForTournament(request: ExtendedRegistrationRequest): Promise<RegistrationResponse> {
     try {

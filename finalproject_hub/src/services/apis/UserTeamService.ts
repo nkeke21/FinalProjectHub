@@ -1,6 +1,6 @@
-import { API_BASE_URL, ENDPOINTS } from '../../constants/apis'
+import { Team } from '../../models/Tournament'
 import { getAuthHeaders } from '../../utils/auth'
-import type { Team, TeamMember } from '../../models/Tournament'
+import { API_BASE_URL, ENDPOINTS } from '../../constants/apis'
 
 export interface TeamRequest {
   name: string
@@ -12,7 +12,7 @@ export interface TeamRequest {
 }
 
 export class UserTeamService {
-  private static readonly BASE_URL = '/api/teams'
+  private static readonly BASE_URL = `${API_BASE_URL}/api/teams`
 
   static async createTeam(teamRequest: TeamRequest): Promise<Team> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.CREATE_TEAM}`, {

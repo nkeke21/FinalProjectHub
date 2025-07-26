@@ -1,4 +1,5 @@
 import { getAuthHeaders } from '../../utils/auth'
+import { API_BASE_URL } from '../../constants/apis'
 
 export interface TournamentRegistrationNotification {
   id: string
@@ -14,7 +15,7 @@ export interface TournamentRegistrationNotification {
 }
 
 export class TournamentRegistrationNotificationService {
-  private static readonly BASE_URL = '/api/tournament-registration-notifications'
+  private static readonly BASE_URL = `${API_BASE_URL}/api/tournament-registration-notifications`
 
   static async getHostNotifications(): Promise<TournamentRegistrationNotification[]> {
     try {
