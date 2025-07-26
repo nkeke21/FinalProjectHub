@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { SportEvent } from '@/models/sportEvent'
-import { createSportEvent, getSportEventById, updateSportEvent, getAllSportEvents, joinEvent, checkParticipation, removeParticipant } from '@/services/apis/SportEventService'
+import { createSportEvent, getSportEventById, updateSportEvent, getAllSportEvents, joinEvent, checkParticipation, removeParticipant, deleteEvent as deleteEventAPI } from '@/services/apis/SportEventService'
 
 export const useSportEventStore = defineStore('sportEvent', {
   state: () => ({
@@ -160,6 +160,34 @@ export const useSportEventStore = defineStore('sportEvent', {
       } catch (error) {
         console.error('❌ Failed to check participation:', error)
         return false
+      }
+    },
+
+    async deleteEvent(id: string) {
+      try {
+        const response = await deleteEventAPI(id)
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          console.error('Error deleting event:', errorData)
+          throw new Error(errorData.message || 'Failed to delete event')
+        }
+        
+        console.log('✅ Event deleted:', id)
+        
+        if (this.selectedEvent && this.selectedEvent.eventId === id) {
+          this.selectedEvent = null
+        }
+        
+        const eventIndex = this.events.findIndex(e => e.eventId === id)
+        if (eventIndex !== -1) {
+          this.events.splice(eventIndex, 1)
+        }
+        
+        return true
+      } catch (error) {
+        console.error('❌ Failed to delete event:', error)
+        throw error
       }
     }
   },

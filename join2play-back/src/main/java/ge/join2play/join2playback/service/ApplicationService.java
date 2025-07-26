@@ -241,6 +241,24 @@ public class ApplicationService {
         return convertEventToEventResponse(event);
     }
 
+    public void deleteEvent(UUID eventId, UUID requestingUserId) {
+        if(userRepository.getById(requestingUserId).isEmpty()){
+            throw new UserDoesNotExistException(
+                    String.format("Requesting user with id %s does not exist.", requestingUserId));
+        }
+        
+        Event event = eventRepository.getById(eventId);
+        if(event == null){
+            throw new RuntimeException("Event with id " + eventId + " does not exist.");
+        }
+        
+        if(!event.getHostId().equals(requestingUserId)){
+            throw new RuntimeException("Only the event host can delete the event.");
+        }
+        
+        eventRepository.delete(eventId);
+    }
+
     public UserDetailsResponse getUserDetails(UUID id) {
         Optional<User> user = userRepository.getById(id);
         if(user.isEmpty()){

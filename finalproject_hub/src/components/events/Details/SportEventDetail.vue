@@ -184,6 +184,19 @@
                   </template>
                   Refresh
                 </n-button>
+                
+                <n-button 
+                  type="error" 
+                  size="large" 
+                  @click="onDeleteClick"
+                  class="action-button"
+                  :loading="isUpdating"
+                >
+                  <template #icon>
+                    <n-icon><TrashOutline /></n-icon>
+                  </template>
+                  Delete Event
+                </n-button>
               </div>
               
               <n-button 
@@ -290,17 +303,19 @@ import {
   AddCircleOutline,
   FitnessOutline,
   PersonAddOutline,
-  RefreshOutline
+  RefreshOutline,
+  TrashOutline
 } from '@vicons/ionicons5'
 import { SportEvent } from '../../../models/SportEvent'
 import { useSportEventStore } from '../../../store/events/useSportEventStore'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import CustomModal from '../Dialog/CustomModal.vue'
 import AddSportEventModalContent from '../Dialog/AddSportEventModalContent.vue'
 import InviteFriendsModal from '../Dialog/InviteFriendsModal.vue'
 import { config } from '../../../utils/config'
 
 const route = useRoute();
+const router = useRouter();
 const store = useSportEventStore()
 const message = useMessage()
 const isUpdating = ref(false)
@@ -489,6 +504,20 @@ const onRemoveParticipant = async (participantId: string, participantName: strin
     isUpdating.value = false
   }
 }
+
+const onDeleteClick = async () => {
+  try {
+    isUpdating.value = true
+    await store.deleteEvent(route.params.id as string)
+    message.success('Event deleted successfully!')
+    // Navigate to user's hosted events page
+    router.push('/profile')
+  } catch (err: any) {
+    message.error(err.message || 'Failed to delete the event. Please try again.')
+  } finally {
+    isUpdating.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -548,7 +577,7 @@ const onRemoveParticipant = async (participantId: string, participantName: strin
 }
 
 .event-content {
-  max-width: 1400px;
+  max-width: 80%;
   margin: 0 auto;
   padding: 2rem;
 }

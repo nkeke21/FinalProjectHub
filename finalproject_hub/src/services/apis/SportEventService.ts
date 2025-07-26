@@ -78,4 +78,11 @@ export async function checkParticipation(id: string): Promise<Response> {
         credentials: 'include'
     })
 }
-  
+
+export async function deleteEvent(id: string): Promise<Response> {
+    return fetch(`${API_BASE_URL}/api/events/${id}`, {
+        method: 'DELETE',
+        headers: HEADERS.JSON,
+        credentials: 'include'
+    })
+}
