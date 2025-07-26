@@ -150,6 +150,19 @@ const handleSubmit = () => {
     return
   }
 
+  if (!formValue.eventTime) {
+    locationError.value = 'Please select an event date and time.'
+    return
+  }
+
+  const selectedDateTime = new Date(formValue.eventTime)
+  const currentDateTime = new Date()
+  
+  if (selectedDateTime <= currentDateTime) {
+    locationError.value = 'Event date and time must be in the future.'
+    return
+  }
+
   emit('submit', { ...formValue })
 }
 </script>
