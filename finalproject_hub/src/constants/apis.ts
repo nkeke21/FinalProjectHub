@@ -46,17 +46,9 @@ export const ENDPOINTS = {
     GET_CURRENT_USER_TOURNAMENTS: '/tournaments/my',
     UPDATE_TOURNAMENT: (id: string) => `/tournaments/${id}`,
     DELETE_TOURNAMENT: (id: string) => `/tournaments/${id}`,
-    CREATE_TEAM: '/teams',
-    GET_TEAM: (id: string) => `/teams/${id}`,
-    UPDATE_TEAM: (id: string) => `/teams/${id}`,
-    MY_TEAMS: '/teams/my',
-    AVAILABLE_TEAMS: '/teams/available',
-    JOIN_TEAM: (id: string) => `/teams/${id}/join`,
-    LEAVE_TEAM: (id: string) => `/teams/${id}/leave`,
-    REMOVE_TEAM_MEMBER: (teamId: string, memberId: string) => `/teams/${teamId}/members/${memberId}`,
     GET_TOURNAMENT_REGISTRATION_NOTIFICATIONS: '/tournament-registration-notifications/host',
     GET_UNREAD_NOTIFICATION_COUNT: '/tournament-registration-notifications/unread-count',
-    MARK_NOTIFICATION_AS_READ: (notificationId: string) => `/tournament-registration-notifications/${notificationId}/read'
+    MARK_NOTIFICATION_AS_READ: (notificationId: string) => `/tournament-registration-notifications/${notificationId}/read`
 }
 
 export const HEADERS = {
