@@ -29,8 +29,12 @@
               <n-icon size="20" color="#f97316">
                 <FootballOutline v-if="tournament.sportType === 'Football'" />
                 <BasketballOutline v-else-if="tournament.sportType === 'Basketball'" />
+                <FitnessOutline v-else-if="tournament.sportType === 'Running'" />
                 <TennisballOutline v-else-if="tournament.sportType === 'Tennis'" />
-                <FitnessOutline v-else />
+                <BicycleOutline v-else-if="tournament.sportType === 'Cycling'" />
+                <BasketballOutline v-else-if="tournament.sportType === 'Volleyball'" />
+                <WaterOutline v-else-if="tournament.sportType === 'Swimming'" />
+                <FootballOutline v-else />
               </n-icon>
               <span class="sport-type">{{ tournament.sportType }}</span>
             </div>
@@ -465,7 +469,9 @@ import {
   TrophyOutline,
   WalletOutline,
   AddOutline,
-  CheckmarkCircleOutline
+  CheckmarkCircleOutline,
+  BicycleOutline,
+  WaterOutline
 } from '@vicons/ionicons5'
 import type { Tournament } from '@/models/Tournament'
 import { SportType, TournamentStatus, TournamentFormat } from '@/models/Tournament'
@@ -475,6 +481,7 @@ import { TournamentRegistrationService } from '@/services/apis/TournamentRegistr
 import type { TournamentRegistration } from '@/models/TournamentRegistration'
 import { TournamentService } from '@/services/apis/TournamentService'
 import { useUserStore } from '@/store/profile/userStore'
+import { SPORT_TYPES } from '@/constants/sportTypes'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -504,13 +511,7 @@ const filters = ref({
   participantsRange: [0, 100] as [number, number]
 })
 
-const sportTypeOptions = [
-  { label: 'Football', value: 'Football' },
-  { label: 'Basketball', value: 'Basketball' },
-  { label: 'Tennis', value: 'Tennis' },
-  { label: 'Running', value: 'Running' },
-  { label: 'Volleyball', value: 'Volleyball' }
-]
+const sportTypeOptions = SPORT_TYPES
 
 
 const formatOptions = [

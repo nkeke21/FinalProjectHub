@@ -3,10 +3,14 @@
     <div class="team-header">
       <div class="team-badge">
         <n-icon size="20" color="#3b82f6">
-          <FootballOutline v-if="team.sportType === 'Football'" />
-          <BasketballOutline v-else-if="team.sportType === 'Basketball'" />
-          <TennisballOutline v-else-if="team.sportType === 'Tennis'" />
-          <FitnessOutline v-else />
+                        <FootballOutline v-if="team.sportType === 'Football'" />
+              <BasketballOutline v-else-if="team.sportType === 'Basketball'" />
+              <FitnessOutline v-else-if="team.sportType === 'Running'" />
+              <TennisballOutline v-else-if="team.sportType === 'Tennis'" />
+              <BicycleOutline v-else-if="team.sportType === 'Cycling'" />
+                              <BasketballOutline v-else-if="team.sportType === 'Volleyball'" />
+                <WaterOutline v-else-if="team.sportType === 'Swimming'" />
+                <FootballOutline v-else />
         </n-icon>
         <span class="sport-type">{{ team.sportType }}</span>
       </div>
@@ -78,6 +82,8 @@ import {
   BasketballOutline,
   TennisballOutline,
   FitnessOutline,
+  BicycleOutline,
+  WaterOutline,
   PeopleOutline,
   CalendarOutline,
   PersonOutline

@@ -250,6 +250,7 @@ import {
 } from '@vicons/ionicons5'
 import type { Tournament, SportType, TournamentFormat, TournamentType } from '@/models/Tournament'
 import { TournamentService } from '@/services/apis/TournamentService'
+import { SPORT_TYPES } from '@/constants/sportTypes'
 
 interface Props {
   show: boolean
@@ -405,15 +406,7 @@ const rules = {
   ]
 }
 
-const sportTypeOptions = [
-  { label: 'Football', value: 'Football' },
-  { label: 'Basketball', value: 'Basketball' },
-  { label: 'Tennis', value: 'Tennis' },
-  { label: 'Running', value: 'Running' },
-  { label: 'Cycling', value: 'Cycling' },
-  { label: 'Volleyball', value: 'Volleyball' },
-  { label: 'Swimming', value: 'Swimming' }
-]
+const sportTypeOptions = SPORT_TYPES
 
 const formatOptions = [
   { label: 'Single Elimination', value: 'SINGLE_ELIMINATION' },

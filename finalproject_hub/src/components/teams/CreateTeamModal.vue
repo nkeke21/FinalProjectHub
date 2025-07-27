@@ -81,6 +81,7 @@ import { NModal, NForm, NFormItem, NInput, NInputNumber, NSelect, NButton, useMe
 import { UserTeamService, type TeamRequest } from '@/services/apis/UserTeamService'
 import type { Team } from '@/models/Tournament'
 import { SportType, TeamRole } from '@/models/Tournament'
+import { SPORT_TYPES } from '@/constants/sportTypes'
 
 interface Props {
   show: boolean
@@ -124,13 +125,7 @@ const rules = {
   }
 }
 
-const sportTypeOptions = [
-  { label: 'Football', value: 'Football' },
-  { label: 'Basketball', value: 'Basketball' },
-  { label: 'Tennis', value: 'Tennis' },
-  { label: 'Running', value: 'Running' },
-  { label: 'Volleyball', value: 'Volleyball' }
-]
+const sportTypeOptions = SPORT_TYPES
 
 const updateShow = (value: boolean) => {
   emit('update:show', value)

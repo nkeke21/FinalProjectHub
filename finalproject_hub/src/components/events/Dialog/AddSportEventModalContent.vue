@@ -72,6 +72,7 @@ import {
   NForm, NFormItem, NInput, NInputNumber, NDatePicker, NSelect, NButton
 } from 'naive-ui'
 import LocationSearch from '../../GMaps/LocationSearch.vue'
+import { SPORT_TYPES } from '@/constants/sportTypes'
 
 const emit = defineEmits(['submit'])
 const props = defineProps({
@@ -98,12 +99,9 @@ const formValue = reactive({
   description: ''
 })
 
-const sportOptions = [
-  { label: 'Football', value: 'Football' },
-  { label: 'Basketball', value: 'Basketball' },
-  { label: 'Tennis', value: 'Tennis' },
-  { label: 'Running', value: 'Running' }
-]
+import { SPORT_TYPES } from '@/constants/sportTypes'
+
+const sportOptions = SPORT_TYPES
 
 watchEffect(() => {
   if (props.initialData) {
