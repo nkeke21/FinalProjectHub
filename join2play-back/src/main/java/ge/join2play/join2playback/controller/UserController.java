@@ -43,7 +43,7 @@ public class UserController {
         return applicationService.updateUserDetails(id, userUpdateDTO);
     }
 
-    @PatchMapping("/details")
+    @PostMapping("/details")
     public ResponseEntity<UserUpdateDTO> updateCurrentUserDetails(@RequestBody UserUpdateDTO userUpdateDTO) {
         return jwtUtil.getCurrentUserId()
                 .map(userId -> ResponseEntity.ok(applicationService.updateUserDetails(userId, userUpdateDTO)))
