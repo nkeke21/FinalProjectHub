@@ -65,6 +65,8 @@ import { ref, computed } from 'vue'
 import { NInput, NButton, NForm, NFormItem, NCard, NDatePicker, useMessage } from 'naive-ui'
 import { AuthService } from '@/services/apis/AuthService'
 
+const emit = defineEmits(['switchToSignIn'])
+
 const name = ref('')
 const email = ref('')
 const phoneNumber = ref('')
@@ -169,8 +171,11 @@ const signUp = async () => {
             email: response.email
         }))
         
-        message.success('Registration successful!')
+        message.success('Registration successful! Please sign in with your credentials.')
         console.log('Registration successful:', response)
+        
+        // Switch to sign-in form after successful registration
+        emit('switchToSignIn')
     } catch (error) {
         message.error(error.message || 'Registration failed')
         console.error('Registration error:', error)
