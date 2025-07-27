@@ -60,7 +60,7 @@ export async function updateUserDetails(userId: string, update: UserUpdateDTO): 
 // New method for updating current user details (JWT-based)
 export async function updateCurrentUserDetails(update: UserUpdateDTO): Promise<UserUpdateDTO> {
     const response = await fetch(`${API_BASE_URL}/api${ENDPOINTS.UPDATE_CURRENT_USER_DETAILS}`, {
-        method: 'PATCH',
+        method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(update)
     })
