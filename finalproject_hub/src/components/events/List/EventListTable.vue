@@ -49,6 +49,8 @@
               <FitnessOutline v-else-if="event.sportType === 'Running'" />
               <TennisballOutline v-else-if="event.sportType === 'Tennis'" />
               <BicycleOutline v-else-if="event.sportType === 'Cycling'" />
+              <BasketballOutline v-else-if="event.sportType === 'Volleyball'" />
+              <WaterOutline v-else-if="event.sportType === 'Swimming'" />
               <FootballOutline v-else />
             </n-icon>
             <span>{{ event.sportType }}</span>
@@ -153,11 +155,13 @@ import {
   PersonOutline,
   LocationOutline,
   CalendarOutline,
-  PeopleOutline
+  PeopleOutline,
+  WaterOutline
 } from '@vicons/ionicons5'
 import { useRouter } from 'vue-router'
 import Pagination from '../../common/Pagination.vue'
 import AddSportEventModal from '../Dialog/AddSportEventModal.vue'
+import { SPORT_TYPES } from '@/constants/sportTypes'
 
 const props = defineProps<{
   events: any[]
@@ -170,13 +174,7 @@ const showSportTypeSelector = ref(false)
 const selectedSportType = ref<string | null>(null)
 const router = useRouter()
 
-const sportTypeOptions = [
-  { label: 'Football', value: 'Football' },
-  { label: 'Basketball', value: 'Basketball' },
-  { label: 'Running', value: 'Running' },
-  { label: 'Tennis', value: 'Tennis' },
-  { label: 'Cycling', value: 'Cycling' },
-]
+const sportTypeOptions = SPORT_TYPES
 
 const filteredEvents = computed(() => {
     return props.events.filter(event => {

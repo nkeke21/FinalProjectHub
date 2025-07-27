@@ -21,8 +21,12 @@
             <n-icon size="24" color="#3b82f6">
               <FootballOutline v-if="tournament.sportType === 'Football'" />
               <BasketballOutline v-else-if="tournament.sportType === 'Basketball'" />
+              <FitnessOutline v-else-if="tournament.sportType === 'Running'" />
               <TennisballOutline v-else-if="tournament.sportType === 'Tennis'" />
-              <FitnessOutline v-else />
+              <BicycleOutline v-else-if="tournament.sportType === 'Cycling'" />
+                              <BasketballOutline v-else-if="tournament.sportType === 'Volleyball'" />
+                <WaterOutline v-else-if="tournament.sportType === 'Swimming'" />
+                <FootballOutline v-else />
             </n-icon>
             <span class="sport-type">{{ tournament.sportType }}</span>
           </div>
@@ -287,6 +291,8 @@ import {
   BasketballOutline,
   TennisballOutline,
   FitnessOutline,
+  BicycleOutline,
+  WaterOutline,
   PeopleOutline,
   CalendarOutline,
   PersonOutline,
