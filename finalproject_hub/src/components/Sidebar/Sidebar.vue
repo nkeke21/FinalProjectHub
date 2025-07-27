@@ -50,13 +50,6 @@
 		</div>
 
 		<div class="flex"></div>
-		
-		<div class="menu">
-			<router-link to="/settings" class="button">
-				<span class="material-icons">settings</span>
-				<span class="text">Settings</span>
-			</router-link>
-		</div>
 	</aside>
 </template>
 
