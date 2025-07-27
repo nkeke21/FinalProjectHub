@@ -30,8 +30,12 @@
         <div v-if="myTeams.length > 0" class="pagination-wrapper">
           <n-pagination
             v-model:page="myTeamsPage"
-            :page-count="Math.ceil(myTeams.length / PAGE_SIZE)"
-            :page-size="PAGE_SIZE"
+            v-model:page-size="myTeamsPageSize"
+            :page-count="Math.ceil(myTeams.length / myTeamsPageSize)"
+            show-size-picker
+            :page-sizes="[5, 10, 20, 50]"
+            @update:page="handleMyTeamsPageChange"
+            @update:page-size="handleMyTeamsPageSizeChange"
             style="margin-top: 1rem;"
           />
         </div>
@@ -54,8 +58,12 @@
         <div v-if="availableTeams.length > 0" class="pagination-wrapper">
           <n-pagination
             v-model:page="availableTeamsPage"
-            :page-count="Math.ceil(availableTeams.length / PAGE_SIZE)"
-            :page-size="PAGE_SIZE"
+            v-model:page-size="availableTeamsPageSize"
+            :page-count="Math.ceil(availableTeams.length / availableTeamsPageSize)"
+            show-size-picker
+            :page-sizes="[5, 10, 20, 50]"
+            @update:page="handleAvailableTeamsPageChange"
+            @update:page-size="handleAvailableTeamsPageSizeChange"
             style="margin-top: 1rem;"
           />
         </div>
@@ -112,17 +120,18 @@ const selectedTeam = ref<Team | null>(null)
 const loading = ref(false)
 const currentUserId = ref<string>('') 
 
-const PAGE_SIZE = 6
+const myTeamsPageSize = ref(10)
+const availableTeamsPageSize = ref(10)
 const myTeamsPage = ref(1)
 const availableTeamsPage = ref(1)
 
 const paginatedMyTeams = computed(() => {
-  const start = (myTeamsPage.value - 1) * PAGE_SIZE
-  return myTeams.value.slice(start, start + PAGE_SIZE)
+  const start = (myTeamsPage.value - 1) * myTeamsPageSize.value
+  return myTeams.value.slice(start, start + myTeamsPageSize.value)
 })
 const paginatedAvailableTeams = computed(() => {
-  const start = (availableTeamsPage.value - 1) * PAGE_SIZE
-  return availableTeams.value.slice(start, start + PAGE_SIZE)
+  const start = (availableTeamsPage.value - 1) * availableTeamsPageSize.value
+  return availableTeams.value.slice(start, start + availableTeamsPageSize.value)
 })
 
 const isCaptain = computed(() => {
@@ -190,6 +199,24 @@ const handleTeamUpdated = async (updatedTeam: Team) => {
 const handleMemberRemoved = async (memberId: string) => {
   message.success('Member removed successfully!')
   await loadTeams()
+}
+
+const handleMyTeamsPageChange = (page: number) => {
+  myTeamsPage.value = page
+}
+
+const handleMyTeamsPageSizeChange = (size: number) => {
+  myTeamsPageSize.value = size
+  myTeamsPage.value = 1
+}
+
+const handleAvailableTeamsPageChange = (page: number) => {
+  availableTeamsPage.value = page
+}
+
+const handleAvailableTeamsPageSizeChange = (size: number) => {
+  availableTeamsPageSize.value = size
+  availableTeamsPage.value = 1
 }
 
 onMounted(() => {

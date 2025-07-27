@@ -271,7 +271,7 @@
     </div>
     
     <div v-else class="tournament-grid">
-      <div class="tournament-card" v-for="tournament in otherTournaments" :key="tournament.id">
+      <div class="tournament-card" v-for="tournament in paginatedOtherTournaments" :key="tournament.id">
         <div class="tournament-header">
           <div class="tournament-badge">
             <n-icon size="20" color="#f97316">
@@ -411,6 +411,18 @@
       </div>
     </div>
 
+    <div v-if="otherTournaments.length > 0" class="pagination-wrapper">
+      <n-pagination
+        v-model:page="currentPage"
+        :page-count="Math.ceil(otherTournaments.length / pageSize)"
+        :page-size="pageSize"
+        show-size-picker
+        :page-sizes="[5, 10, 20, 50]"
+        @update:page="handlePageChange"
+        @update:page-size="handlePageSizeChange"
+      />
+    </div>
+
     <CreateTournamentModal
       v-model:show="showCreateModal"
       @tournament-created="handleTournamentCreated"
@@ -436,7 +448,8 @@ import {
   NDatePicker,
   NSlider,
   NTag,
-  NSpin
+  NSpin,
+  NPagination
 } from 'naive-ui'
 import { 
   FilterOutline,
@@ -477,6 +490,9 @@ const registrationLoading = ref(false)
 
 const showQuickRegistrationModal = ref(false)
 const selectedTournament = ref<Tournament | null>(null)
+
+const currentPage = ref(1)
+const pageSize = ref(10)
 
 const filters = ref({
   sportType: null as string | null,
@@ -576,6 +592,12 @@ const sortedTournaments = computed(() => {
 
 const myHostedTournaments = computed(() => sortedTournaments.value.filter(t => isTournamentHost(t)))
 const otherTournaments = computed(() => sortedTournaments.value.filter(t => !isTournamentHost(t)))
+
+const paginatedOtherTournaments = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return otherTournaments.value.slice(start, end)
+})
 
 const hasActiveFilters = computed(() => {
   return searchQuery.value || 
@@ -754,7 +776,7 @@ const openQuickRegistration = (tournament: Tournament) => {
 const handleQuickRegistrationSuccess = async () => {
   await Promise.all([
     loadUserRegistrations(),
-    loadTournaments() // Refresh tournament data to update participant counts
+    loadTournaments()
   ])
 }
 
@@ -762,7 +784,15 @@ const handleQuickRegistrationError = (message: string) => {
   console.error('Registration failed:', message)
 }
 
-// Watch for user profile changes and reload registrations
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+}
+
+const handlePageSizeChange = (size: number) => {
+  pageSize.value = size
+  currentPage.value = 1
+}
+
 watch(() => userStore.profile, async (newProfile) => {
   console.log('User profile changed:', newProfile)
   if (newProfile) {
@@ -770,6 +800,10 @@ watch(() => userStore.profile, async (newProfile) => {
     await loadUserRegistrations()
   }
 }, { immediate: true })
+
+watch([searchQuery, filters, sortBy], () => {
+  currentPage.value = 1
+})
 
 onMounted(async () => {
   console.log('TournamentListPage mounted, current profile:', userStore.profile)
@@ -1088,6 +1122,13 @@ onMounted(async () => {
   text-align: center;
   padding: 4rem 2rem;
   color: #64748b;
+}
+
+.pagination-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
 @media (max-width: 768px) {
